@@ -72,3 +72,29 @@ pendientes las sesiones seguras, permisos de las API, revisión de credenciales,
 la ruta /pendiente y la validación completa de registro/aprobación. No activar
 PM2 ni cambiar DNS, HAProxy o certificados durante esta sincronización.
 El hostname previsto para la publicación futura es conecta.reduniv.edu.cu.
+
+## Validaciones ejecutadas
+
+- Windows: instalación, typecheck y build correctos; lint sin errores y 27 advertencias preexistentes; cuatro pruebas de migración correctas.
+- Linux, directorio aislado: npm ci, typecheck, cuatro pruebas, migración repetida y build correctos con Node 22.22.2.
+- Servidor temporal en 127.0.0.1:3101: `/`, `/login`, `/register`, `/api/events` y `/api/stats` devolvieron 200; `/api/auth/me` devolvió 401 y `/api/admin/users` devolvió 403 sin sesión.
+- Confirmado `/pendiente` devuelve 404. No se considera validado el flujo completo de aprobación.
+- El servidor temporal se detuvo después de las comprobaciones. Nginx, HAProxy, DNS y certificados no se modificaron.
+
+## Resultado de la sincronización
+
+La implementación reconciliada es el commit `2ca5531`, publicado en GitHub y
+aplicado al checkout de la VM mediante avance rápido con un bundle transferido
+por SSH. Los cambios anteriores de la VM se conservaron en `stash` con el mensaje
+`pre-sync-20261025`; su identificador está en `stash-ref` dentro del respaldo.
+No aplicar ese stash completo sobre el código nuevo: contiene ajustes históricos
+y archivos de datos que ahora se administran por separado.
+
+En el directorio real de despliegue se ejecutaron npm ci, migración y build.
+La migración de dev.db conservó todos los valores originales de las 16 tablas,
+con integrity_check correcto. prod.db se conservó vacía. La base local original
+no fue migrada ni sustituida.
+
+Se mantiene detenido el servicio permanente. Las pruebas HTTP utilizan un
+proceso temporal en loopback y copias de datos; no equivalen a una habilitación
+pública ni a una validación completa de seguridad.

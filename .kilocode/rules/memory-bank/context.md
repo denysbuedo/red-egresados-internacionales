@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status**: Aplicación completa implementada
+**Status**: Código reconciliado y compilado en la VM; publicación pendiente de seguridad y validación funcional
 
 Red social para egresados internacionales de la educación superior cubana. Permite gestionar perfiles, conectar egresados por criterios de afinidad, y crear listas de distribución de correo.
 
@@ -86,7 +86,7 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Hallazgos: cookie de sesión Base64 sin firma en local y VM; API de listas de correo sin autenticación; SQLite usa dev.db fijo, pese a DATABASE_URL documentada.
 - Sin cambios remotos ni reinicios. Informe: REVISION_DESPLIEGUE_2026-10-25.md. Comparación contra checkout local, sin actualizar GitHub ni ejecutar build/tests.
 
-## Sincronización en preparación — 2026-10-25
+## Sincronización realizada — 2026-10-25
 
 - GitHub/main confirmado en 5717917 mediante fetch. Revisados los cambios de la VM frente al ancestro 1294541; no se encontraron funciones exclusivas más avanzadas en la VM.
 - Respaldo completo verificado en /var/backups/red-egresados/pre-sync-20261025 (tar, configuración, patch Git y copias SQLite con integridad OK).
@@ -96,3 +96,7 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - dev.db deja de versionarse; notas de acceso y bases excluidas de Git. DATABASE_PATH permite probar copias sin tocar datos reales.
 - Estado operativo y publicación pendientes de endurecimiento de sesiones/API y revisión funcional. Dominio previsto: conecta.reduniv.edu.cu.
 - Ver SINCRONIZACION_DESPLIEGUE.md para decisiones de reconciliación y procedimiento.
+
+- Reconciliación funcional publicada en GitHub como 2ca5531 y aplicada a la VM por fast-forward mediante bundle SSH. Cambios previos preservados en stash pre-sync-20261025, además del respaldo.
+- npm ci y build correctos también en el directorio real de despliegue. Migración aplicada a dev.db real, con todos los valores anteriores de las 16 tablas conservados e integridad OK.
+- Typecheck y cuatro pruebas pasan en Windows/Linux. Lint local: 0 errores y 27 advertencias existentes. Pruebas HTTP temporales correctas; servicio permanente sigue detenido y la ruta /pendiente sigue pendiente.

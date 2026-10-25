@@ -27,13 +27,13 @@ Red social profesional que conecta a egresados internacionales que se formaron e
 
 ```bash
 # 1. Instalar dependencias
-bun install
+npm ci
 
 # 2. Ejecutar migraciones
 node scripts/migrate.cjs
 
 # 3. Iniciar servidor de desarrollo
-bun run dev
+npm run dev
 ```
 
 La aplicación estará en **http://localhost:3000**
@@ -48,6 +48,7 @@ La aplicación estará en **http://localhost:3000**
 
 | Documento | Descripción |
 |-----------|-------------|
+| [Sincronización del despliegue](SINCRONIZACION_DESPLIEGUE.md) | Estado verificado, datos conservados y procedimiento vigente |
 | [📘 Guía del Desarrollador](GUIDE_DESARROLLADOR.md) | Documentación técnica completa para el equipo de desarrollo |
 | [📋 Protocolo de Prueba](PROTOCOLO_PRUEBA.md) | 44 casos de prueba para QA |
 | [🚀 Protocolo de Despliegue](PROTOCOLO_DESPLIEGUE.md) | Instrucciones para producción (Ubuntu 24.04) |

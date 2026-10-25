@@ -1,6 +1,12 @@
 # Protocolo de Despliegue en Producción
 ## Red de Egresados Internacionales de la Educación Superior Cubana
 
+> Documento histórico de abril de 2026. Para el estado actual y el procedimiento
+> verificado, consultar [SINCRONIZACION_DESPLIEGUE.md](SINCRONIZACION_DESPLIEGUE.md).
+> Los ejemplos siguientes de DATABASE_URL/prod.db, npm ci --production y PM2
+> en cluster no describen la configuración reconciliada. No usarlos para actualizar
+> la VM existente ni ejecutar scripts de creación de administradores de ejemplo.
+
 ---
 
 ## 1. Estimación de Recursos del Servidor
