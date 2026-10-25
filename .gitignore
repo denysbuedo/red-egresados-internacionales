@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local access notes and runtime data must never be deployed through Git.
+/acceso.txt
+/codex.txt
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+/backups/

@@ -77,3 +77,22 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 | Current | Full Egresados Cuba social network implemented |
 | Current | Primary color changed from red to blue across all components |
 | Current | Navbar logo gradient changed from red-500 to blue-800 |
+
+## Revisión de despliegue — 2026-10-25
+
+- Auditoría de solo lectura de VM vmredegresados (10.46.4.75), proyecto en /var/www/red-egresados-internacionales, accediendo por bastión SSH y validando host conocido.
+- HEAD local 5717917; HEAD remoto 1294541, dos commits por detrás. VM con 10 archivos versionados modificados y 4 sin seguimiento. Falta AppShell.tsx; múltiples fuentes difieren.
+- Nginx activo en 80, sin listener 3000 ni proceso Next.js observado. Consulta directa sin proxy con Host correcto devuelve 502. BUILD_ID fechado 2026-04-11.
+- Hallazgos: cookie de sesión Base64 sin firma en local y VM; API de listas de correo sin autenticación; SQLite usa dev.db fijo, pese a DATABASE_URL documentada.
+- Sin cambios remotos ni reinicios. Informe: REVISION_DESPLIEGUE_2026-10-25.md. Comparación contra checkout local, sin actualizar GitHub ni ejecutar build/tests.
+
+## Sincronización en preparación — 2026-10-25
+
+- GitHub/main confirmado en 5717917 mediante fetch. Revisados los cambios de la VM frente al ancestro 1294541; no se encontraron funciones exclusivas más avanzadas en la VM.
+- Respaldo completo verificado en /var/backups/red-egresados/pre-sync-20261025 (tar, configuración, patch Git y copias SQLite con integridad OK).
+- Datos válidos en dev.db: 8 usuarios, 7 perfiles, 8 noticias, 2 eventos. prod.db vacía. No sustituir por la base del repositorio.
+- Integrados valores por defecto del perfil y validación de roles; conservadas correcciones más completas del repositorio para reacciones y eventos. Lock npm y configuración PM2/optimización proceden de la VM, revisados.
+- Reparado migrador transaccional/idempotente con checksums y añadidas migraciones institution_name/pending_university. Pruebas sobre copia real: todos los valores originales de 16 tablas conservados.
+- dev.db deja de versionarse; notas de acceso y bases excluidas de Git. DATABASE_PATH permite probar copias sin tocar datos reales.
+- Estado operativo y publicación pendientes de endurecimiento de sesiones/API y revisión funcional. Dominio previsto: conecta.reduniv.edu.cu.
+- Ver SINCRONIZACION_DESPLIEGUE.md para decisiones de reconciliación y procedimiento.

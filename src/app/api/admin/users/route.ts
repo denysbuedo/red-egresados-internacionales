@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, graduates } from "@/db/schema";
 import { getSession } from "@/lib/session";
-import { eq, like, sql } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
 // GET - Obtener lista de usuarios (solo admin)
 export async function GET(request: NextRequest) {
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
     const role = searchParams.get("role");
 
-    let conditions = [];
+    const conditions = [];
 
     if (search) {
       conditions.push(
@@ -29,7 +29,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (role) {
-      conditions.push(eq(users.role, role as any));
+      if (!["user", "admin", "institution", "editor"].includes(role)) {
+        return NextResponse.json({ error: "Rol inválido" }, { status: 400 });
+      }
+      conditions.push(eq(users.role, role as typeof users.$inferSelect.role));
     }
 
     const allUsers = await db
@@ -45,6 +48,7 @@ export async function GET(request: NextRequest) {
       })
       .from(users)
       .leftJoin(graduates, eq(users.id, graduates.userId))
+      .where(and(...conditions))
       .orderBy(sql`users.created_at DESC`);
 
     return NextResponse.json(allUsers);

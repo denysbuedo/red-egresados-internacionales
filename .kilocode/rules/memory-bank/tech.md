@@ -66,3 +66,11 @@ bun db:migrate     # Run migrations (auto in sandbox)
   "eslint": "^9.39.1"
 }
 ```
+
+## Despliegue reconciliado (2026-10-25)
+
+- Producción utiliza Node 22, npm ci y package-lock.json recuperado de la VM. Bun sigue disponible como alternativa de desarrollo; no mezclar locks en un despliegue.
+- SQLite usa DATABASE_PATH si se define, o dev.db en el directorio de trabajo. No usa DATABASE_URL. Los archivos de datos no se versionan.
+- scripts/migrate.cjs aplica/adopta las migraciones SQL 0000-0015 con journal app_migrations y transacción. Incluye las columnas de aprobación institucional que faltaban.
+- npm test ejecuta pruebas de migración con node:test. ecosystem.config.js conserva una instancia PM2 y escucha en 127.0.0.1.
+- La sincronización no activa servicios ni publica el dominio; faltan correcciones de seguridad documentadas.
