@@ -18,11 +18,7 @@ export default function NewPostPage() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [previewImage, setPreviewImage] = useState<string>("");
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  async function checkAuth() {
     try {
       const response = await fetch("/api/auth/me");
       if (!response.ok) {
@@ -30,7 +26,7 @@ export default function NewPostPage() {
         return;
       }
       const data = await response.json();
-      if (data.user.role !== "admin") {
+      if (!["admin", "editor"].includes(data.user.role)) {
         router.push("/");
         return;
       }
@@ -41,7 +37,7 @@ export default function NewPostPage() {
     } finally {
       setCheckingAuth(false);
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +70,11 @@ export default function NewPostPage() {
     setFormData({ ...formData, imageUrl: url });
     setPreviewImage(url);
   };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
 
   if (checkingAuth || !user) {
     return (

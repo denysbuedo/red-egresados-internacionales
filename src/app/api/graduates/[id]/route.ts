@@ -1,12 +1,17 @@
+import { validateProfileInput } from "@/lib/profile-input";
+import { authorizeApi } from "@/lib/api-access";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { graduates, connections, posts } from "@/db/schema";
+import { graduates, connections, posts, users } from "@/db/schema";
+import { getSession } from "@/lib/session";
 import { eq, and } from "drizzle-orm";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const { id } = await params;
     const graduateId = parseInt(id);
@@ -49,8 +54,15 @@ export async function GET(
       .where(eq(posts.graduateId, graduateId))
       .orderBy(posts.createdAt);
 
+    const session = (await getSession())!;
+    const targetUser = db.select({ status: users.status }).from(users).where(eq(users.id, graduate[0].userId ?? -1)).get();
+    if (session.role !== "admin" && graduate[0].userId !== session.id && targetUser?.status !== "approved") {
+      return NextResponse.json({ error: "Egresado no encontrado" }, { status: 404 });
+    }
+    const { email, phone, userId, linkedin, website, ...publicProfile } = graduate[0];
+    const contact = session.role === "admin" || userId === session.id ? { email, phone, linkedin, website } : {};
     return NextResponse.json({
-      ...graduate[0],
+      ...publicProfile, ...contact,
       connectionsCount:
         graduateConnections.length + receivedConnections.length,
       postsCount: graduatePosts.length,
@@ -69,10 +81,21 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const { id } = await params;
     const graduateId = parseInt(id);
+    const session = (await getSession())!;
+    const target = db.select().from(graduates).where(eq(graduates.id, graduateId)).get();
+    if (!target) return NextResponse.json({ error: "Egresado no encontrado" }, { status: 404 });
+    if (session.role !== "admin" && target.userId !== session.id) {
+      return NextResponse.json({ error: "No puedes modificar otro perfil" }, { status: 403 });
+    }
+
     const body = await request.json();
+    const invalid = validateProfileInput(body);
+    if (invalid) return invalid;
 
     const updated = await db
       .update(graduates)
@@ -120,9 +143,18 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const { id } = await params;
     const graduateId = parseInt(id);
+    const session = (await getSession())!;
+    const target = db.select().from(graduates).where(eq(graduates.id, graduateId)).get();
+    if (!target) return NextResponse.json({ error: "Egresado no encontrado" }, { status: 404 });
+    if (session.role !== "admin" && target.userId !== session.id) {
+      return NextResponse.json({ error: "No puedes modificar otro perfil" }, { status: 403 });
+    }
+
 
     await db.delete(graduates).where(eq(graduates.id, graduateId));
 

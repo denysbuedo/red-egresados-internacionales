@@ -1,9 +1,12 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { graduates, connections, posts } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const totalGraduates = await db
       .select({ count: sql<number>`count(*)` })

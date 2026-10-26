@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { events, eventAttendees, graduates, users } from "@/db/schema";
@@ -6,6 +7,8 @@ import { eq, and, desc, gte, sql } from "drizzle-orm";
 
 // GET - Obtener eventos
 export async function GET(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const { searchParams } = new URL(request.url);
     const upcoming = searchParams.get("upcoming") === "true";
@@ -107,10 +110,12 @@ export async function GET(request: NextRequest) {
 
 // POST - Crear evento (solo admin)
 export async function POST(request: NextRequest) {
+  const denied = await authorizeApi(request, ["admin", "editor"]);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
-    if (!session || session.role !== "admin") {
+    if (!session || !["admin", "editor"].includes(session.role)) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 403 }
@@ -127,6 +132,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const organizer = db.select({ id: graduates.id }).from(graduates)
+      .where(eq(graduates.userId, session.id)).get();
+    if (!organizer) return NextResponse.json({ error: "Completa tu perfil para crear eventos" }, { status: 400 });
     const newEvent = await db
       .insert(events)
       .values({
@@ -136,7 +144,7 @@ export async function POST(request: NextRequest) {
         location: location || null,
         type,
         link: link || null,
-        organizerId: 1, // Admin como organizador por defecto
+        organizerId: organizer.id,
         maxAttendees: maxAttendees || null,
       })
       .returning();
@@ -153,6 +161,8 @@ export async function POST(request: NextRequest) {
 
 // PUT - RSVP a evento
 export async function PUT(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 

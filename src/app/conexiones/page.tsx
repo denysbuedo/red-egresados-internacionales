@@ -36,27 +36,7 @@ export default function ConnectionsPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
-  useEffect(() => {
-    // Verificar sesión y estado de aprobación
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          router.push("/login?redirect=/conexiones");
-          return;
-        }
-        if (data.user?.status === "pending") {
-          router.push("/pendiente");
-          return;
-        }
-        fetchData();
-      })
-      .catch(() => {
-        router.push("/login?redirect=/conexiones");
-      });
-  }, [activeTab]);
-
-  const fetchData = async () => {
+  async function fetchData() {
     setLoading(true);
     try {
       if (activeTab === "pending") {
@@ -83,7 +63,7 @@ export default function ConnectionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleResponse = async (connectionId: number, action: "accept" | "reject") => {
     setActionLoading(connectionId);
@@ -120,6 +100,27 @@ export default function ConnectionsPage() {
       setActionLoading(null);
     }
   };
+
+  useEffect(() => {
+    // Verificar sesión y estado de aprobación
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          router.push("/login?redirect=/conexiones");
+          return;
+        }
+        if (data.user?.status === "pending") {
+          router.push("/pendiente");
+          return;
+        }
+        fetchData();
+      })
+      .catch(() => {
+        router.push("/login?redirect=/conexiones");
+      });
+  }, [activeTab]);
+
 
   return (
     <main className="min-h-screen bg-gray-50">

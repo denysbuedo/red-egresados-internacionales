@@ -1,118 +1,51 @@
-/**
- * Gestión de Sesiones — Red de Egresados Internacionales
- *
- * Funciones:
- * - getSession(): Obtiene la sesión del usuario desde la cookie
- * - setSession(): Crea una nueva sesión al hacer login
- * - clearSession(): Elimina la cookie de sesión
- *
- * Detalles de la sesión:
- * - Almacenamiento: Cookie HTTP-only
- * - Duración: 24 horas (86,400 segundos)
- * - Token: Base64 de { userId, createdAt }
- * - Validación: Se verifica createdAt vs Date.now() en cada request
- */
-
 import "server-only";
 import { cookies } from "next/headers";
-import { db } from "@/db";
+import { db, sqlite } from "@/db";
 import { users, graduates } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { createSessionStore, MAX_AGE } from "./session-store.cjs";
 
-const SESSION_COOKIE_NAME = "session";
-const SESSION_MAX_AGE = 60 * 60 * 24; // 1 day (en segundos)
+const SESSION_COOKIE_NAME = process.env.NODE_ENV === "production" ? "__Host-session" : "session";
+export const sessionStore = createSessionStore(sqlite);
+export type SessionUser = Pick<typeof users.$inferSelect,
+  "id" | "username" | "email" | "role" | "status" | "pendingUniversity" | "institutionName" | "graduateId">;
 
-export interface SessionUser {
-  id: number;
-  username: string;
-  email: string;
-  role: "user" | "admin" | "institution" | "editor";
-  status: string;
-  pendingUniversity?: string | null;
-  institutionName?: string | null;
-  graduateId?: number | null;
+export async function getSession(options: { allowPending?: boolean } = {}): Promise<SessionUser | null> {
+  const token = (await cookies()).get(SESSION_COOKIE_NAME)?.value;
+  const userId = sessionStore.find(token);
+  if (!userId) return null;
+  const user = db.select({
+    id: users.id, username: users.username, email: users.email, role: users.role,
+    status: users.status, pendingUniversity: users.pendingUniversity,
+    institutionName: users.institutionName, graduateId: users.graduateId,
+  }).from(users).where(eq(users.id, userId)).get();
+  if (!user || !["pending", "approved"].includes(user.status)) return null;
+  if (!options.allowPending && user.status !== "approved") return null;
+  return user;
 }
 
-interface SessionData {
-  userId: number;
-  createdAt: number; // timestamp en ms
-}
-
-export async function getSession(): Promise<SessionUser | null> {
+export async function setSession(user: { id: number }): Promise<void> {
   const cookieStore = await cookies();
-  const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-
-  if (!sessionToken) {
-    return null;
-  }
-
-  try {
-    const decoded = atob(sessionToken);
-    const data = JSON.parse(decoded) as SessionData;
-
-    // Verificar si la sesión ha expirado
-    const sessionAge = Date.now() - data.createdAt;
-    const maxAgeMs = SESSION_MAX_AGE * 1000;
-
-    if (sessionAge > maxAgeMs) {
-      // Sesión expirada - limpiar cookie
-      await clearSession();
-      return null;
-    }
-
-    const user = await db
-      .select({
-        id: users.id,
-        username: users.username,
-        email: users.email,
-        role: users.role,
-        status: users.status,
-        pendingUniversity: users.pendingUniversity,
-        institutionName: users.institutionName,
-        graduateId: users.graduateId,
-      })
-      .from(users)
-      .where(eq(users.id, data.userId))
-      .limit(1);
-
-    if (user.length === 0) {
-      return null;
-    }
-
-    return user[0];
-  } catch {
-    return null;
-  }
-}
-
-export async function setSession(user: SessionUser): Promise<void> {
-  const cookieStore = await cookies();
-  const token = btoa(JSON.stringify({ userId: user.id, createdAt: Date.now() }));
-
+  sessionStore.revoke(cookieStore.get(SESSION_COOKIE_NAME)?.value);
+  const token = sessionStore.create(user.id);
   cookieStore.set(SESSION_COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: SESSION_MAX_AGE,
-    path: "/",
+    httpOnly: true, secure: process.env.NODE_ENV === "production",
+    sameSite: "lax", maxAge: MAX_AGE, path: "/",
   });
 }
 
 export async function clearSession(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete(SESSION_COOKIE_NAME);
+  sessionStore.revoke(cookieStore.get(SESSION_COOKIE_NAME)?.value);
+  cookieStore.set(SESSION_COOKIE_NAME, "", {
+    httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 0,
+  });
 }
 
 export async function getCurrentUser(): Promise<SessionUser | null> {
-  return getSession();
+  return getSession({ allowPending: true });
 }
 
 export async function getGraduateByUserId(userId: number) {
-  const result = await db
-    .select()
-    .from(graduates)
-    .where(eq(graduates.userId, userId))
-    .limit(1);
-
-  return result.length > 0 ? result[0] : null;
+  return db.select().from(graduates).where(eq(graduates.userId, userId)).get() || null;
 }

@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { userPosts, graduates } from "@/db/schema";
@@ -9,6 +10,8 @@ const DAILY_POST_LIMIT = 3;
 
 // GET - Obtener feed de posts
 export async function GET(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const { searchParams } = new URL(request.url);
     const graduateId = searchParams.get("graduateId");
@@ -75,6 +78,8 @@ export async function GET(request: NextRequest) {
 
 // POST - Crear nuevo post (con límite diario)
 export async function POST(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -177,6 +182,8 @@ export async function POST(request: NextRequest) {
 
 // DELETE - Eliminar post (solo el autor)
 export async function DELETE(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 

@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { userPosts, graduates } from "@/db/schema";
@@ -6,7 +7,9 @@ import { eq, gte, sql, and } from "drizzle-orm";
 
 const DAILY_POST_LIMIT = 3;
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 

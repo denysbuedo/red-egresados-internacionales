@@ -34,13 +34,7 @@ export default function EventDetailPage() {
   const [rsvpLoading, setRsvpLoading] = useState(false);
   const [userStatus, setUserStatus] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (eventId) {
-      fetchEvent();
-    }
-  }, [eventId]);
-
-  const fetchEvent = async () => {
+  async function fetchEvent() {
     try {
       const response = await fetch(`/api/events?id=${eventId}`);
       if (response.ok) {
@@ -60,7 +54,7 @@ export default function EventDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleRSVP = async (status: string) => {
     setRsvpLoading(true);
@@ -93,6 +87,13 @@ export default function EventDetailPage() {
       minute: "2-digit",
     });
   };
+
+  useEffect(() => {
+    if (eventId) {
+      fetchEvent();
+    }
+  }, [eventId]);
+
 
   if (loading) {
     return (

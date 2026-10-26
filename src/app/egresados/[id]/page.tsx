@@ -16,7 +16,9 @@ export default async function GraduateProfilePage({
 }) {
   const { id } = await params;
   const graduateId = parseInt(id);
-  const session = await getSession();
+  const session = await getSession({ allowPending: true });
+  if (!session) redirect("/login");
+  if (session.status !== "approved") redirect("/pendiente");
 
   // Obtener datos del egresado
   const graduateData = await db
@@ -30,6 +32,8 @@ export default async function GraduateProfilePage({
   }
 
   const graduate = graduateData[0];
+  const targetUser = db.select({ status: users.status }).from(users).where(eq(users.id, graduate.userId ?? -1)).get();
+  if (session.role !== "admin" && graduate.userId !== session.id && targetUser?.status !== "approved") notFound();
 
   // Verificar permisos
   let canViewProfile = false;

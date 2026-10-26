@@ -34,29 +34,14 @@ export function Navbar() {
   const [notifCount, setNotifCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  useEffect(() => {
-    fetchUser();
-    fetchPendingCount();
-    fetchNotifications();
-
-    // Refrescar datos cada 30 segundos
-    const interval = setInterval(() => {
-      fetchPendingCount();
-      fetchNotifications();
-      router.refresh();
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchUser = async () => {
+  async function fetchUser() {
     try {
       const response = await fetch("/api/auth/me");
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
         // Redirigir usuarios pendientes
-        if (data.user?.status === "pending") {
+        if (data.user?.status === "pending" && window.location.pathname !== "/pendiente") {
           window.location.href = "/pendiente";
         }
       }
@@ -65,9 +50,9 @@ export function Navbar() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const fetchPendingCount = async () => {
+  async function fetchPendingCount() {
     try {
       const response = await fetch("/api/connections");
       if (response.ok) {
@@ -77,9 +62,9 @@ export function Navbar() {
     } catch (error) {
       console.error("Error fetching pending count:", error);
     }
-  };
+  }
 
-  const fetchNotifications = async () => {
+  async function fetchNotifications() {
     try {
       // Get all notifications, not just unread
       const response = await fetch("/api/notifications");
@@ -91,7 +76,7 @@ export function Navbar() {
     } catch (error) {
       console.error("Error fetching notifications:", error);
     }
-  };
+  }
 
   const markAsRead = async (notificationId: number) => {
     try {
@@ -136,6 +121,22 @@ export function Navbar() {
       console.error("Error logging out:", error);
     }
   };
+
+  useEffect(() => {
+    fetchUser();
+    fetchPendingCount();
+    fetchNotifications();
+
+    // Refrescar datos cada 30 segundos
+    const interval = setInterval(() => {
+      fetchPendingCount();
+      fetchNotifications();
+      router.refresh();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -287,7 +288,7 @@ export function Navbar() {
                       <p className="text-gray-800 font-medium text-sm">{user.username}</p>
                       <p className="text-gray-500 text-xs truncate">{user.email}</p>
                     </div>
-                    {user.role === "admin" && (
+                    {["admin", "editor"].includes(user.role) && (
                       <Link
                         href="/admin"
                         className="block px-4 py-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50 text-sm transition-colors font-medium"
@@ -378,7 +379,7 @@ export function Navbar() {
 
               {user ? (
                 <>
-                  {user.role === "admin" && (
+                  {["admin", "editor"].includes(user.role) && (
                     <MobileNavLink
                       href="/admin"
                       onClick={() => setIsOpen(false)}

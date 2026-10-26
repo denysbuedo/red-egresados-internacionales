@@ -1,5 +1,8 @@
 # Sincronización del repositorio y la VM
 
+> Registro de la primera etapa. La evolución de sesiones, permisos y arranque
+> posterior se documenta en [SEGURIDAD_DESPLIEGUE.md](SEGURIDAD_DESPLIEGUE.md).
+
 ## Reconciliación del 25 de octubre de 2026
 
 Se comparó el checkout de la VM en `1294541` y sus cambios sin confirmar con

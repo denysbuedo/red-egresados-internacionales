@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { userPosts, graduates, users } from "@/db/schema";
@@ -9,6 +10,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ postId: string }> }
 ) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
     const { postId } = await params;

@@ -74,3 +74,11 @@ bun db:migrate     # Run migrations (auto in sandbox)
 - scripts/migrate.cjs aplica/adopta las migraciones SQL 0000-0015 con journal app_migrations y transacción. Incluye las columnas de aprobación institucional que faltaban.
 - npm test ejecuta pruebas de migración con node:test. ecosystem.config.js conserva una instancia PM2 y escucha en 127.0.0.1.
 - La sincronización no activa servicios ni publica el dominio; faltan correcciones de seguridad documentadas.
+
+## Seguridad y ejecución (2026-10-25)
+
+- Sesiones persistentes: tablas sessions y auth_rate_limits, migración 0016; helpers de tokens y límites en src/lib/session-store.cjs. Control transversal de API en src/lib/api-access.ts.
+- Registro y creación de perfil atómicos mediante Drizzle; nuevo endpoint register-complete. Instituciones limitadas por institution_name/pending_university.
+- Runtime objetivo Node 22.23.4, Next 16.4.3 y React 19.3.1. Único lock soportado para despliegue: package-lock.json, npm ci.
+- deploy/red-egresados.service define ejecución sin root, fuente root-owned y SQLite en /var/lib/red-egresados/dev.db. Scripts de DB cargan DATABASE_PATH desde .env, respetando valores ya exportados.
+- npm test: migraciones y sesiones. npm run test:http: flujos HTTP con datos aislados y servidor temporal; requiere build previo.

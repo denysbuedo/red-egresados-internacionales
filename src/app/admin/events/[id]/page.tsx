@@ -34,13 +34,7 @@ export default function AdminEventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "attending" | "maybe" | "declined">("all");
 
-  useEffect(() => {
-    if (eventId) {
-      fetchEvent();
-    }
-  }, [eventId]);
-
-  const fetchEvent = async () => {
+  async function fetchEvent() {
     try {
       const response = await fetch(`/api/events?id=${eventId}`);
       if (response.ok) {
@@ -52,7 +46,7 @@ export default function AdminEventDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const formatDate = (date: Date | null) => {
     if (!date) return "Fecha por confirmar";
@@ -77,6 +71,13 @@ export default function AdminEventDetailPage() {
     maybe: "bg-yellow-100 text-yellow-800",
     declined: "bg-red-100 text-red-800",
   };
+
+  useEffect(() => {
+    if (eventId) {
+      fetchEvent();
+    }
+  }, [eventId]);
+
 
   if (loading) {
     return (

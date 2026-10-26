@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { postComments, userPosts, graduates, users } from "@/db/schema";
@@ -12,6 +13,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ postId: string }> }
 ) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const { postId } = await params;
 
@@ -45,6 +48,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ postId: string }> }
 ) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
     const { postId } = await params;
@@ -191,6 +196,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ postId: string }> }
 ) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
     const { postId } = await params;
@@ -227,6 +234,7 @@ export async function DELETE(
       .where(
         and(
           eq(postComments.id, parseInt(commentId)),
+          eq(postComments.postId, parseInt(postId)),
           eq(postComments.graduateId, graduateId)
         )
       )

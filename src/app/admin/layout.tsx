@@ -19,7 +19,7 @@ export default async function AdminLayout({
     redirect("/login?redirect=/admin");
   }
 
-  if (session.role !== "admin") {
+  if (!["admin", "editor"].includes(session.role)) {
     redirect("/");
   }
 
@@ -82,7 +82,7 @@ export default async function AdminLayout({
                 </h2>
               </div>
               <div className="p-2">
-                <AdminNavLink href="/admin" exact>
+                {session.role === "admin" && (<AdminNavLink href="/admin" exact>
                   <svg
                     className="w-5 h-5"
                     fill="none"
@@ -97,14 +97,14 @@ export default async function AdminLayout({
                     />
                   </svg>
                   Dashboard
-                </AdminNavLink>
-                <AdminNavLink href="/admin/approvals">
+                </AdminNavLink>)}
+                {session.role === "admin" && (<AdminNavLink href="/admin/approvals">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Aprobaciones
-                </AdminNavLink>
-                <AdminNavLink href="/admin/users">
+                </AdminNavLink>)}
+                {session.role === "admin" && (<AdminNavLink href="/admin/users">
                   <svg
                     className="w-5 h-5"
                     fill="none"
@@ -119,7 +119,7 @@ export default async function AdminLayout({
                     />
                   </svg>
                   Usuarios
-                </AdminNavLink>
+                </AdminNavLink>)}
                 <AdminNavLink href="/admin/posts">
                   <svg
                     className="w-5 h-5"

@@ -29,12 +29,7 @@ export function PostComments({ postId, currentGraduateId, onCountChange }: PostC
     remaining: number;
   } | null>(null);
 
-  useEffect(() => {
-    fetchComments();
-    fetchCommentLimit();
-  }, []);
-
-  const fetchComments = async () => {
+  async function fetchComments() {
     try {
       const response = await fetch(`/api/posts/${postId}/comments`);
       if (response.ok) {
@@ -47,9 +42,9 @@ export function PostComments({ postId, currentGraduateId, onCountChange }: PostC
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
-  };
+  }
 
-  const fetchCommentLimit = async () => {
+  async function fetchCommentLimit() {
     try {
       const response = await fetch("/api/posts/limit");
       if (response.ok) {
@@ -66,7 +61,7 @@ export function PostComments({ postId, currentGraduateId, onCountChange }: PostC
     } catch (error) {
       console.error("Error fetching comment limit:", error);
     }
-  };
+  }
 
   const handleSubmit = async () => {
     if (!newComment.trim() || newComment.trim().length < 2) return;
@@ -120,6 +115,12 @@ export function PostComments({ postId, currentGraduateId, onCountChange }: PostC
       minute: "2-digit",
     });
   };
+
+  useEffect(() => {
+    fetchComments();
+    fetchCommentLimit();
+  }, []);
+
 
   return (
     <div className="mt-4 pt-4 border-t border-gray-100">

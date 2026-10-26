@@ -1,3 +1,5 @@
+import { getSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { users, graduates, adminPosts, connections } from "@/db/schema";
 import { sql } from "drizzle-orm";
@@ -6,6 +8,10 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
+  const session = await getSession();
+  if (!session) redirect("/login");
+  if (session.role === "editor") redirect("/admin/posts");
+  if (session.role !== "admin") redirect("/");
   // Obtener estadísticas
   const [
     totalUsers,

@@ -1,91 +1,20 @@
 const Database = require("better-sqlite3");
 const bcrypt = require("bcryptjs");
-const { join } = require("path");
-const readline = require("readline");
+const databasePath = require("./database-path.cjs").databasePath();
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-function question(query) {
-  return new Promise((resolve) => {
-    rl.question(query, (answer) => {
-      resolve(answer);
-    });
-  });
+const username = process.env.ADMIN_USERNAME;
+const email = process.env.ADMIN_EMAIL;
+const password = process.env.ADMIN_PASSWORD;
+if (!username || !email || !password || password.length < 12 || Buffer.byteLength(password) > 72) {
+  console.error("Define ADMIN_USERNAME, ADMIN_EMAIL y ADMIN_PASSWORD (12 caracteres como mínimo, 72 bytes como máximo). No hay credenciales predeterminadas.");
+  process.exit(1);
 }
-
-async function createAdmin() {
-  console.log("🛡️  Crear Administrador - Red de Egresados\n");
-
-  const sqlite = new Database(join(__dirname, "..", "dev.db"));
-
-  // Verificar si ya hay admins
-  const existingAdmins = sqlite
-    .prepare("SELECT id, username, email FROM users WHERE role = 'admin'")
-    .all();
-
-  if (existingAdmins.length > 0) {
-    console.log("⚠️  Ya existen administradores en la base de datos:");
-    existingAdmins.forEach((admin) => {
-      console.log(`   - ${admin.username} (${admin.email})`);
-    });
-    console.log();
+const db = new Database(databasePath, { fileMustExist: true });
+try {
+  if (db.prepare("SELECT id FROM users WHERE lower(username)=lower(?) OR lower(email)=lower(?)").get(username,email)) {
+    throw new Error("La cuenta ya existe. Este script no modifica contraseñas ni cuentas existentes.");
   }
-
-  // Pedir datos del admin
-  const username = await question("Username: ");
-  const email = await question("Email: ");
-  const password = await question("Contraseña: ");
-
-  if (!username || !email || !password) {
-    console.log("\n❌ Todos los campos son requeridos");
-    rl.close();
-    return;
-  }
-
-  if (password.length < 6) {
-    console.log("\n❌ La contraseña debe tener al menos 6 caracteres");
-    rl.close();
-    return;
-  }
-
-  // Verificar si el username o email ya existen
-  const existingUser = sqlite
-    .prepare("SELECT id FROM users WHERE username = ? OR email = ?")
-    .get(username, email);
-
-  if (existingUser) {
-    console.log("\n❌ El username o email ya están registrados");
-    rl.close();
-    return;
-  }
-
-  // Hashear contraseña
-  const passwordHash = bcrypt.hashSync(password, 10);
-
-  // Crear usuario admin
-  try {
-    const result = sqlite
-      .prepare(
-        `INSERT INTO users (username, email, password_hash, role, created_at, updated_at) 
-         VALUES (?, ?, ?, 'admin', strftime('%s', 'now'), strftime('%s', 'now'))`
-      )
-      .run(username, email, passwordHash);
-
-    console.log("\n✅ Administrador creado exitosamente!");
-    console.log(`   ID: ${result.lastInsertRowid}`);
-    console.log(`   Username: ${username}`);
-    console.log(`   Email: ${email}`);
-    console.log("\n📍 Ahora puedes iniciar sesión en /login con tus credenciales");
-    console.log("   Después de login, verás la opción '🛡️ Panel Admin' en tu menú");
-  } catch (error) {
-    console.log("\n❌ Error al crear el administrador:", error.message);
-  }
-
-  sqlite.close();
-  rl.close();
-}
-
-createAdmin();
+  db.prepare("INSERT INTO users (username,email,password_hash,role,status,created_at,updated_at) VALUES (?,?,?,'admin','approved',?,?)")
+    .run(username,email,bcrypt.hashSync(password,12),Math.floor(Date.now()/1000),Math.floor(Date.now()/1000));
+  console.log("Administrador creado. La contraseña no se muestra ni se registra.");
+} finally { db.close(); }

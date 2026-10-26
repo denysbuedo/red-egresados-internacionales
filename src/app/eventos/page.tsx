@@ -24,27 +24,7 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [rsvpLoading, setRsvpLoading] = useState<number | null>(null);
 
-  useEffect(() => {
-    // Verificar sesión y estado de aprobación
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          router.push("/login?redirect=/eventos");
-          return;
-        }
-        if (data.user?.status === "pending") {
-          router.push("/pendiente");
-          return;
-        }
-        fetchEvents();
-      })
-      .catch(() => {
-        router.push("/login?redirect=/eventos");
-      });
-  }, []);
-
-  const fetchEvents = async () => {
+  async function fetchEvents() {
     try {
       const response = await fetch("/api/events?upcoming=true");
       if (response.ok) {
@@ -56,7 +36,7 @@ export default function EventsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleRSVP = async (eventId: number, status: string) => {
     setRsvpLoading(eventId);
@@ -88,6 +68,27 @@ export default function EventsPage() {
       minute: "2-digit",
     });
   };
+
+  useEffect(() => {
+    // Verificar sesión y estado de aprobación
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          router.push("/login?redirect=/eventos");
+          return;
+        }
+        if (data.user?.status === "pending") {
+          router.push("/pendiente");
+          return;
+        }
+        fetchEvents();
+      })
+      .catch(() => {
+        router.push("/login?redirect=/eventos");
+      });
+  }, []);
+
 
   return (
     <main className="min-h-screen bg-gray-50">

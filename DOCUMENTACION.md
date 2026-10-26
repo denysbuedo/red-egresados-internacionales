@@ -391,7 +391,7 @@ src/
 |-------|-------|
 | Username | `dinfo` |
 | Email | `dinfo@mes.gob.cu` |
-| Contraseña | `Alexa.55260611` |
+| Contraseña | `<configurar fuera del repositorio>` |
 
 ---
 

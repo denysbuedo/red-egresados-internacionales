@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, graduates } from "@/db/schema";
@@ -6,6 +7,8 @@ import { eq, and, sql } from "drizzle-orm";
 
 // GET - Obtener lista de usuarios (solo admin)
 export async function GET(request: NextRequest) {
+  const denied = await authorizeApi(request, ["admin"]);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -41,6 +44,7 @@ export async function GET(request: NextRequest) {
         username: users.username,
         email: users.email,
         role: users.role,
+        institutionName: users.institutionName,
         createdAt: users.createdAt,
         graduateId: users.graduateId,
         graduateName: graduates.name,
@@ -63,6 +67,8 @@ export async function GET(request: NextRequest) {
 
 // PUT - Actualizar usuario (solo admin)
 export async function PUT(request: NextRequest) {
+  const denied = await authorizeApi(request, ["admin"]);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -91,10 +97,22 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const updateData: any = {};
+    if (role && !["user", "admin", "institution", "editor"].includes(role)) {
+      return NextResponse.json({ error: "Rol inválido" }, { status: 400 });
+    }
+    const updateData: Partial<typeof users.$inferInsert> = {};
     if (role) updateData.role = role;
     if (username) updateData.username = username;
     if (email) updateData.email = email;
+    if (body.institutionName !== undefined) {
+      if (typeof body.institutionName !== "string" || body.institutionName.length > 200) {
+        return NextResponse.json({ error: "Universidad inválida" }, { status: 400 });
+      }
+      updateData.institutionName = body.institutionName.trim() || null;
+    }
+    if (role === "institution" && !updateData.institutionName) {
+      return NextResponse.json({ error: "Debes asignar la universidad de la institución" }, { status: 400 });
+    }
 
     await db
       .update(users)
@@ -113,6 +131,8 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - Eliminar usuario (solo admin)
 export async function DELETE(request: NextRequest) {
+  const denied = await authorizeApi(request, ["admin"]);
+  if (denied) return denied;
   try {
     const session = await getSession();
 

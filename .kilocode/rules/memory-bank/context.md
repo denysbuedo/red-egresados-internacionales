@@ -100,3 +100,13 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Reconciliación funcional publicada en GitHub como 2ca5531 y aplicada a la VM por fast-forward mediante bundle SSH. Cambios previos preservados en stash pre-sync-20261025, además del respaldo.
 - npm ci y build correctos también en el directorio real de despliegue. Migración aplicada a dev.db real, con todos los valores anteriores de las 16 tablas conservados e integridad OK.
 - Typecheck y cuatro pruebas pasan en Windows/Linux. Lint local: 0 errores y 27 advertencias existentes. Pruebas HTTP temporales correctas; servicio permanente sigue detenido y la ruta /pendiente sigue pendiente.
+
+## Sesiones y permisos — 2026-10-25
+
+- Implementadas sesiones opacas con hashes, expiración y revocación (migración 0016). Cookie __Host-session en producción. Cookies antiguas invalidadas.
+- API de negocio requiere cuenta aprobada; mutations verifican Origin. Propiedad de perfiles/conexiones y alcance institucional verificados. Listas de correo solo admin; editores gestionan contenido.
+- Creado register-complete transaccional, /pendiente sin bucle de redirección y /universidad. Registro público nunca asigna roles solicitados por el cliente.
+- Next 16.4.3 y React 19.3.1 fijados; npm audit --omit=dev sin hallazgos. Cuatro avisos moderados de herramientas de desarrollo pendientes; no aplicar audit --force. Se retira bun.lock para mantener npm ci como único lock de despliegue.
+- Servicio systemd preparado con usuario red-egresados y datos en /var/lib/red-egresados/dev.db; runtime Node 22.23.4 verificado por SHA-256 oficial. Pendiente de validación Linux y activación al registrar esta entrada.
+- Respaldo previo verificado en /var/backups/red-egresados/pre-security-20261025. Un administrador aún usa la contraseña histórica publicada: se rotará antes del arranque.
+- Ver SEGURIDAD_DESPLIEGUE.md para diseño, pruebas y operación. DNS/TLS/HAProxy del dominio nuevo permanecen pendientes.

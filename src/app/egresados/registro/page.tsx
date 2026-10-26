@@ -48,11 +48,7 @@ export default function RegistroPage() {
   const [user, setUser] = useState<User | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  async function checkAuth() {
     try {
       const response = await fetch("/api/auth/me");
       if (response.ok) {
@@ -73,7 +69,7 @@ export default function RegistroPage() {
     } finally {
       setCheckingAuth(false);
     }
-  };
+  }
 
   const isPending = user?.status === "pending";
 
@@ -124,6 +120,11 @@ export default function RegistroPage() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
 
   if (checkingAuth) {
     return (

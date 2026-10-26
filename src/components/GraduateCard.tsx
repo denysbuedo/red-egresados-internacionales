@@ -32,11 +32,7 @@ export function GraduateCard({
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
 
-  useEffect(() => {
-    checkConnectionStatus();
-  }, [id]);
-
-  const checkConnectionStatus = async () => {
+  async function checkConnectionStatus() {
     setChecking(true);
     try {
       const response = await fetch(`/api/connections?check=${id}`);
@@ -60,7 +56,7 @@ export function GraduateCard({
     } finally {
       setChecking(false);
     }
-  };
+  }
 
   const handleConnect = async () => {
     setLoading(true);
@@ -93,6 +89,11 @@ export function GraduateCard({
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  useEffect(() => {
+    checkConnectionStatus();
+  }, [id]);
+
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all group">

@@ -7,7 +7,8 @@ interface User {
   id: number;
   username: string;
   email: string;
-  role: "user" | "admin";
+  institutionName?: string | null;
+  role: "user" | "admin" | "institution" | "editor";
   createdAt: Date | null;
   graduateId: number | null;
   graduateName: string | null;
@@ -19,15 +20,11 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [filterRole, setFilterRole] = useState<"all" | "user" | "admin">("all");
+  const [filterRole, setFilterRole] = useState<"all" | "user" | "admin" | "institution" | "editor">("all");
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [search, filterRole]);
-
-  const fetchUsers = async () => {
+  async function fetchUsers() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -44,19 +41,22 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const handleUpdateRole = async (userId: number, newRole: "user" | "admin") => {
+  const handleUpdateRole = async (userId: number, newRole: "user" | "admin" | "institution" | "editor") => {
     try {
       const response = await fetch("/api/admin/users", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: userId, role: newRole }),
+        body: JSON.stringify({ id: userId, role: newRole, ...(newRole === "institution" ? { institutionName: window.prompt("Nombre exacto de la universidad que gestionará esta cuenta:") || "" } : {}) }),
       });
 
       if (response.ok) {
         fetchUsers();
         setEditingUser(null);
+      } else {
+        const body = await response.json();
+        alert(body.error || "No se pudo actualizar el rol");
       }
     } catch (error) {
       console.error("Error updating user:", error);
@@ -77,6 +77,11 @@ export default function AdminUsersPage() {
       console.error("Error deleting user:", error);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [search, filterRole]);
+
 
   return (
     <div className="space-y-6">
@@ -182,7 +187,7 @@ export default function AdminUsersPage() {
                         <select
                           value={user.role}
                           onChange={(e) =>
-                            handleUpdateRole(user.id, e.target.value as "user" | "admin")
+                            handleUpdateRole(user.id, e.target.value as "user" | "admin" | "institution" | "editor")
                           }
                           onBlur={() => setEditingUser(null)}
                           autoFocus
@@ -190,6 +195,8 @@ export default function AdminUsersPage() {
                         >
                           <option value="user">Usuario</option>
                           <option value="admin">Administrador</option>
+                          <option value="institution">Institución</option>
+                          <option value="editor">Editor</option>
                         </select>
                       ) : (
                         <span
@@ -200,7 +207,7 @@ export default function AdminUsersPage() {
                           }`}
                           onClick={() => setEditingUser(user)}
                         >
-                          {user.role === "admin" ? "Admin" : "Usuario"}
+                          {{ admin: "Admin", user: "Usuario", institution: "Institución", editor: "Editor" }[user.role]}
                         </span>
                       )}
                     </td>

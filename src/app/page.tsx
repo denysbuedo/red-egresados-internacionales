@@ -13,10 +13,7 @@ import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  // Check and send event notifications
-  await checkAndSendEventNotifications();
-
-  const session = await getSession();
+  const session = await getSession({ allowPending: true });
   
   // Redirigir usuarios pendientes a la página de espera
   if (session?.status === "pending") {
@@ -24,6 +21,7 @@ export default async function Home() {
   }
   
   const isLoggedIn = !!session;
+  if (session?.status === "approved") await checkAndSendEventNotifications();
 
   const stats = await Promise.all([
     db.select({ count: sql<number>`count(*)` }).from(graduates),
@@ -44,6 +42,7 @@ export default async function Home() {
   const recentGraduates = await db
     .select()
     .from(graduates)
+    .where(sql`EXISTS (SELECT 1 FROM users WHERE users.id = ${graduates.userId} AND users.status = 'approved')`)
     .orderBy(desc(graduates.createdAt))
     .limit(6);
 

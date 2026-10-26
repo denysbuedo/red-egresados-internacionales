@@ -49,15 +49,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    params.then(p => {
-      setGroupId(p.id);
-      fetchGroup(p.id);
-      checkMembership();
-    });
-  }, [params]);
-
-  const checkMembership = async () => {
+  async function checkMembership() {
     try {
       const response = await fetch("/api/auth/me");
       if (response.ok) {
@@ -69,9 +61,9 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
     } catch (error) {
       console.error("Error checking membership:", error);
     }
-  };
+  }
 
-  const fetchGroup = async (id: string) => {
+  async function fetchGroup(id: string) {
     setLoading(true);
     try {
       const response = await fetch(`/api/groups?id=${id}`);
@@ -101,7 +93,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleJoin = async () => {
     try {
@@ -191,6 +183,15 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
       setSaving(false);
     }
   };
+
+  useEffect(() => {
+    params.then(p => {
+      setGroupId(p.id);
+      fetchGroup(p.id);
+      checkMembership();
+    });
+  }, [params]);
+
 
   if (loading) {
     return (

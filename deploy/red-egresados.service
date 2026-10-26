@@ -1,0 +1,37 @@
+[Unit]
+Description=Red de Egresados Internacionales (Next.js)
+After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=red-egresados
+Group=red-egresados
+WorkingDirectory=/var/www/red-egresados-internacionales
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=DATABASE_PATH=/var/lib/red-egresados/dev.db
+Environment=NEXT_TELEMETRY_DISABLED=1
+Environment=PATH=/opt/red-egresados/node/bin:/usr/sbin:/usr/bin:/sbin:/bin
+EnvironmentFile=-/etc/red-egresados/environment
+ExecStartPre=/usr/bin/test -r /var/lib/red-egresados/dev.db
+ExecStart=/opt/red-egresados/node/bin/node /var/www/red-egresados-internacionales/node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3000
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/red-egresados /var/www/red-egresados-internacionales/.next/cache
+
+[Install]
+WantedBy=multi-user.target

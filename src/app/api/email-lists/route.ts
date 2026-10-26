@@ -1,9 +1,12 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { emailLists, graduates } from "@/db/schema";
 import { eq, and, gte, lte, isNotNull } from "drizzle-orm";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await authorizeApi(request, ["admin"]);
+  if (denied) return denied;
   try {
     const lists = await db.select().from(emailLists).orderBy(emailLists.createdAt);
     return NextResponse.json(lists);
@@ -17,6 +20,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const denied = await authorizeApi(request, ["admin"]);
+  if (denied) return denied;
   try {
     const body = await request.json();
 

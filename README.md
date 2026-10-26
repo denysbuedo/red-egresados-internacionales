@@ -38,16 +38,16 @@ npm run dev
 
 La aplicación estará en **http://localhost:3000**
 
-### Credenciales de desarrollo
+### Administración
 
-| Rol | Username | Contraseña |
-|-----|----------|------------|
-| Admin | `dinfo` | `Alexa.55260611` |
+No hay credenciales predeterminadas. El script de creación de administradores exige
+ADMIN_USERNAME, ADMIN_EMAIL y ADMIN_PASSWORD, y no modifica cuentas existentes.
 
 ## 📚 Documentación
 
 | Documento | Descripción |
 |-----------|-------------|
+| [Seguridad y operación](SEGURIDAD_DESPLIEGUE.md) | Sesiones, permisos, pruebas y servicio de la VM |
 | [Sincronización del despliegue](SINCRONIZACION_DESPLIEGUE.md) | Estado verificado, datos conservados y procedimiento vigente |
 | [📘 Guía del Desarrollador](GUIDE_DESARROLLADOR.md) | Documentación técnica completa para el equipo de desarrollo |
 | [📋 Protocolo de Prueba](PROTOCOLO_PRUEBA.md) | 44 casos de prueba para QA |

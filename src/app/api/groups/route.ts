@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { groups, groupMembers, groupPosts, graduates, users } from "@/db/schema";
@@ -6,6 +7,8 @@ import { eq, and, desc, sql } from "drizzle-orm";
 
 // GET - Obtener grupos
 export async function GET(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type");
@@ -128,6 +131,8 @@ export async function GET(request: NextRequest) {
 
 // POST - Crear grupo
 export async function POST(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -200,6 +205,8 @@ export async function POST(request: NextRequest) {
 
 // PUT - Unirse/Salir de grupo
 export async function PUT(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -287,6 +294,8 @@ export async function PUT(request: NextRequest) {
 
 // PATCH - Editar grupo (solo creador)
 export async function PATCH(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 

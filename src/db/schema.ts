@@ -256,3 +256,15 @@ export const eventNotificationLog = sqliteTable("event_notification_log", {
     () => new Date()
   ),
 });
+
+export const sessions = sqliteTable("sessions", {
+  tokenHash: text("token_hash").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  expiresAt: integer("expires_at").notNull(),
+});
+
+export const authRateLimits = sqliteTable("auth_rate_limits", {
+  key: text("key").primaryKey(),
+  attempts: integer("attempts").notNull(),
+  expiresAt: integer("expires_at").notNull(),
+});

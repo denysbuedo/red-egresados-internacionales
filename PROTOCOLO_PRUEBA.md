@@ -75,7 +75,7 @@
 ### TC-013: Login de administrador
 | Paso | Acción | Resultado esperado | ✅/❌ |
 |------|--------|-------------------|------|
-| 1 | Login con `dinfo` / `Alexa.55260611` | Login exitoso | |
+| 1 | Login con `dinfo` / `<configurar fuera del repositorio>` | Login exitoso | |
 | 2 | Abrir menú de usuario | Muestra opción "🛡️ Panel Admin" | |
 | 3 | Click en Panel Admin | Accede a `/admin` | |
 

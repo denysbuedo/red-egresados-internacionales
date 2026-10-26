@@ -21,11 +21,7 @@ export default function ApprovalsPage() {
   const [rejectReason, setRejectReason] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
-  useEffect(() => {
-    fetchPendingUsers();
-  }, []);
-
-  const fetchPendingUsers = async () => {
+  async function fetchPendingUsers() {
     try {
       const response = await fetch("/api/admin/approvals?status=pending");
       if (response.ok) {
@@ -37,7 +33,7 @@ export default function ApprovalsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleAction = async (userId: number, action: "approve" | "reject") => {
     if (action === "reject" && !rejectReason.trim()) {
@@ -68,6 +64,11 @@ export default function ApprovalsPage() {
       setActionLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPendingUsers();
+  }, []);
+
 
   return (
     <div className="space-y-6">

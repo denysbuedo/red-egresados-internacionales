@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { connections, graduates, users } from "@/db/schema";
@@ -7,6 +8,8 @@ import { createNotification } from "@/lib/notifications";
 
 // GET - Obtener solicitudes del usuario actual
 export async function GET(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -190,6 +193,8 @@ export async function GET(request: NextRequest) {
 
 // POST - Enviar solicitud de conexión
 export async function POST(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -298,6 +303,8 @@ export async function POST(request: NextRequest) {
 
 // PUT - Aceptar o rechazar solicitud
 export async function PUT(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -406,6 +413,8 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - Cancelar solicitud enviada
 export async function DELETE(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -426,9 +435,13 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await db
-      .delete(connections)
-      .where(eq(connections.id, parseInt(connectionId)));
+    const profile = db.select({ id: graduates.id }).from(graduates).where(eq(graduates.userId, session.id)).get();
+    if (!profile) return NextResponse.json({ error: "No tienes perfil de egresado" }, { status: 403 });
+    const removed = db.delete(connections).where(and(
+      eq(connections.id, Number(connectionId)),
+      or(eq(connections.senderId, profile.id), eq(connections.receiverId, profile.id))
+    )).returning({ id: connections.id }).get();
+    if (!removed) return NextResponse.json({ error: "Conexión no encontrada" }, { status: 404 });
 
     return NextResponse.json({
       success: true,

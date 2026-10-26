@@ -33,7 +33,7 @@ export default async function DirectorioPage({
   const yearTo = params.yearTo || "";
 
   let query = db.select().from(graduates);
-  const conditions = [];
+  const conditions = [sql`EXISTS (SELECT 1 FROM users WHERE users.id = ${graduates.userId} AND users.status = 'approved')`];
 
   if (search) {
     conditions.push(

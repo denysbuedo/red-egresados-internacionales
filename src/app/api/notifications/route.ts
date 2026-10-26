@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { notifications, users } from "@/db/schema";
@@ -6,6 +7,8 @@ import { eq, desc, sql } from "drizzle-orm";
 
 // GET - Obtener notificaciones del usuario
 export async function GET(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -36,6 +39,8 @@ export async function GET(request: NextRequest) {
 
 // PUT - Marcar como leída
 export async function PUT(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 
@@ -85,6 +90,8 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - Eliminar notificación
 export async function DELETE(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 

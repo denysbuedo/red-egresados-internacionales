@@ -1,3 +1,5 @@
+import { validateProfileInput } from "@/lib/profile-input";
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { graduates, users } from "@/db/schema";
@@ -5,6 +7,8 @@ import { like, eq, and, gte, lte, sql } from "drizzle-orm";
 import { getSession } from "@/lib/session";
 
 export async function GET(request: Request) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search");
@@ -14,7 +18,7 @@ export async function GET(request: Request) {
     const yearFrom = searchParams.get("yearFrom");
     const yearTo = searchParams.get("yearTo");
 
-    const conditions = [];
+    const conditions = [sql`EXISTS (SELECT 1 FROM users WHERE users.id = ${graduates.userId} AND users.status = 'approved')`];
 
     if (search) {
       conditions.push(
@@ -45,9 +49,12 @@ export async function GET(request: Request) {
             .where(and(...conditions))
         : db.select().from(graduates);
 
-    const allGraduates = await query.orderBy(graduates.createdAt);
+    const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit")) || 50));
+    const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
+    const allGraduates = await query.orderBy(graduates.createdAt).limit(limit).offset(offset);
 
-    return NextResponse.json(allGraduates);
+    const publicProfiles = allGraduates.map(({ email, phone, userId, linkedin, website, ...profile }) => profile);
+    return NextResponse.json(publicProfiles);
   } catch (error) {
     console.error("Error fetching graduates:", error);
     return NextResponse.json(
@@ -58,6 +65,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     // Verificar autenticación
     const session = await getSession();
@@ -70,6 +79,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    const invalid = validateProfileInput(body);
+    if (invalid) return invalid;
 
     // Verificar si el usuario ya tiene un perfil de egresado
     const existingGraduate = await db

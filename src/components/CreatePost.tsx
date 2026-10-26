@@ -18,11 +18,7 @@ export function CreatePost() {
   } | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    fetchLimitInfo();
-  }, []);
-
-  const fetchLimitInfo = async () => {
+  async function fetchLimitInfo() {
     try {
       const response = await fetch("/api/posts/limit");
       if (response.ok) {
@@ -32,7 +28,7 @@ export function CreatePost() {
     } catch (error) {
       console.error("Error fetching limit:", error);
     }
-  };
+  }
 
   const handleSubmit = async () => {
     if (!content.trim() || content.trim().length < 5) {
@@ -83,6 +79,11 @@ export function CreatePost() {
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 300)}px`;
     }
   };
+
+  useEffect(() => {
+    fetchLimitInfo();
+  }, []);
+
 
   if (!limitInfo) {
     return (

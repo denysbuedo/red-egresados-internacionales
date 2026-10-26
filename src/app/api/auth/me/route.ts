@@ -21,6 +21,7 @@ export async function GET() {
       status: user.status,
       pendingUniversity: user.pendingUniversity,
       graduateId: user.graduateId,
+      institutionName: user.institutionName,
     },
     graduate,
   });

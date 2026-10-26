@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { groupPosts, groupMembers, graduates, users } from "@/db/schema";
@@ -9,6 +10,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ groupId: string }> }
 ) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const { groupId } = await params;
 
@@ -43,6 +46,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ groupId: string }> }
 ) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
     const { groupId } = await params;

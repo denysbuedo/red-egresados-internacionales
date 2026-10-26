@@ -29,27 +29,7 @@ export default function CommunitiesPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    // Verificar sesión y estado de aprobación
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          router.push("/login?redirect=/comunidades");
-          return;
-        }
-        if (data.user?.status === "pending") {
-          router.push("/pendiente");
-          return;
-        }
-        fetchGroups();
-      })
-      .catch(() => {
-        router.push("/login?redirect=/comunidades");
-      });
-  }, [filter]);
-
-  const fetchGroups = async () => {
+  async function fetchGroups() {
     setLoading(true);
     try {
       const url = filter === "all" ? "/api/groups" : `/api/groups?type=${filter}`;
@@ -63,7 +43,7 @@ export default function CommunitiesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,6 +102,27 @@ export default function CommunitiesPage() {
     country: "bg-green-50 text-green-700 border-green-200",
     interest: "bg-orange-50 text-orange-700 border-orange-200",
   };
+
+  useEffect(() => {
+    // Verificar sesión y estado de aprobación
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          router.push("/login?redirect=/comunidades");
+          return;
+        }
+        if (data.user?.status === "pending") {
+          router.push("/pendiente");
+          return;
+        }
+        fetchGroups();
+      })
+      .catch(() => {
+        router.push("/login?redirect=/comunidades");
+      });
+  }, [filter]);
+
 
   return (
     <main className="min-h-screen bg-gray-50">

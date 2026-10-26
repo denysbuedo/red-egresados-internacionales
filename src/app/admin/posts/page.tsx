@@ -19,11 +19,7 @@ export default function AdminPostsPage() {
   const [loading, setLoading] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  const fetchPosts = async () => {
+  async function fetchPosts() {
     setLoading(true);
     try {
       const response = await fetch("/api/admin/posts");
@@ -36,7 +32,7 @@ export default function AdminPostsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleDeletePost = async (postId: number) => {
     try {
@@ -52,6 +48,11 @@ export default function AdminPostsPage() {
       console.error("Error deleting post:", error);
     }
   };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
 
   return (
     <div className="space-y-6">

@@ -1,6 +1,6 @@
 const Database = require("better-sqlite3");
 const { createHash } = require("node:crypto");
-const { join, resolve } = require("node:path");
+const { join } = require("node:path");
 const { readFileSync, readdirSync } = require("node:fs");
 
 // Older deployments applied SQL manually, without a migration journal.
@@ -47,7 +47,7 @@ function migrate(databasePath, migrationsPath = join(__dirname, "..", "src", "db
 }
 
 if (require.main === module) {
-  const databasePath = resolve(process.env.DATABASE_PATH || join(__dirname, "..", "dev.db"));
+  const databasePath = require("./database-path.cjs").databasePath();
   migrate(databasePath);
   console.log("Migraciones completadas.");
 }

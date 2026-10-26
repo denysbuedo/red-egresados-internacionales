@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { adminPosts } from "@/db/schema";
@@ -5,7 +6,9 @@ import { getSession } from "@/lib/session";
 import { desc, eq } from "drizzle-orm";
 
 // GET - Obtener todos los posts (público)
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const posts = await db
       .select({
@@ -31,6 +34,8 @@ export async function GET() {
 
 // POST - Crear nuevo post (solo admin)
 export async function POST(request: NextRequest) {
+  const denied = await authorizeApi(request, ["admin", "editor"]);
+  if (denied) return denied;
   try {
     // Verificar autenticación y rol de admin
     const session = await getSession();
@@ -42,7 +47,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (session.role !== "admin") {
+    if (!["admin", "editor"].includes(session.role)) {
       return NextResponse.json(
         { error: "No tienes permisos para realizar esta acción" },
         { status: 403 }
@@ -106,6 +111,8 @@ export async function POST(request: NextRequest) {
 
 // DELETE - Eliminar post (solo admin)
 export async function DELETE(request: NextRequest) {
+  const denied = await authorizeApi(request, ["admin", "editor"]);
+  if (denied) return denied;
   try {
     // Verificar autenticación y rol de admin
     const session = await getSession();
@@ -117,7 +124,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    if (session.role !== "admin") {
+    if (!["admin", "editor"].includes(session.role)) {
       return NextResponse.json(
         { error: "No tienes permisos para realizar esta acción" },
         { status: 403 }

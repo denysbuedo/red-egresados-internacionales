@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { events, eventAttendees, graduates, notifications } from "@/db/schema";
@@ -8,11 +9,13 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ eventId: string }> }
 ) {
+  const denied = await authorizeApi(request, ["admin", "editor"]);
+  if (denied) return denied;
   try {
     const session = await getSession();
     const { eventId } = await params;
 
-    if (!session || session.role !== "admin") {
+    if (!session || !["admin", "editor"].includes(session.role)) {
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 403 }

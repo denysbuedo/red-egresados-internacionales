@@ -1,83 +1,59 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, graduates } from "@/db/schema";
-import { getSession } from "@/lib/session";
-import { eq, or, desc } from "drizzle-orm";
+import { getSession, sessionStore } from "@/lib/session";
+import { authorizeApi } from "@/lib/api-access";
+import { eq, and, desc } from "drizzle-orm";
 
-// GET - Obtener usuarios pendientes de aprobación
 export async function GET(request: NextRequest) {
-  try {
-    const session = await getSession();
-    if (!session || (session.role !== "admin" && session.role !== "institution")) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status") || "pending";
-
-    const pendingUsers = await db
-      .select({
-        id: users.id,
-        username: users.username,
-        email: users.email,
-        role: users.role,
-        status: users.status,
-        rejectionReason: users.rejectionReason,
-        createdAt: users.createdAt,
-        graduateId: users.graduateId,
-        graduateName: graduates.name,
-        graduateUniversity: graduates.university,
-        graduateCountry: graduates.country,
-      })
-      .from(users)
-      .leftJoin(graduates, eq(users.id, graduates.userId))
-      .where(eq(users.status, status as any))
-      .orderBy(desc(users.createdAt));
-
-    return NextResponse.json(pendingUsers);
-  } catch (error) {
-    console.error("Error fetching pending users:", error);
-    return NextResponse.json({ error: "Error al obtener usuarios" }, { status: 500 });
+  const denied = await authorizeApi(request, ["admin", "institution"]);
+  if (denied) return denied;
+  const session = (await getSession())!;
+  const status = new URL(request.url).searchParams.get("status") || "pending";
+  if (status !== "pending" && status !== "approved" && status !== "rejected") {
+    return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
   }
+  if (session.role === "institution" && !session.institutionName) {
+    return NextResponse.json({ error: "Tu cuenta no tiene una universidad asignada" }, { status: 403 });
+  }
+  const conditions = [eq(users.status, status), eq(users.role, "user")];
+  if (session.role === "institution") conditions.push(eq(users.pendingUniversity, session.institutionName!));
+  const pendingUsers = db.select({
+    id: users.id, username: users.username, email: users.email, role: users.role,
+    status: users.status, rejectionReason: users.rejectionReason, createdAt: users.createdAt,
+    graduateId: users.graduateId, graduateName: graduates.name,
+    graduateUniversity: users.pendingUniversity, graduateCountry: graduates.country,
+  }).from(users).leftJoin(graduates, eq(users.id, graduates.userId))
+    .where(and(...conditions)).orderBy(desc(users.createdAt)).all();
+  return NextResponse.json(pendingUsers);
 }
 
-// PUT - Aprobar o rechazar usuario
 export async function PUT(request: NextRequest) {
-  try {
-    const session = await getSession();
-    if (!session || (session.role !== "admin" && session.role !== "institution")) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-    }
-
-    const body = await request.json();
-    const { userId, action, reason } = body;
-
-    if (!userId || !["approve", "reject"].includes(action)) {
-      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
-    }
-
-    if (action === "reject" && !reason) {
-      return NextResponse.json(
-        { error: "Debe especificar un motivo de rechazo" },
-        { status: 400 }
-      );
-    }
-
-    await db
-      .update(users)
-      .set({
-        status: action === "approve" ? "approved" : "rejected",
-        rejectionReason: action === "reject" ? reason : null,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.id, parseInt(userId)));
-
-    return NextResponse.json({
-      success: true,
-      message: action === "approve" ? "Usuario aprobado" : "Usuario rechazado",
-    });
-  } catch (error) {
-    console.error("Error updating user status:", error);
-    return NextResponse.json({ error: "Error al actualizar usuario" }, { status: 500 });
+  const denied = await authorizeApi(request, ["admin", "institution"]);
+  if (denied) return denied;
+  const session = (await getSession())!;
+  let body;
+  try { body = await request.json(); } catch { return NextResponse.json({ error: "Datos inválidos" }, { status: 400 }); }
+  const { userId, action, reason } = body || {};
+  const id = Number(userId);
+  if (!Number.isSafeInteger(id) || id <= 0 || !["approve", "reject"].includes(action) ||
+      (action === "reject" && (typeof reason !== "string" || !reason.trim() || reason.length > 2000))) {
+    return NextResponse.json({ error: "Datos inválidos o falta el motivo de rechazo" }, { status: 400 });
   }
+  const target = db.select().from(users).where(eq(users.id, id)).get();
+  if (!target) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+  if (target.id === session.id || target.role !== "user" ||
+      (session.role === "institution" && (!session.institutionName || target.pendingUniversity !== session.institutionName))) {
+    return NextResponse.json({ error: "No puedes gestionar esta solicitud" }, { status: 403 });
+  }
+  if (target.status !== "pending") return NextResponse.json({ error: "La solicitud ya fue resuelta" }, { status: 409 });
+  const updated = db.transaction((tx) => {
+    const result = tx.update(users).set({ status: action === "approve" ? "approved" : "rejected",
+      rejectionReason: action === "reject" ? reason.trim() : null, updatedAt: new Date() })
+      .where(and(eq(users.id, id), eq(users.status, "pending"))).returning({ id: users.id }).get();
+    if (result && action === "reject") sessionStore.revokeUser(id);
+    return result;
+  });
+  if (!updated) return NextResponse.json({ error: "La solicitud ya fue resuelta" }, { status: 409 });
+  return NextResponse.json({ success: true, message: action === "approve" ? "Usuario aprobado" : "Usuario rechazado" });
 }

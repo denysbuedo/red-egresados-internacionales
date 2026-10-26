@@ -1,3 +1,4 @@
+import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { postReactions, adminPosts } from "@/db/schema";
@@ -6,6 +7,8 @@ import { eq, sql, and } from "drizzle-orm";
 
 // GET - Obtener reacciones de un post
 export async function GET(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
     const { searchParams } = new URL(request.url);
@@ -80,6 +83,8 @@ export async function GET(request: NextRequest) {
 
 // POST - Agregar/actualizar reacción
 export async function POST(request: NextRequest) {
+  const denied = await authorizeApi(request);
+  if (denied) return denied;
   try {
     const session = await getSession();
 

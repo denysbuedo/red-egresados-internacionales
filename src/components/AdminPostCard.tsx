@@ -48,11 +48,7 @@ export function AdminPostCard({
   });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchReactions();
-  }, [id]);
-
-  const fetchReactions = async () => {
+  async function fetchReactions() {
     try {
       const response = await fetch(`/api/posts/reactions?postId=${id}`);
       if (response.ok) {
@@ -62,7 +58,7 @@ export function AdminPostCard({
     } catch (error) {
       console.error("Error fetching reactions:", error);
     }
-  };
+  }
 
   const handleReaction = async (reactionType: string) => {
     if (loading) return;
@@ -138,6 +134,11 @@ export function AdminPostCard({
     : "N/A";
 
   const totalReactions = reactions.like + reactions.love + reactions.celebrate + reactions.insightful;
+
+  useEffect(() => {
+    fetchReactions();
+  }, [id]);
+
 
   return (
     <article className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">

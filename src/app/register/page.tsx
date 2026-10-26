@@ -107,7 +107,7 @@ export default function RegistroPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <InputField label="Username" name="username" required placeholder="Elige un username" />
               <InputField label="Correo Electrónico" name="email" type="email" required placeholder="tu@email.com" />
-              <InputField label="Contraseña" name="password" type="password" required placeholder="Mínimo 6 caracteres" />
+              <InputField label="Contraseña" name="password" type="password" required minLength={12} maxLength={72} placeholder="Mínimo 12 caracteres" />
             </div>
           </Section>
 
@@ -179,7 +179,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function InputField({ label, name, type = "text", required, placeholder, min, max }: any) {
+function InputField({ label, name, type = "text", required, placeholder, min, max, minLength, maxLength }: any) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -192,6 +192,8 @@ function InputField({ label, name, type = "text", required, placeholder, min, ma
         placeholder={placeholder}
         min={min}
         max={max}
+        minLength={minLength}
+        maxLength={maxLength}
         className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent text-sm"
       />
     </div>
