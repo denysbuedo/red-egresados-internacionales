@@ -1,120 +1,22 @@
-# System Patterns: Next.js Starter Template
+# Arquitectura: Red de Egresados Internacionales
 
-## Architecture Overview
+## Componentes
 
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── layout.tsx          # Root layout + metadata
-│   ├── page.tsx            # Home page
-│   ├── globals.css         # Tailwind imports + global styles
-│   └── favicon.ico         # Site icon
-└── (expand as needed)
-    ├── components/         # React components (add when needed)
-    ├── lib/                # Utilities and helpers (add when needed)
-    └── db/                 # Database files (add via recipe)
-```
+- Next.js App Router y React: páginas de inicio, registro, espera, directorio, perfiles, conexiones, comunidades, eventos, noticias y administración.
+- Rutas en src/app/api: llaman a authorizeApi antes de ejecutar operaciones de negocio. Los layouts también protegen páginas; la autorización no depende del cliente ni de ocultar enlaces.
+- src/lib/api-access.ts: exige cuenta aprobada, aplica roles y comprueba Origin en mutaciones. Cada handler conserva las comprobaciones de propiedad y alcance institucional.
+- src/lib/session.ts y session-store.cjs: token aleatorio de 256 bits en cookie __Host-session, hash en SQLite, caducidad 24 horas y revocación. Los roles/estados se leen de users en cada petición; no se confía en datos de identidad de la cookie.
+- src/lib/registration.ts: validación y transacción de cuenta/perfil, siempre con rol user y estado pending. Las instituciones se limitan a su institution_name y las solicitudes a pending_university.
+- src/db: Drizzle sobre better-sqlite3. Incluye perfiles, usuarios, contenido, conexiones, grupos, eventos, notificaciones, sesiones y límites de autenticación. La migración CJS transaccional mantiene app_migrations con checksums y adopta el esquema heredado.
 
-## Key Design Patterns
+## Ejecución
 
-### 1. App Router Pattern
+Nginx en 80 envía a Next en 127.0.0.1:3000. systemd ejecuta Node 22 bajo el usuario red-egresados, con ProtectSystem=strict y sin privilegios de root. El código y .git son propiedad de root. Solo los datos y la caché de Next permiten escrituras del servicio.
 
-Uses Next.js App Router with file-based routing:
-```
-src/app/
-├── page.tsx           # Route: /
-├── about/page.tsx     # Route: /about
-├── blog/
-│   ├── page.tsx       # Route: /blog
-│   └── [slug]/page.tsx # Route: /blog/:slug
-└── api/
-    └── route.ts       # API Route: /api
-```
+La base activa es /var/lib/red-egresados/dev.db y se configura con DATABASE_PATH. Fuentes, datos, secretos, backups y artefactos de build tienen ciclos separados. Los datos nunca se sincronizan mediante checkout Git.
 
-### 2. Component Organization Pattern (When Expanding)
+El frontal HTTPS/HAProxy y el DNS del dominio conecta.reduniv.edu.cu se preparan en una etapa separada. Las cookies de producción exigen HTTPS. No ejecutar simultáneamente PM2 y la unidad systemd.
 
-```
-src/components/
-├── ui/                # Reusable UI components (Button, Card, etc.)
-├── layout/            # Layout components (Header, Footer)
-├── sections/          # Page sections (Hero, Features, etc.)
-└── forms/             # Form components
-```
+## Validación
 
-### 3. Server Components by Default
-
-All components are Server Components unless marked with `"use client"`:
-```tsx
-// Server Component (default) - can fetch data, access DB
-export default function Page() {
-  return <div>Server rendered</div>;
-}
-
-// Client Component - for interactivity
-"use client";
-export default function Counter() {
-  const [count, setCount] = useState(0);
-  return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
-}
-```
-
-### 4. Layout Pattern
-
-Layouts wrap pages and can be nested:
-```tsx
-// src/app/layout.tsx - Root layout
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
-}
-
-// src/app/dashboard/layout.tsx - Nested layout
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex">
-      <Sidebar />
-      <main>{children}</main>
-    </div>
-  );
-}
-```
-
-## Styling Conventions
-
-### Tailwind CSS Usage
-- Utility classes directly on elements
-- Component composition for repeated patterns
-- Responsive: `sm:`, `md:`, `lg:`, `xl:`
-
-### Common Patterns
-```tsx
-// Container
-<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-// Responsive grid
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-// Flexbox centering
-<div className="flex items-center justify-center">
-```
-
-## File Naming Conventions
-
-- Components: PascalCase (`Button.tsx`, `Header.tsx`)
-- Utilities: camelCase (`utils.ts`, `helpers.ts`)
-- Pages/Routes: lowercase (`page.tsx`, `layout.tsx`)
-- Directories: kebab-case (`api-routes/`) or lowercase (`components/`)
-
-## State Management
-
-For simple needs:
-- `useState` for local component state
-- `useContext` for shared state
-- Server Components for data fetching
-
-For complex needs (add when necessary):
-- Zustand for client state
-- React Query for server state
+npm ci utiliza el único package-lock.json. npm test cubre migración y sesiones; npm run test:http crea base y servidor propios para probar autorización y flujos de registro/aprobación. Los datos reales no se usan para crear cuentas de prueba. Ver SEGURIDAD_DESPLIEGUE.md para evidencia y límites de la revisión.

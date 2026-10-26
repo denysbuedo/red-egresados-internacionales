@@ -56,3 +56,33 @@ Validación aislada completada: Node 22.23.4 en Linux, instalación limpia con n
 auditoría de producción sin hallazgos, typecheck, build, seis pruebas unitarias y
 ocho pruebas HTTP correctas. La migración repetida conservó los registros de las
 17 tablas existentes, añadiendo únicamente su entrada al journal de migraciones.
+
+## Resultado operativo verificado
+
+El código de esta etapa se publicó como `5c37255` y se aplicó a la VM por
+fast-forward, con reinstalación desde package-lock.json y build en el directorio
+real. La unidad systemd está habilitada y activa bajo red-egresados; Next escucha
+únicamente en 127.0.0.1:3000. Nginx responde 200 en inicio, login y registro.
+
+Se verificó en el servicio real que las API privadas responden 401 sin sesión,
+que la contraseña histórica del administrador es rechazada, que la nueva permite
+acceder y que logout invalida el token. También se comprobó el rechazo de un
+Origin ajeno. La prueba no imprimió contraseñas, cookies ni respuestas con datos
+personales. No se crearon usuarios de prueba en producción.
+
+La nueva contraseña está únicamente en:
+`/var/backups/red-egresados/pre-security-20261025/credenciales-rotadas.json`.
+El operador autorizado puede consultarla personalmente con sudo en la VM. El
+archivo tiene permisos 0600, su directorio 0700 y el servicio no puede leerlo.
+No publicarla en el chat ni copiarla a Git. Solo se rotó la cuenta que todavía
+utilizaba la credencial expuesta; las otras siete contraseñas se conservaron.
+
+Los 8 usuarios, 7 perfiles y demás registros de negocio se conservaron. Se
+verificaron todas las columnas originales, exceptuando el cambio intencional de
+password_hash/updated_at de la cuenta rotada y la entrada nueva del journal de
+migraciones. integrity_check y foreign_key_check son correctos. El archivo dev.db
+que antes estaba dentro del checkout se conserva en el respaldo como
+working-tree-dev.db; la copia operativa actual es /var/lib/red-egresados/dev.db.
+
+No se modificaron DNS, HAProxy ni certificados del dominio nuevo. La validación
+de HTTPS y del recorrido desde internet sigue pendiente de esa configuración.

@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status**: Código reconciliado y compilado en la VM; publicación pendiente de seguridad y validación funcional
+**Status**: Servicio activo en la VM, sesiones y permisos corregidos y flujos HTTP validados; publicación del dominio nuevo pendiente de DNS/TLS/HAProxy
 
 Red social para egresados internacionales de la educación superior cubana. Permite gestionar perfiles, conectar egresados por criterios de afinidad, y crear listas de distribución de correo.
 
@@ -107,6 +107,10 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - API de negocio requiere cuenta aprobada; mutations verifican Origin. Propiedad de perfiles/conexiones y alcance institucional verificados. Listas de correo solo admin; editores gestionan contenido.
 - Creado register-complete transaccional, /pendiente sin bucle de redirección y /universidad. Registro público nunca asigna roles solicitados por el cliente.
 - Next 16.4.3 y React 19.3.1 fijados; npm audit --omit=dev sin hallazgos. Cuatro avisos moderados de herramientas de desarrollo pendientes; no aplicar audit --force. Se retira bun.lock para mantener npm ci como único lock de despliegue.
-- Servicio systemd preparado con usuario red-egresados y datos en /var/lib/red-egresados/dev.db; runtime Node 22.23.4 verificado por SHA-256 oficial. Pendiente de validación Linux y activación al registrar esta entrada.
-- Respaldo previo verificado en /var/backups/red-egresados/pre-security-20261025. Un administrador aún usa la contraseña histórica publicada: se rotará antes del arranque.
+- Servicio systemd activo y habilitado con usuario red-egresados y datos en /var/lib/red-egresados/dev.db; runtime Node 22.23.4 verificado por SHA-256 oficial. Validación Linux, build y pruebas HTTP completados.
+- Respaldo previo verificado en /var/backups/red-egresados/pre-security-20261025. Se detectó y rotó la contraseña histórica de un administrador antes del arranque; nueva credencial únicamente en credenciales-rotadas.json dentro del respaldo, accesible solo por root.
 - Ver SEGURIDAD_DESPLIEGUE.md para diseño, pruebas y operación. DNS/TLS/HAProxy del dominio nuevo permanecen pendientes.
+
+- Verificación real por Nginx: inicio/login/registro 200, API privadas anónimas 401, contraseña antigua rechazada, nueva válida, cookie segura y logout revocado. systemd running/enabled, NRestarts=0, escucha exclusiva 127.0.0.1:3000.
+- Integridad y claves foráneas OK. Conservados 8 usuarios, 7 perfiles y datos de negocio; único cambio deliberado en cuentas: hash/fecha de la contraseña expuesta. Los datos usados por pruebas permanecieron separados.
+- Se conserva el código root-owned; el usuario de servicio no puede modificarlo ni leer credenciales de respaldo. Secretos y bases fuera de Git. Implementación publicada como 5c37255; documentación final se sincroniza por separado.
