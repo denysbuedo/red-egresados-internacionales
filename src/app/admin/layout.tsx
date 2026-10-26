@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Panel de Administración",
-  description: "Gestión de la Red de Egresados",
+  description: "Gestión de la Red MES",
 };
 
 export default async function AdminLayout({

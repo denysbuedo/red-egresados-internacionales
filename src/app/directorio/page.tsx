@@ -1,3 +1,4 @@
+import { MEMBER_TYPES } from "@/lib/site";
 import { db } from "@/db";
 import { graduates } from "@/db/schema";
 import { sql } from "drizzle-orm";
@@ -27,7 +28,8 @@ export default async function DirectorioPage({
   const params = await searchParams;
   const search = params.search || "";
   const country = params.country || "";
-  const university = params.university || "";
+  const university = params.institution || params.university || "";
+  const memberType = params.memberType || "";
   const career = params.career || "";
   const yearFrom = params.yearFrom || "";
   const yearTo = params.yearTo || "";
@@ -43,6 +45,7 @@ export default async function DirectorioPage({
   if (country) conditions.push(sql`${graduates.country} = ${country}`);
   if (university)
     conditions.push(sql`${graduates.university} = ${university}`);
+  if (memberType && MEMBER_TYPES.some((type) => type.value === memberType)) conditions.push(sql`${graduates.memberType} = ${memberType}`);
   if (career) conditions.push(sql`${graduates.career} = ${career}`);
   if (yearFrom)
     conditions.push(
@@ -79,7 +82,7 @@ export default async function DirectorioPage({
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Directorio</h1>
           <p className="text-gray-600 mt-1">
-            Busca y filtra egresados por diferentes criterios
+            Encuentra personas de la comunidad por institución, vínculo o área de conocimiento
           </p>
         </div>
 
@@ -115,11 +118,11 @@ export default async function DirectorioPage({
             </select>
 
             <select
-              name="university"
+              name="institution"
               defaultValue={university}
               className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
             >
-              <option value="">Todas las universidades</option>
+              <option value="">Todas las instituciones</option>
               {universitiesResult.map((u) => (
                 <option key={u.university} value={u.university}>
                   {u.university}
@@ -127,13 +130,18 @@ export default async function DirectorioPage({
               ))}
             </select>
 
+            <select name="memberType" defaultValue={memberType}
+              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm">
+              <option value="">Todos los vínculos</option>
+              {MEMBER_TYPES.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
+            </select>
             <select
               name="career"
               defaultValue={career}
               className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
             >
-              <option value="">Todas las carreras</option>
-              {careersResult.map((c) => (
+              <option value="">Todas las áreas de conocimiento</option>
+              {careersResult.filter((c) => c.career).map((c) => (
                 <option key={c.career} value={c.career}>
                   {c.career}
                 </option>
@@ -161,7 +169,7 @@ export default async function DirectorioPage({
             />
           </div>
 
-          {(search || country || university || career || yearFrom || yearTo) && (
+          {(search || country || university || career || memberType || yearFrom || yearTo) && (
             <div className="flex items-center gap-2">
               <span className="text-gray-600 text-sm">
                 {allGraduates.length} resultado{allGraduates.length !== 1 && "s"}
@@ -186,7 +194,8 @@ export default async function DirectorioPage({
                 country={g.country}
                 university={g.university}
                 career={g.career}
-                graduationYear={g.graduationYear}
+                graduationYear={g.graduationYear || null}
+                memberType={g.memberType}
                 currentProfession={g.currentProfession}
                 currentCompany={g.currentCompany}
                 photoUrl={g.photoUrl}
@@ -220,7 +229,7 @@ export default async function DirectorioPage({
               href="/directorio"
               className="inline-block px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors"
             >
-              Ver todos los egresados
+              Ver todos los miembros
             </a>
           </div>
         )}

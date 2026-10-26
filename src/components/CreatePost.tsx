@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { POST_TYPES } from "@/lib/site";
 import { useRouter } from "next/navigation";
 
 export function CreatePost() {
   const router = useRouter();
   const [content, setContent] = useState("");
+  const [postType, setPostType] = useState("update");
+  const [referenceUrl, setReferenceUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [showImageInput, setShowImageInput] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,6 +53,8 @@ export function CreatePost() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content: content.trim(),
+          postType,
+          referenceUrl: referenceUrl || null,
           imageUrl: imageUrl || null,
         }),
       });
@@ -58,6 +63,8 @@ export function CreatePost() {
 
       if (response.ok) {
         setContent("");
+        setReferenceUrl("");
+        setPostType("update");
         setImageUrl("");
         setShowImageInput(false);
         fetchLimitInfo();
@@ -106,35 +113,21 @@ export function CreatePost() {
       {/* Header con límite diario */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">
-          Crear Publicación
+          Compartir un aporte
         </h3>
         <div className={`text-sm ${limitInfo.remaining === 0 ? 'text-red-600' : 'text-gray-500'}`}>
           {limitInfo.remaining} de {limitInfo.dailyLimit} publicaciones hoy
         </div>
       </div>
 
-      {/* Barra de progreso del límite */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-          <span>Progreso diario</span>
-          <span>{Math.round((limitInfo.postsToday / limitInfo.dailyLimit) * 100)}%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className={`h-2 rounded-full transition-all ${
-              limitInfo.postsToday >= limitInfo.dailyLimit
-                ? 'bg-red-500'
-                : limitInfo.postsToday >= 2
-                ? 'bg-yellow-500'
-                : 'bg-green-500'
-            }`}
-            style={{ width: `${(limitInfo.postsToday / limitInfo.dailyLimit) * 100}%` }}
-          />
-        </div>
-      </div>
-
       {/* Área de texto */}
       <div className="space-y-3">
+        <label className="block text-sm font-medium text-gray-700">Tipo de aporte
+          <select value={postType} onChange={(event) => setPostType(event.target.value)} disabled={!limitInfo.canPost || loading}
+            className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900">
+            {POST_TYPES.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
+          </select>
+        </label>
         <textarea
           ref={textareaRef}
           value={content}
@@ -142,12 +135,17 @@ export function CreatePost() {
             setContent(e.target.value);
             handleTextareaResize();
           }}
-          placeholder="¿Qué quieres compartir con la red? (mínimo 5 caracteres)"
+          placeholder="Comparte un resultado, presenta un proyecto, plantea una consulta o invita a colaborar..."
           className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent transition-all resize-none min-h-[100px]"
           disabled={!limitInfo.canPost || loading}
           maxLength={2000}
         />
 
+        <label className="block text-sm font-medium text-gray-700">Enlace al recurso (opcional)
+          <input type="url" value={referenceUrl} onChange={(event) => setReferenceUrl(event.target.value)} maxLength={2000}
+            placeholder="https://doi.org/... o enlace al proyecto, convocatoria o documento"
+            disabled={!limitInfo.canPost || loading} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+        </label>
         {/* Contador de caracteres */}
         <div className="flex items-center justify-between text-xs">
           <span className={`text-gray-500 ${content.length > 2000 ? 'text-red-600' : ''}`}>

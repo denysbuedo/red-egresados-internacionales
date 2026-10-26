@@ -90,7 +90,7 @@ export default function CommunitiesPage() {
   };
 
   const typeLabels = {
-    university: "🏛️ Universidad",
+    university: "🏛️ Institución",
     career: "📚 Carrera",
     country: "🌍 País",
     interest: "💡 Interés",
@@ -132,7 +132,7 @@ export default function CommunitiesPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Comunidades</h1>
             <p className="text-gray-600 mt-1">
-              Grupos por universidad, carrera, país o intereses
+              Comunidades por institución, área de conocimiento, país o intereses
             </p>
           </div>
           <button
@@ -162,7 +162,7 @@ export default function CommunitiesPage() {
                   value={newGroup.name}
                   onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
                   className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f]"
-                  placeholder="Ej: Egresados de Medicina"
+                  placeholder="Ej: Comunidad de Ciencias de la Salud"
                   required
                   minLength={3}
                 />
@@ -187,7 +187,7 @@ export default function CommunitiesPage() {
                     onChange={(e) => setNewGroup({ ...newGroup, type: e.target.value as Group["type"] })}
                     className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f]"
                   >
-                    <option value="university">Universidad</option>
+                    <option value="university">Institución</option>
                     <option value="career">Carrera</option>
                     <option value="country">País</option>
                     <option value="interest">Interés</option>

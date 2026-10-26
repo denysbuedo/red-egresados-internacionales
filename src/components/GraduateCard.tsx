@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { memberTypeLabel } from "@/lib/site";
 import { useState, useEffect } from "react";
 
 interface GraduateCardProps {
@@ -9,7 +10,8 @@ interface GraduateCardProps {
   country: string;
   university: string;
   career: string;
-  graduationYear: number;
+  graduationYear: number | null;
+  memberType?: string;
   currentProfession: string;
   currentCompany?: string | null;
   photoUrl?: string | null;
@@ -22,6 +24,7 @@ export function GraduateCard({
   university,
   career,
   graduationYear,
+  memberType,
   currentProfession,
   currentCompany,
   photoUrl,
@@ -98,7 +101,7 @@ export function GraduateCard({
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all group">
       <div className="flex items-start gap-4">
-        <Link href={`/egresados/${id}`}>
+        <Link href={`/miembros/${id}`}>
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
             {photoUrl ? (
               <img
@@ -112,7 +115,7 @@ export function GraduateCard({
           </div>
         </Link>
         <div className="min-w-0 flex-1">
-          <Link href={`/egresados/${id}`}>
+          <Link href={`/miembros/${id}`}>
             <h3 className="text-gray-900 font-semibold text-base group-hover:text-blue-600 transition-colors truncate">
               {name}
             </h3>
@@ -162,6 +165,7 @@ export function GraduateCard({
             </span>
           </div>
 
+          <p className="mt-2 text-xs font-medium text-blue-700">{memberTypeLabel(memberType)}</p>
           {/* Botón de conectar */}
           <div className="mt-3">
             {checking ? (

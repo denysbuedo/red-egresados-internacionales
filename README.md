@@ -1,6 +1,6 @@
-# Red de Egresados Internacionales de la Educación Superior Cubana
+# Red MES — Ministerio de Educación Superior
 
-> Plataforma de colaboración profesional para egresados extranjeros de universidades cubanas.
+> Red profesional y académica para trabajadores del MES y de sus instituciones.
 
 [![Versión](https://img.shields.io/badge/versión-0.0.8--beta.1-blue.svg)](https://github.com/denysbuedo/red-egresados-internacionales/releases)
 [![Licencia](https://img.shields.io/badge/licencia-Privado-gray.svg)]()
@@ -9,13 +9,13 @@
 
 ## 📋 Descripción
 
-Red social profesional que conecta a egresados internacionales que se formaron en la educación superior cubana. Permite crear perfiles profesionales, compartir publicaciones científicas, participar en grupos temáticos, asistir a eventos y mantener vínculos académicos.
+Red profesional y académica para docentes, investigadores, especialistas, técnicos, directivos y demás trabajadores del Ministerio de Educación Superior y sus instituciones. Permite crear perfiles, establecer contactos y compartir resultados, proyectos, convocatorias y consultas. El registro de estudiantes no está habilitado en esta primera etapa.
 
 ## ✨ Características
 
 - ✅ **Registro con aprobación** — Flujo de validación por instituciones
 - ✅ **Perfiles profesionales** — Datos académicos y profesionales completos
-- ✅ **Feed de actividad** — Publicaciones con límite diario (3 posts, 10 comentarios)
+- ✅ **Aportes profesionales** — Resultados científicos, proyectos, convocatorias y consultas con enlaces y filtros
 - ✅ **Sistema de conexiones** — Solicitudes de amistad con aceptar/rechazar
 - ✅ **Eventos** — Webinars y encuentros con RSVP automático
 - ✅ **Comunidades** — Grupos por universidad, carrera, país o interés
@@ -47,6 +47,7 @@ ADMIN_USERNAME, ADMIN_EMAIL y ADMIN_PASSWORD, y no modifica cuentas existentes.
 
 | Documento | Descripción |
 |-----------|-------------|
+| [Reconversión a Red MES](RECONVERSION_RED_MES.md) | Público inicial, orientación profesional y académica, datos y compatibilidad |
 | [Seguridad y operación](SEGURIDAD_DESPLIEGUE.md) | Sesiones, permisos, pruebas y servicio de la VM |
 | [Sincronización del despliegue](SINCRONIZACION_DESPLIEGUE.md) | Estado verificado, datos conservados y procedimiento vigente |
 | [📘 Guía del Desarrollador](GUIDE_DESARROLLADOR.md) | Documentación técnica completa para el equipo de desarrollo |
@@ -75,7 +76,7 @@ src/
 │   ├── comunidades/        # Grupos
 │   ├── conexiones/         # Solicitudes
 │   ├── directorio/         # Búsqueda
-│   ├── egresados/          # Perfiles
+│   ├── miembros/           # Perfiles profesionales (egresados/ como compatibilidad)
 │   ├── eventos/            # Eventos
 │   ├── noticias/           # Noticias
 │   ├── terminos/           # Términos
@@ -89,7 +90,7 @@ src/
 
 | Rol | Función |
 |-----|---------|
-| `user` | Egresado registrado y aprobado |
+| `user` | Trabajador registrado y aprobado |
 | `admin` | Control total del sistema |
 | `institution` | Aprueba registros de su universidad |
 | `editor` | Publica noticias y eventos |
@@ -130,4 +131,4 @@ Actual: **v0.0.8-beta.1**
 
 ---
 
-**© 2026** Red de Egresados Internacionales · Ministerio de Educación Superior · República de Cuba
+**© 2026** Red MES · Ministerio de Educación Superior · República de Cuba

@@ -8,7 +8,7 @@ export default async function UniversityPage() {
   if (!session) redirect("/login");
   if (session.role !== "institution") redirect("/");
   return <main className="mx-auto max-w-7xl px-4 py-8">
-    <h1 className="mb-6 text-2xl font-bold">{session.institutionName || "Universidad sin asignar"}</h1>
+    <h1 className="mb-6 text-2xl font-bold">{session.institutionName || "Institución sin asignar"}</h1>
     <ApprovalsPage />
   </main>;
 }

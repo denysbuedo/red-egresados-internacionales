@@ -114,3 +114,20 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Verificación real por Nginx: inicio/login/registro 200, API privadas anónimas 401, contraseña antigua rechazada, nueva válida, cookie segura y logout revocado. systemd running/enabled, NRestarts=0, escucha exclusiva 127.0.0.1:3000.
 - Integridad y claves foráneas OK. Conservados 8 usuarios, 7 perfiles y datos de negocio; único cambio deliberado en cuentas: hash/fecha de la contraseña expuesta. Los datos usados por pruebas permanecieron separados.
 - Se conserva el código root-owned; el usuario de servicio no puede modificarlo ni leer credenciales de respaldo. Secretos y bases fuera de Git. Implementación publicada como 5c37255; documentación final se sincroniza por separado.
+
+## Recuperación de acceso administrador — 2026-10-26
+
+- A petición del operador, se verificó en modo de solo lectura la cuenta administradora aprobada y la vigencia de la credencial rotada, comparándola con su hash actual.
+- Se entregó una copia local en acceso-admin-recuperado-20261026.txt, excluida mediante .git/info/exclude y con ACL limitada al usuario Windows actual y SYSTEM. No publicar su contenido en el chat ni versionarlo.
+- No se modificaron contraseñas, usuarios, base de datos ni servicios de la VM durante esta recuperación.
+
+## Reconversión a Red MES — 2026-10-26
+
+- Objetivo confirmado: red profesional y académica para trabajadores del MES y sus instituciones. No replicar Facebook; combinar contactos profesionales y colaboración científica. Estudiantes fuera de la primera etapa, con posibilidad de inclusión futura.
+- En preparación: identidad institucional, perfiles laborales, institución libre con validación, formación opcional, directorio por tipo profesional y rutas /miembros y /institucion con compatibilidad de las rutas históricas.
+- Registro exige tipo laboral habilitado y declaración de empleo; aprobar exige completar el vínculo. Nuevas categorías no conceden permisos administrativos. Se prepara /completar-perfil para revalidar afiliación sin perder datos.
+- Aportes clasificados por actualización, publicación científica, proyecto, convocatoria o consulta; enlaces a recursos y filtros. Sin fingir bibliografía verificada ni expedientes de proyectos completos.
+- Migración 0017 aditiva. Perfiles históricos sin tipo ni empleo declarado se marcan por actualizar; no se modifica su aprobación automáticamente. Pendiente la elección del operador sobre la revalidación de las siete cuentas históricas de miembros.
+- Respaldo verificado en /var/backups/red-egresados/pre-red-mes-20261026. Snapshot: 8 usuarios, 7 perfiles, 5 aportes, 8 noticias y 8 conexiones. El servicio continúa activo durante preparación y pruebas.
+- Pruebas Windows: typecheck/build correctos, siete pruebas unitarias y trece HTTP correctas; lint con cero errores y 44 advertencias. Validación sobre copia real en Linux correcta: valores originales de las 19 tablas conservados, integridad y claves foráneas OK. Falta aplicar el despliegue.
+- Ver RECONVERSION_RED_MES.md para alcance, conservación de datos y límites de esta etapa.

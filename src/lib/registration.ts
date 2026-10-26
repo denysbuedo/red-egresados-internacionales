@@ -5,6 +5,7 @@ import { users, graduates } from "@/db/schema";
 import { hashPassword } from "./auth";
 import { setSession, sessionStore } from "./session";
 import { checkRequestOrigin } from "./api-access";
+import { MEMBER_TYPES, type MemberType } from "./site";
 import { sql, eq } from "drizzle-orm";
 
 export async function registerAccount(request: NextRequest) {
@@ -30,9 +31,14 @@ export async function registerAccount(request: NextRequest) {
     if (!/^[a-zA-Z0-9_.-]{3,40}$/.test(username)) throw new Error("El username debe tener entre 3 y 40 letras, números, puntos, guiones o guiones bajos");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Correo electrónico inválido");
     if (typeof password !== "string" || password.length < 12 || Buffer.byteLength(password) > 72) throw new Error("La contraseña debe tener al menos 12 caracteres y como máximo 72 bytes");
+    if (body.institution !== undefined) body.university = body.institution;
     const university = text("university", 200, true)!;
-    const graduationYear = Number(body.graduationYear);
-    if (!Number.isInteger(graduationYear) || graduationYear < 1900 || graduationYear > new Date().getFullYear()) throw new Error("Año de graduación inválido");
+    const memberType = body.memberType;
+    if (memberType === "student") return NextResponse.json({ error: "El registro de estudiantes no está habilitado en esta primera etapa" }, { status: 403 });
+    if (!MEMBER_TYPES.some((type) => type.value === memberType)) throw new Error("Selecciona tu vínculo laboral con el MES o sus instituciones");
+    if (body.employmentConfirmed !== true) throw new Error("Debes confirmar tu vínculo laboral con el MES o una de sus instituciones");
+    const graduationYear = body.graduationYear == null || body.graduationYear === "" ? 0 : Number(body.graduationYear);
+    if (graduationYear !== 0 && (!Number.isInteger(graduationYear) || graduationYear < 1900 || graduationYear > new Date().getFullYear())) throw new Error("Año de graduación inválido");
     account = { username, email, password, university };
     const safeLink = (key: string) => {
       const value = text(key, 2000);
@@ -41,7 +47,7 @@ export async function registerAccount(request: NextRequest) {
     };
     profile = {
       name: text("name", 150, true)!, email, country: text("country", 100, true)!,
-      university, career: text("career", 200, true)!, graduationYear,
+      memberType: memberType as MemberType, employmentConfirmed: true, university, career: text("career", 200) || "", graduationYear,
       currentProfession: text("currentProfession", 200, true)!, city: text("city", 150),
       currentCompany: text("currentCompany", 200), bio: text("bio", 5000), phone: text("phone", 50),
       linkedin: safeLink("linkedin"), website: safeLink("website"), photoUrl: safeLink("photoUrl"),
@@ -69,7 +75,7 @@ export async function registerAccount(request: NextRequest) {
       return user;
     });
     await setSession(newUser);
-    return NextResponse.json({ message: "Registro recibido. Tu universidad revisará la solicitud.",
+    return NextResponse.json({ message: "Registro recibido. Tu institución revisará la solicitud.",
       pending: true, redirect: "/pendiente", user: { id: newUser.id, username: newUser.username, status: "pending" } }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && /UNIQUE constraint failed/.test(error.message)) {

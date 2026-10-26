@@ -48,7 +48,7 @@ export default function AdminUsersPage() {
       const response = await fetch("/api/admin/users", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: userId, role: newRole, ...(newRole === "institution" ? { institutionName: window.prompt("Nombre exacto de la universidad que gestionará esta cuenta:") || "" } : {}) }),
+        body: JSON.stringify({ id: userId, role: newRole, ...(newRole === "institution" ? { institutionName: window.prompt("Nombre exacto de la institución que gestionará esta cuenta:") || "" } : {}) }),
       });
 
       if (response.ok) {

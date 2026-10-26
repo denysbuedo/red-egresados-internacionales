@@ -15,7 +15,7 @@ interface AdminPostCardProps {
 const PREVIEW_LENGTH = 500;
 
 const REACTION_TYPES = [
-  { type: "like", emoji: "👍", label: "Me gusta" },
+  { type: "like", emoji: "👍", label: "Recomendar" },
   { type: "love", emoji: "❤️", label: "Me encanta" },
   { type: "celebrate", emoji: "🎉", label: "Celebrar" },
   { type: "insightful", emoji: "💡", label: "Interesante" },

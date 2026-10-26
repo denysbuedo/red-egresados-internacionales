@@ -23,7 +23,7 @@ export async function GET(
 
     if (!graduate.length) {
       return NextResponse.json(
-        { error: "Egresado no encontrado" },
+        { error: "Miembro no encontrado" },
         { status: 404 }
       );
     }
@@ -57,12 +57,12 @@ export async function GET(
     const session = (await getSession())!;
     const targetUser = db.select({ status: users.status }).from(users).where(eq(users.id, graduate[0].userId ?? -1)).get();
     if (session.role !== "admin" && graduate[0].userId !== session.id && targetUser?.status !== "approved") {
-      return NextResponse.json({ error: "Egresado no encontrado" }, { status: 404 });
+      return NextResponse.json({ error: "Miembro no encontrado" }, { status: 404 });
     }
     const { email, phone, userId, linkedin, website, ...publicProfile } = graduate[0];
     const contact = session.role === "admin" || userId === session.id ? { email, phone, linkedin, website } : {};
     return NextResponse.json({
-      ...publicProfile, ...contact,
+      ...publicProfile, ...contact, graduationYear: publicProfile.graduationYear || null, institution: publicProfile.university,
       connectionsCount:
         graduateConnections.length + receivedConnections.length,
       postsCount: graduatePosts.length,
@@ -71,7 +71,7 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching graduate:", error);
     return NextResponse.json(
-      { error: "Error al obtener egresado" },
+      { error: "Error al obtener miembro" },
       { status: 500 }
     );
   }
@@ -88,7 +88,7 @@ export async function PUT(
     const graduateId = parseInt(id);
     const session = (await getSession())!;
     const target = db.select().from(graduates).where(eq(graduates.id, graduateId)).get();
-    if (!target) return NextResponse.json({ error: "Egresado no encontrado" }, { status: 404 });
+    if (!target) return NextResponse.json({ error: "Miembro no encontrado" }, { status: 404 });
     if (session.role !== "admin" && target.userId !== session.id) {
       return NextResponse.json({ error: "No puedes modificar otro perfil" }, { status: 403 });
     }
@@ -96,17 +96,22 @@ export async function PUT(
     const body = await request.json();
     const invalid = validateProfileInput(body);
     if (invalid) return invalid;
+    const institution = body.institution ?? body.university;
+    if ((institution !== undefined && institution !== target.university) || (body.memberType !== undefined && body.memberType !== target.memberType)) {
+      return NextResponse.json({ error: "Los cambios de vínculo laboral requieren validación", redirect: "/completar-perfil" }, { status: 409 });
+    }
 
     const updated = await db
       .update(graduates)
       .set({
+        memberType: body.memberType,
         name: body.name,
         email: body.email,
         country: body.country,
         city: body.city,
-        university: body.university,
+        university: body.institution || body.university,
         career: body.career,
-        graduationYear: body.graduationYear,
+        graduationYear: body.graduationYear === undefined ? undefined : (body.graduationYear ? Number(body.graduationYear) : 0),
         currentProfession: body.currentProfession,
         currentCompany: body.currentCompany,
         bio: body.bio,
@@ -124,7 +129,7 @@ export async function PUT(
 
     if (!updated.length) {
       return NextResponse.json(
-        { error: "Egresado no encontrado" },
+        { error: "Miembro no encontrado" },
         { status: 404 }
       );
     }
@@ -133,7 +138,7 @@ export async function PUT(
   } catch (error) {
     console.error("Error updating graduate:", error);
     return NextResponse.json(
-      { error: "Error al actualizar egresado" },
+      { error: "Error al actualizar perfil" },
       { status: 500 }
     );
   }
@@ -150,7 +155,7 @@ export async function DELETE(
     const graduateId = parseInt(id);
     const session = (await getSession())!;
     const target = db.select().from(graduates).where(eq(graduates.id, graduateId)).get();
-    if (!target) return NextResponse.json({ error: "Egresado no encontrado" }, { status: 404 });
+    if (!target) return NextResponse.json({ error: "Miembro no encontrado" }, { status: 404 });
     if (session.role !== "admin" && target.userId !== session.id) {
       return NextResponse.json({ error: "No puedes modificar otro perfil" }, { status: 403 });
     }
@@ -158,11 +163,11 @@ export async function DELETE(
 
     await db.delete(graduates).where(eq(graduates.id, graduateId));
 
-    return NextResponse.json({ message: "Egresado eliminado" });
+    return NextResponse.json({ message: "Perfil eliminado" });
   } catch (error) {
     console.error("Error deleting graduate:", error);
     return NextResponse.json(
-      { error: "Error al eliminar egresado" },
+      { error: "Error al eliminar perfil" },
       { status: 500 }
     );
   }

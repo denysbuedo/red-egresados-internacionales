@@ -129,7 +129,7 @@ export default function ConnectionsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Mis Conexiones</h1>
           <p className="text-gray-600 mt-1">
-            Gestiona tus solicitudes y amigos
+            Construye tu red de contactos profesionales
           </p>
         </div>
 
@@ -189,7 +189,7 @@ export default function ConnectionsPage() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                Amigos
+                Contactos
               </div>
               {activeTab === "friends" && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
@@ -211,7 +211,7 @@ export default function ConnectionsPage() {
                 {pendingRequests.map((request) => (
                   <div key={request.id} className="p-6 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1">
-                      <Link href={`/egresados/${request.senderId}`}>
+                      <Link href={`/miembros/${request.senderId}`}>
                         <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
                           {request.senderPhoto ? (
                             <img src={request.senderPhoto} alt={request.senderName} className="w-full h-full object-cover" />
@@ -221,7 +221,7 @@ export default function ConnectionsPage() {
                         </div>
                       </Link>
                       <div>
-                        <Link href={`/egresados/${request.senderId}`}>
+                        <Link href={`/miembros/${request.senderId}`}>
                           <h3 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
                             {request.senderName}
                           </h3>
@@ -278,7 +278,7 @@ export default function ConnectionsPage() {
                 {sentRequests.map((request) => (
                   <div key={request.id} className="p-6 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1">
-                      <Link href={`/egresados/${request.receiverId}`}>
+                      <Link href={`/miembros/${request.receiverId}`}>
                         <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
                           {request.receiverPhoto ? (
                             <img src={request.receiverPhoto} alt={request.receiverName} className="w-full h-full object-cover" />
@@ -288,7 +288,7 @@ export default function ConnectionsPage() {
                         </div>
                       </Link>
                       <div>
-                        <Link href={`/egresados/${request.receiverId}`}>
+                        <Link href={`/miembros/${request.receiverId}`}>
                           <h3 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
                             {request.receiverName}
                           </h3>
@@ -326,7 +326,7 @@ export default function ConnectionsPage() {
                   Sin solicitudes enviadas
                 </h3>
                 <p className="text-gray-500 mb-6">
-                  Explora el directorio y conecta con otros egresados
+                  Explora el directorio y conecta con otros miembros
                 </p>
                 <Link
                   href="/directorio"
@@ -342,7 +342,7 @@ export default function ConnectionsPage() {
                 {friends.map((friend) => (
                   <Link
                     key={friend.graduateId}
-                    href={`/egresados/${friend.graduateId}`}
+                    href={`/miembros/${friend.graduateId}`}
                     className="flex items-center gap-4 p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
                   >
                     <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
@@ -370,10 +370,10 @@ export default function ConnectionsPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                  Sin amigos aún
+                  Aún no tienes contactos profesionales
                 </h3>
                 <p className="text-gray-500 mb-6">
-                  Comienza a conectar con otros egresados
+                  Comienza a conectar con otros miembros
                 </p>
                 <Link
                   href="/directorio"

@@ -20,9 +20,10 @@ export async function GET() {
       role: user.role,
       status: user.status,
       pendingUniversity: user.pendingUniversity,
+      pendingInstitution: user.pendingUniversity,
       graduateId: user.graduateId,
       institutionName: user.institutionName,
     },
-    graduate,
+    graduate: graduate ? { ...graduate, graduationYear: graduate.graduationYear || null, institution: graduate.university } : null,
   });
 }

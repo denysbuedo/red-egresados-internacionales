@@ -29,7 +29,7 @@ async function login(username) {
   return setCookie.split(";")[0];
 }
 function profile(username, university = uniA) {
-  return { username, email: `${username}@example.test`, password, university,
+  return { username, email: `${username}@example.test`, password, university, memberType: "staff", employmentConfirmed: true,
     name: "Egresado de prueba", country: "Cuba", career: "Informática", graduationYear: 2020,
     currentProfession: "Desarrollador", role: "admin", status: "approved" };
 }
@@ -65,7 +65,7 @@ after(async () => {
 });
 
 test("all business APIs require authentication; legacy cookies cannot impersonate admin", async () => {
-  for (const path of ["/api/stats","/api/graduates","/api/graduates/2","/api/email-lists","/api/posts","/api/posts/1/comments","/api/posts/reactions?postId=1","/api/events","/api/groups","/api/groups/1/posts","/api/connections","/api/notifications","/api/admin/users","/api/admin/posts","/api/admin/approvals"]) {
+  for (const path of ["/api/stats","/api/members","/api/members/2","/api/graduates","/api/graduates/2","/api/email-lists","/api/posts","/api/posts/1/comments","/api/posts/reactions?postId=1","/api/events","/api/groups","/api/groups/1/posts","/api/connections","/api/notifications","/api/admin/users","/api/admin/posts","/api/admin/approvals"]) {
     assert.equal((await call(path)).status,401,path);
   }
   const legacy = 'session='+Buffer.from(JSON.stringify({userId:1,createdAt:Date.now()})).toString('base64');
@@ -157,4 +157,79 @@ test("editor can publish content but cannot administer users, institutions have 
   assert.equal((await call('/api/admin/users',{method:'PUT',cookie:cookies.admin,body:{id:2,role:'superadmin'}})).status,400);
   assert.equal((await call('/api/admin/users',{method:'PUT',cookie:cookies.admin,body:{id:2,role:'institution'}})).status,400);
   assert.equal((await call('/api/graduates/2',{method:'PUT',cookie:cookies.member,body:{website:'javascript:alert(1)'}})).status,400);
+});
+
+
+test("first stage accepts workers without graduation requirements, not student registration", async () => {
+  assert.equal((await call('/api/auth/register-complete',{method:'POST',body:{...profile('studentonly'),memberType:'student'}})).status,403);
+  assert.equal(db.prepare("SELECT count(*) n FROM users WHERE username='studentonly'").get().n,0);
+  assert.equal((await call('/api/auth/register-complete',{method:'POST',body:{...profile('notconfirmed'),employmentConfirmed:false}})).status,400);
+  for (const memberType of ['teacher','researcher','specialist','technician','administrative','manager','staff']) {
+    const response=await call('/api/auth/register-complete',{method:'POST',body:{...profile('worker_'+memberType),memberType,graduationYear:null,career:''}});
+    assert.equal(response.status,201,memberType);
+  }
+  const response=await call('/api/auth/register-complete',{method:'POST',body:{...profile('centralworker'),institution:'Ministerio de Educación Superior',memberType:'specialist',graduationYear:null,career:''}});
+  assert.equal(response.status,201);
+  const cookie=response.headers.get('set-cookie').split(';')[0];
+  const account=await (await call('/api/auth/me',{cookie})).json();
+  assert.equal(account.user.pendingInstitution,'Ministerio de Educación Superior');
+  assert.equal(account.graduate.graduationYear,null);
+  assert.equal(account.graduate.memberType,'specialist'); assert.equal(account.graduate.employmentConfirmed,true);
+  const registrationHtml=await (await call('/register')).text();
+  assert.ok(!registrationHtml.includes('value="student"'));
+  assert.ok(registrationHtml.includes('employmentConfirmed'));
+});
+
+test("generic member and institution routes keep legacy profile identifiers and permissions", async () => {
+  const canonical=await (await call('/api/members/2',{cookie:cookies.member})).json();
+  const legacy=await (await call('/api/graduates/2',{cookie:cookies.member})).json();
+  assert.deepEqual(canonical,legacy); assert.equal(canonical.id,2);
+  assert.equal((await call('/miembros/2',{cookie:cookies.member})).status,200);
+  assert.equal((await call('/institucion',{cookie:cookies.institution})).status,200);
+});
+
+test("legacy affiliation is self-service and requires a new scoped institutional approval", async () => {
+  assert.equal((await call('/api/auth/affiliation',{method:'POST',body:{}})).status,401);
+  assert.equal((await call('/api/members/2',{method:'PUT',cookie:cookies.member,body:{memberType:'student'}})).status,400);
+  const unchanged=db.prepare('SELECT university FROM graduates WHERE user_id=3').get().university;
+  const body={institution:uniB,memberType:'researcher',currentProfession:'Investigador',currentCompany:'Centro de investigación',employmentConfirmed:true,userId:3,role:'admin'};
+  assert.equal((await call('/api/auth/affiliation',{method:'POST',cookie:cookies.member,origin:'https://attacker.example',body})).status,403);
+  assert.equal((await call('/api/auth/affiliation',{method:'POST',cookie:cookies.member,body})).status,200);
+  assert.equal(db.prepare('SELECT university FROM graduates WHERE user_id=3').get().university,unchanged);
+  assert.equal(db.prepare('SELECT role FROM users WHERE id=2').get().role,'user');
+  assert.equal((await call('/api/members',{cookie:cookies.member})).status,403);
+  assert.equal((await call('/completar-perfil',{cookie:cookies.member})).status,200);
+  assert.equal((await call('/api/admin/approvals',{method:'PUT',cookie:cookies.institution,body:{userId:2,action:'approve'}})).status,403);
+  assert.equal((await call('/api/admin/approvals',{method:'PUT',cookie:cookies.admin,body:{userId:2,action:'approve'}})).status,200);
+  assert.equal((await call('/api/members',{cookie:cookies.member})).status,200);
+  // Historical records cannot be approved before submitting employment details.
+  db.prepare("UPDATE users SET status='pending' WHERE id=3").run();
+  assert.equal((await call('/api/admin/approvals',{method:'PUT',cookie:cookies.admin,body:{userId:3,action:'approve'}})).status,409);
+});
+
+test("professional contributions keep type and resource and filter correctly", async () => {
+  assert.equal((await call('/api/posts',{method:'POST',cookie:cookies.member,body:{content:'A valid contribution',postType:'publication',referenceUrl:'javascript:alert(1)'}})).status,400);
+  assert.equal((await call('/api/posts',{method:'POST',cookie:cookies.member,body:{content:'A valid contribution',postType:'social-game'}})).status,400);
+  const publication=await call('/api/posts',{method:'POST',cookie:cookies.member,body:{content:'Resultado científico de prueba',postType:'publication',referenceUrl:'https://doi.org/10.0000/example'}});
+  assert.equal(publication.status,201); const p=await publication.json(); assert.equal(p.postType,'publication');
+  const project=await call('/api/posts',{method:'POST',cookie:cookies.member,body:{content:'Proyecto de colaboración de prueba',postType:'project',referenceUrl:'https://example.test/project'}});
+  assert.equal(project.status,201);
+  const list=await (await call('/api/posts?type=publication',{cookie:cookies.member})).json();
+  assert.ok(list.some(row=>row.id===p.id)); assert.ok(list.every(row=>row.postType==='publication'));
+  const html=await (await call('/?type=project',{cookie:cookies.member})).text();
+  assert.ok(html.includes('Proyecto de colaboración de prueba')); assert.ok(html.includes('Consultar recurso original'));
+  assert.ok(!html.includes('Resultado científico de prueba'));
+});
+
+test("pending accounts without a profile can complete only their own employment profile", async () => {
+  const id=db.prepare("INSERT INTO users (username,email,password_hash,role,status) VALUES ('incomplete','incomplete@example.test',?,'user','pending')").run(bcrypt.hashSync(password,10)).lastInsertRowid;
+  const cookie=await login('incomplete');
+  assert.equal((await call('/completar-perfil',{cookie})).status,200);
+  const response=await call('/api/members',{method:'POST',cookie,body:{name:'Perfil pendiente',country:'Cuba',institution:uniA,memberType:'technician',currentProfession:'Técnico',employmentConfirmed:true,graduationYear:null,userId:1,role:'admin'}});
+  assert.equal(response.status,201); const created=await response.json();
+  assert.equal(created.userId,Number(id)); assert.equal(created.graduationYear,null);
+  assert.equal(db.prepare('SELECT role FROM users WHERE id=?').get(id).role,'user');
+  assert.equal((await call('/api/members',{cookie})).status,403);
+  assert.equal((await call('/api/admin/approvals',{method:'PUT',cookie:cookies.institution,body:{userId:Number(id),action:'approve'}})).status,200);
+  assert.equal((await call('/api/members',{cookie})).status,200);
 });

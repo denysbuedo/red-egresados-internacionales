@@ -35,7 +35,7 @@ export default function ListasCorreoPage() {
       .then((r) => r.json())
       .then(setLists);
 
-    fetch("/api/graduates")
+    fetch("/api/members")
       .then((r) => r.json())
       .then((data) => {
         const unis = [...new Set(data.map((g: { university: string }) => g.university))] as string[];
@@ -145,7 +145,7 @@ export default function ListasCorreoPage() {
                   <input
                     name="name"
                     required
-                    placeholder="Ej: Egresados Medicina 2020"
+                    placeholder="Ej: Personal de Ciencias de la Salud"
                     className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 text-sm"
                   />
                 </div>
@@ -166,7 +166,7 @@ export default function ListasCorreoPage() {
                   name="filterUniversity"
                   className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
                 >
-                  <option value="">Todas las universidades</option>
+                  <option value="">Todas las instituciones</option>
                   {universities.map((u) => (
                     <option key={u} value={u}>
                       {u}
@@ -177,7 +177,7 @@ export default function ListasCorreoPage() {
                   name="filterCareer"
                   className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
                 >
-                  <option value="">Todas las carreras</option>
+                  <option value="">Todas las áreas de conocimiento</option>
                   {careers.map((c) => (
                     <option key={c} value={c}>
                       {c}
@@ -234,7 +234,7 @@ export default function ListasCorreoPage() {
                 name="filterUniversity"
                 className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
               >
-                <option value="">Todas las universidades</option>
+                <option value="">Todas las instituciones</option>
                 {universities.map((u) => (
                   <option key={u} value={u}>
                     {u}
@@ -245,7 +245,7 @@ export default function ListasCorreoPage() {
                 name="filterCareer"
                 className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
               >
-                <option value="">Todas las carreras</option>
+                <option value="">Todas las áreas de conocimiento</option>
                 {careers.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -296,7 +296,7 @@ export default function ListasCorreoPage() {
                   <span className="text-white font-semibold">
                     {preview.count}
                   </span>{" "}
-                  egresado{preview.count !== 1 && "s"} encontrado
+                  miembro{preview.count !== 1 && "s"} encontrado
                   {preview.count !== 1 && "s"}
                 </p>
                 <button
@@ -334,7 +334,7 @@ export default function ListasCorreoPage() {
                   )}
                   <div className="mt-3 flex flex-wrap gap-2">
                     {list.filterUniversity && (
-                      <FilterBadge label="Universidad" value={list.filterUniversity} />
+                      <FilterBadge label="Institución" value={list.filterUniversity} />
                     )}
                     {list.filterCareer && (
                       <FilterBadge label="Carrera" value={list.filterCareer} />

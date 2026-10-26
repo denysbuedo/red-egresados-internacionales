@@ -1,3 +1,4 @@
+import { memberTypeLabel } from "@/lib/site";
 import { db } from "@/db";
 import { graduates, connections, users, userPosts } from "@/db/schema";
 import { getSession } from "@/lib/session";
@@ -20,7 +21,7 @@ export default async function GraduateProfilePage({
   if (!session) redirect("/login");
   if (session.status !== "approved") redirect("/pendiente");
 
-  // Obtener datos del egresado
+  // Obtener datos del miembro
   const graduateData = await db
     .select()
     .from(graduates)
@@ -136,8 +137,8 @@ export default async function GraduateProfilePage({
             </h1>
             <p className="text-gray-600 mb-6 max-w-md mx-auto">
               {session
-                ? "Solo los amigos conectados pueden ver este perfil. Envía una solicitud para ver la información completa."
-                : "Debes iniciar sesión y ser amigo de este egresado para ver su perfil."}
+                ? "Solo los contactos profesionales conectados pueden ver este perfil. Envía una solicitud para ver la información completa."
+                : "Debes iniciar sesión y conectar con este miembro para ver su perfil."}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               {session ? (
@@ -150,7 +151,7 @@ export default async function GraduateProfilePage({
                 )
               ) : (
                 <Link
-                  href={`/login?redirect=/egresados/${graduateId}`}
+                  href={`/login?redirect=/miembros/${graduateId}`}
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
                 >
                   Iniciar Sesión
@@ -169,12 +170,14 @@ export default async function GraduateProfilePage({
     );
   }
 
-  // Obtener posts del egresado
+  // Obtener posts del miembro
   const graduatePosts = await db
     .select({
       id: userPosts.id,
       content: userPosts.content,
       imageUrl: userPosts.imageUrl,
+      postType: userPosts.postType,
+      referenceUrl: userPosts.referenceUrl,
       likes: userPosts.likes,
       commentsCount: userPosts.commentsCount,
       createdAt: userPosts.createdAt,
@@ -194,6 +197,10 @@ export default async function GraduateProfilePage({
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {graduate.userId === session.id && <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+          <p className="text-sm text-gray-700">{graduate.employmentConfirmed ? "Mantén actualizada tu institución y actividad profesional." : "Completa tu vínculo laboral para la nueva etapa de Red MES."}</p>
+          <Link href="/completar-perfil" className="text-sm font-semibold text-blue-800 underline">Actualizar vínculo laboral</Link>
+        </div>}
         {/* Header del perfil */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden mb-6">
           {/* Banner */}
@@ -263,20 +270,24 @@ export default async function GraduateProfilePage({
 
             {/* Formación */}
             <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Formación en Cuba</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Vinculación institucional y formación</h2>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Universidad</p>
+                  <p className="text-sm font-medium text-gray-700">Institución</p>
                   <p className="text-gray-600">{graduate.university}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Carrera</p>
-                  <p className="text-gray-600">{graduate.career}</p>
+                  <p className="text-sm font-medium text-gray-700">Vínculo con la comunidad</p>
+                  <p className="text-gray-600">{memberTypeLabel(graduate.memberType)}</p>
                 </div>
-                <div>
+                {graduate.career && <div>
+                  <p className="text-sm font-medium text-gray-700">Área de conocimiento o formación</p>
+                  <p className="text-gray-600">{graduate.career}</p>
+                </div>}
+                {graduate.graduationYear > 0 && <div>
                   <p className="text-sm font-medium text-gray-700">Año de graduación</p>
                   <p className="text-gray-600">{graduate.graduationYear}</p>
-                </div>
+                </div>}
               </div>
             </div>
 
@@ -380,6 +391,8 @@ export default async function GraduateProfilePage({
                   id={post.id}
                   content={post.content}
                   imageUrl={post.imageUrl}
+                  postType={post.postType}
+                  referenceUrl={post.referenceUrl}
                   likes={post.likes ?? 0}
                   commentsCount={post.commentsCount ?? 0}
                   createdAt={post.createdAt}

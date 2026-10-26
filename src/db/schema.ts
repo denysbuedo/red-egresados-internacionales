@@ -1,5 +1,5 @@
 /**
- * Schema de Base de Datos — Red de Egresados Internacionales
+ * Schema de Base de Datos — Red MES
  *
  * Tablas principales:
  * - users: Autenticación y gestión de cuentas
@@ -43,6 +43,8 @@ export const users = sqliteTable("users", {
 export const graduates = sqliteTable("graduates", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id"),
+  memberType: text("member_type", { enum: ["teacher", "researcher", "specialist", "technician", "administrative", "manager", "staff", "student", "graduate", "collaborator", "unspecified"] }).notNull().default("unspecified"),
+  employmentConfirmed: integer("employment_confirmed", { mode: "boolean" }).notNull().default(false),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   country: text("country").notNull(),
@@ -159,6 +161,8 @@ export const userPosts = sqliteTable("user_posts", {
   graduateId: integer("graduate_id").notNull().references(() => graduates.id, { onDelete: "cascade" }),
   content: text("content").notNull(),
   imageUrl: text("image_url"),
+  postType: text("post_type", { enum: ["update", "publication", "project", "call", "question"] }).notNull().default("update"),
+  referenceUrl: text("reference_url"),
   likes: integer("likes").notNull().default(0),
   commentsCount: integer("comments_count").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(

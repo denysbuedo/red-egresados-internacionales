@@ -4,31 +4,31 @@ export default function EstatutosPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Estatutos de la Red</h1>
-          <p className="text-sm text-gray-500 mb-8">Red de Egresados Internacionales de la Educación Superior Cubana</p>
+          <p className="text-sm text-gray-500 mb-8">Red del Ministerio de Educación Superior</p>
 
           <div className="space-y-6 text-gray-700">
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">Capítulo I: Disposiciones Generales</h2>
-              <p><strong>Artículo 1.</strong> La Red de Egresados Internacionales de la Educación Superior Cubana es una plataforma digital creada para conectar a los profesionales extranjeros que cursaron estudios en universidades cubanas.</p>
+              <p><strong>Artículo 1.</strong> La Red del Ministerio de Educación Superior es una plataforma digital creada para conectar a docentes, investigadores, especialistas, técnicos, directivos y demás trabajadores del Ministerio de Educación Superior y sus instituciones.</p>
               <p className="mt-2"><strong>Artículo 2.</strong> La Red tiene como fines principales:</p>
               <ul className="list-disc ml-6 mt-2 space-y-1">
-                <li>Fomentar la colaboración académica y científica entre egresados</li>
+                <li>Fomentar la colaboración académica y científica entre miembros</li>
                 <li>Facilitar el intercambio de conocimientos y experiencias</li>
-                <li>Fortalecer los lazos entre los egresados y las universidades cubanas</li>
+                <li>Fortalecer los lazos entre las personas y las instituciones de la educación superior</li>
                 <li>Promover proyectos de investigación conjuntos</li>
               </ul>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">Capítulo II: De los Miembros</h2>
-              <p><strong>Artículo 3.</strong> Pueden ser miembros de la Red todos los egresados extranjeros de universidades cubanas que cumplan con el proceso de registro y sean aprobados por su institución de origen.</p>
+              <p><strong>Artículo 3.</strong> Pueden ser miembros de la Red los trabajadores del MES y de sus instituciones que cumplan con el proceso de registro y sean aprobados por su institución de vinculación o la administración de la red.</p>
               <p className="mt-2"><strong>Artículo 4.</strong> Los miembros tienen los siguientes derechos:</p>
               <ul className="list-disc ml-6 mt-2 space-y-1">
                 <li>Crear y mantener un perfil profesional</li>
-                <li>Conectar con otros egresados</li>
+                <li>Conectar con otros miembros</li>
                 <li>Participar en grupos temáticos y eventos</li>
                 <li>Publicar contenido académico y científico</li>
-                <li>Acceder al directorio de egresados</li>
+                <li>Acceder al directorio de miembros</li>
               </ul>
               <p className="mt-2"><strong>Artículo 5.</strong> Los miembros tienen las siguientes obligaciones:</p>
               <ul className="list-disc ml-6 mt-2 space-y-1">

@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
 
     if (!userGraduate || userGraduate.length === 0) {
       return NextResponse.json(
-        { error: "No tienes perfil de egresado registrado. Completa tu perfil primero." },
+        { error: "No tienes perfil registrado. Completa tu perfil primero." },
         { status: 400 }
       );
     }
@@ -236,7 +236,7 @@ export async function PUT(request: NextRequest) {
 
     if (!userGraduate || userGraduate.length === 0) {
       return NextResponse.json(
-        { error: "No tienes perfil de egresado" },
+        { error: "No tienes perfil de miembro" },
         { status: 400 }
       );
     }
@@ -325,7 +325,7 @@ export async function PATCH(request: NextRequest) {
 
     if (!userGraduate || userGraduate.length === 0) {
       return NextResponse.json(
-        { error: "No tienes perfil de egresado" },
+        { error: "No tienes perfil de miembro" },
         { status: 400 }
       );
     }

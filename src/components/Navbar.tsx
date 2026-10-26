@@ -41,7 +41,7 @@ export function Navbar() {
         const data = await response.json();
         setUser(data.user);
         // Redirigir usuarios pendientes
-        if (data.user?.status === "pending" && window.location.pathname !== "/pendiente") {
+        if (data.user?.status === "pending" && !["/pendiente", "/completar-perfil"].includes(window.location.pathname)) {
           window.location.href = "/pendiente";
         }
       }
@@ -144,7 +144,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-3">
             <span className="text-[#003f8f] font-bold text-xl hidden sm:block">
-              Red Egresados Internacionales
+              Red MES
             </span>
           </Link>
 
@@ -152,8 +152,8 @@ export function Navbar() {
             <NavLink href="/">Inicio</NavLink>
             {user && <NavLink href="/directorio">Directorio</NavLink>}
             {user && user.role === "institution" && (
-              <NavLink href="/universidad">
-                <span className="flex items-center gap-1">🏛️ Mi Universidad</span>
+              <NavLink href="/institucion">
+                <span className="flex items-center gap-1">🏛️ Mi institución</span>
               </NavLink>
             )}
             {user && <NavLink href="/eventos">Eventos</NavLink>}
@@ -299,13 +299,14 @@ export function Navbar() {
                     )}
                     {user.graduateId && (
                       <Link
-                        href={`/egresados/${user.graduateId}`}
+                        href={`/miembros/${user.graduateId}`}
                         className="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 text-sm transition-colors"
                         onClick={() => setUserMenuOpen(false)}
                       >
                         Mi Perfil
                       </Link>
                     )}
+                    <Link href="/completar-perfil" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Vínculo laboral</Link>
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-red-600 hover:text-red-700 hover:bg-gray-50 text-sm transition-colors"
@@ -371,7 +372,7 @@ export function Navbar() {
               {user && <MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Directorio</MobileNavLink>}
               {user && <MobileNavLink href="/conexiones" onClick={() => setIsOpen(false)}>🤝 Conexiones</MobileNavLink>}
               {user && user.role === "institution" && (
-                <MobileNavLink href="/universidad" onClick={() => setIsOpen(false)}>🏛️ Mi Universidad</MobileNavLink>
+                <MobileNavLink href="/institucion" onClick={() => setIsOpen(false)}>🏛️ Mi institución</MobileNavLink>
               )}
               {user && <MobileNavLink href="/eventos" onClick={() => setIsOpen(false)}>Eventos</MobileNavLink>}
               {user && <MobileNavLink href="/noticias" onClick={() => setIsOpen(false)}>Noticias</MobileNavLink>}
@@ -389,12 +390,13 @@ export function Navbar() {
                   )}
                   {user.graduateId && (
                     <MobileNavLink
-                      href={`/egresados/${user.graduateId}`}
+                      href={`/miembros/${user.graduateId}`}
                       onClick={() => setIsOpen(false)}
                     >
                       Mi Perfil
                     </MobileNavLink>
                   )}
+                  <MobileNavLink href="/completar-perfil" onClick={() => setIsOpen(false)}>Vínculo laboral</MobileNavLink>
                   <button
                     onClick={() => {
                       handleLogout();

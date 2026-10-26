@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
 
     if (!receiverId) {
       return NextResponse.json(
-        { error: "ID de egresado requerido" },
+        { error: "ID de miembro requerido" },
         { status: 400 }
       );
     }
@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
 
     if (!userGraduate || userGraduate.length === 0) {
       return NextResponse.json(
-        { error: "No tienes un perfil de egresado registrado" },
+        { error: "No tienes un perfil registrado" },
         { status: 400 }
       );
     }
@@ -262,19 +262,19 @@ export async function POST(request: NextRequest) {
       const status = existingConnection[0].status;
       if (status === "accepted") {
         return NextResponse.json(
-          { error: "Ya estás conectado con este egresado" },
+          { error: "Ya estás conectado con este miembro" },
           { status: 400 }
         );
       } else if (status === "pending") {
         // Verificar quién envió la solicitud
         if (existingConnection[0].senderId === senderId) {
           return NextResponse.json(
-            { error: "Ya has enviado una solicitud a este egresado" },
+            { error: "Ya has enviado una solicitud a este miembro" },
             { status: 400 }
           );
         } else {
           return NextResponse.json(
-            { error: "Este egresado ya te ha enviado una solicitud" },
+            { error: "Este miembro ya te ha enviado una solicitud" },
             { status: 400 }
           );
         }
@@ -341,7 +341,7 @@ export async function PUT(request: NextRequest) {
 
     if (!userGraduate || userGraduate.length === 0) {
       return NextResponse.json(
-        { error: "No tienes un perfil de egresado registrado" },
+        { error: "No tienes un perfil registrado" },
         { status: 400 }
       );
     }
@@ -393,7 +393,7 @@ export async function PUT(request: NextRequest) {
           senderGraduate[0].userId,
           "connection_accepted",
           `${receiverGraduate[0]?.name || "Alguien"} aceptó tu solicitud de conexión`,
-          `/egresados/${graduateId}`
+          `/miembros/${graduateId}`
         );
       }
     }
@@ -436,7 +436,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const profile = db.select({ id: graduates.id }).from(graduates).where(eq(graduates.userId, session.id)).get();
-    if (!profile) return NextResponse.json({ error: "No tienes perfil de egresado" }, { status: 403 });
+    if (!profile) return NextResponse.json({ error: "No tienes perfil de miembro" }, { status: 403 });
     const removed = db.delete(connections).where(and(
       eq(connections.id, Number(connectionId)),
       or(eq(connections.senderId, profile.id), eq(connections.receiverId, profile.id))

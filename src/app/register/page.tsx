@@ -2,24 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { MemberTypeSelect } from "@/components/MemberTypeSelect";
+import { InstitutionField } from "@/components/InstitutionField";
 import { useRouter } from "next/navigation";
-
-const UNIVERSITIES = [
-  "Universidad de La Habana",
-  "Universidad de Oriente",
-  "Universidad Central de Las Villas",
-  "Universidad de Camagüey",
-  "Universidad de Pinar del Río",
-  "Universidad de Holguín",
-  "Universidad de Granma",
-  "Universidad de Matanzas",
-  "Instituto Superior Politécnico José Antonio Echeverría (CUJAE)",
-  "Universidad de Ciencias Médicas de La Habana",
-  "Escuela Internacional de Educación Física y Deportes",
-  "Instituto Superior de Arte",
-  "Universidad de las Ciencias Informáticas",
-  "Otra",
-];
 
 const COUNTRIES = [
   "Argentina", "Bolivia", "Brasil", "Canadá", "Chile", "Colombia",
@@ -44,14 +29,16 @@ export default function RegistroPage() {
 
     // Combine auth + graduate data in one request
     const data = {
+      memberType: formData.get("memberType"),
+      employmentConfirmed: formData.get("employmentConfirmed") === "on",
       username: formData.get("username"),
       email: formData.get("email"),
       password: formData.get("password"),
-      university: formData.get("university"),
+      institution: formData.get("institution"),
       name: formData.get("name"),
       country: formData.get("country"),
       career: formData.get("career"),
-      graduationYear: parseInt(formData.get("graduationYear") as string),
+      graduationYear: formData.get("graduationYear") ? Number(formData.get("graduationYear")) : null,
       currentProfession: formData.get("currentProfession"),
       city: formData.get("city") || null,
       currentCompany: formData.get("currentCompany") || null,
@@ -91,8 +78,8 @@ export default function RegistroPage() {
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-900">Registro de Egresado</h1>
-          <p className="text-gray-600 mt-2">Completa tus datos para unirte a la red</p>
+          <h1 className="text-3xl font-bold text-gray-900">Únete a Red MES</h1>
+          <p className="text-gray-600 mt-2">Una red profesional y académica para trabajadores del MES y sus instituciones</p>
         </div>
 
         {error && (
@@ -116,24 +103,25 @@ export default function RegistroPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <InputField label="Nombre Completo" name="name" required placeholder="Juan Pérez García" />
               <SelectField label="País de Residencia" name="country" required options={COUNTRIES} />
-              <InputField label="Ciudad" name="city" placeholder="Madrid" />
+              <InputField label="Ciudad" name="city" placeholder="La Habana" />
             </div>
           </Section>
 
           {/* Formación */}
-          <Section title="Formación en Cuba">
+          <Section title="Vinculación institucional y formación">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <SelectField label="Universidad" name="university" required options={UNIVERSITIES} />
-              <InputField label="Carrera Estudiada" name="career" required placeholder="Ingeniería Informática" />
-              <InputField label="Año de Graduación" name="graduationYear" type="number" required min={1960} max={2030} placeholder="2020" />
+              <InstitutionField />
+              <MemberTypeSelect />
+              <InputField label="Área de conocimiento o formación (opcional)" name="career" placeholder="Ingeniería Informática" />
+              <InputField label="Año de graduación (opcional)" name="graduationYear" type="number" min={1900} max={new Date().getFullYear()} placeholder="2020" />
             </div>
           </Section>
 
           {/* Situación Profesional */}
-          <Section title="Situación Profesional Actual">
+          <Section title="Actividad en la comunidad">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Profesión Actual" name="currentProfession" required placeholder="Desarrollador de Software" />
-              <InputField label="Empresa / Organización" name="currentCompany" placeholder="Tech Company S.A." />
+              <InputField label="Cargo o actividad actual" name="currentProfession" required placeholder="Docente, especialista, investigador, técnico..." />
+              <InputField label="Unidad, centro o departamento" name="currentCompany" placeholder="Facultad, dirección, centro o departamento" />
             </div>
           </Section>
 
@@ -151,6 +139,10 @@ export default function RegistroPage() {
             </div>
           </Section>
 
+          <label className="flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-gray-700">
+            <input type="checkbox" name="employmentConfirmed" required className="mt-1" />
+            <span>Declaro que trabajo en el MES o en una de sus instituciones. La institución verificará mi vínculo antes de aprobar el acceso. El registro de estudiantes no está habilitado en esta etapa.</span>
+          </label>
           <button
             type="submit"
             disabled={loading}

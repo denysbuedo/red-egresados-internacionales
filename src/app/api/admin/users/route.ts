@@ -106,12 +106,12 @@ export async function PUT(request: NextRequest) {
     if (email) updateData.email = email;
     if (body.institutionName !== undefined) {
       if (typeof body.institutionName !== "string" || body.institutionName.length > 200) {
-        return NextResponse.json({ error: "Universidad inválida" }, { status: 400 });
+        return NextResponse.json({ error: "Institución inválida" }, { status: 400 });
       }
       updateData.institutionName = body.institutionName.trim() || null;
     }
     if (role === "institution" && !updateData.institutionName) {
-      return NextResponse.json({ error: "Debes asignar la universidad de la institución" }, { status: 400 });
+      return NextResponse.json({ error: "Debes asignar la institución que gestionará la cuenta" }, { status: 400 });
     }
 
     await db

@@ -4,22 +4,22 @@ export default function TerminosPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Términos y Condiciones</h1>
-          <p className="text-sm text-gray-500 mb-8">Última actualización: Abril 2026</p>
+          <p className="text-sm text-gray-500 mb-8">Última actualización: Octubre 2026</p>
 
           <div className="space-y-6 text-gray-700">
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">1. Aceptación de los Términos</h2>
-              <p>Al registrarse y utilizar la Red de Egresados Internacionales de la Educación Superior Cubana, usted acepta cumplir con estos Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no podrá acceder al servicio.</p>
+              <p>Al registrarse y utilizar la Red del Ministerio de Educación Superior, usted acepta cumplir con estos Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no podrá acceder al servicio.</p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">2. Descripción del Servicio</h2>
-              <p>La plataforma es una red profesional diseñada para conectar a egresados extranjeros que se formaron en universidades cubanas. Permite crear perfiles profesionales, conectar con otros egresados, participar en grupos temáticos, asistir a eventos y compartir contenido académico y científico.</p>
+              <p>La plataforma es una red institucional de colaboración para la comunidad del Ministerio de Educación Superior. Permite crear perfiles profesionales, conectar con otros miembros, participar en grupos temáticos, asistir a eventos y compartir contenido académico y científico.</p>
             </section>
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">3. Registro y Aprobación</h2>
-              <p>El registro en la plataforma está sujeto a aprobación por parte de la universidad correspondiente. Los usuarios deben proporcionar información veraz y completa. La cuenta permanecerá en estado &quot;pendiente&quot; hasta ser aprobada por una institución autorizada.</p>
+              <p>En esta primera etapa, el registro está dirigido a trabajadores del MES y de sus instituciones; no está habilitado el registro como estudiante. El acceso está sujeto a la declaración y verificación del vínculo laboral, y a aprobación por parte de la institución correspondiente o de la administración de la red. Los usuarios deben proporcionar información veraz y completa. La cuenta permanecerá en estado &quot;pendiente&quot; hasta ser aprobada por una institución autorizada.</p>
             </section>
 
             <section>
@@ -36,7 +36,7 @@ export default function TerminosPage() {
 
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">5. Privacidad y Datos</h2>
-              <p>La plataforma recopila y almacena datos de los usuarios con el fin de facilitar la conexión entre egresados. La información del perfil es visible para otros usuarios aprobados de la red. Los datos no serán compartidos con terceros sin consentimiento del usuario.</p>
+              <p>La plataforma recopila y almacena datos de los usuarios con el fin de facilitar la conexión entre miembros. La información del perfil es visible para otros usuarios aprobados de la red. Los datos no serán compartidos con terceros sin consentimiento del usuario.</p>
             </section>
 
             <section>

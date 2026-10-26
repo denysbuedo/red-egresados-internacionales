@@ -207,13 +207,13 @@ export default function AdminEventDetailPage() {
                 className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <Link href={`/egresados/${attendee.graduateId}`}>
+                  <Link href={`/miembros/${attendee.graduateId}`}>
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#003f8f] to-[#0050b8] flex items-center justify-center text-white text-sm font-bold shrink-0">
                       {attendee.graduateName?.charAt(0).toUpperCase()}
                     </div>
                   </Link>
                   <div>
-                    <Link href={`/egresados/${attendee.graduateId}`} className="font-medium text-gray-900 hover:text-[#003f8f]">
+                    <Link href={`/miembros/${attendee.graduateId}`} className="font-medium text-gray-900 hover:text-[#003f8f]">
                       {attendee.graduateName}
                     </Link>
                     <p className="text-xs text-gray-500">{attendee.graduateProfession}</p>

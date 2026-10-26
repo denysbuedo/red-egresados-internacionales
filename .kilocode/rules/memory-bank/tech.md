@@ -82,3 +82,13 @@ bun db:migrate     # Run migrations (auto in sandbox)
 - Runtime objetivo Node 22.23.4, Next 16.4.3 y React 19.3.1. Único lock soportado para despliegue: package-lock.json, npm ci.
 - deploy/red-egresados.service define ejecución sin root, fuente root-owned y SQLite en /var/lib/red-egresados/dev.db. Scripts de DB cargan DATABASE_PATH desde .env, respetando valores ya exportados.
 - npm test: migraciones y sesiones. npm run test:http: flujos HTTP con datos aislados y servidor temporal; requiere build previo.
+
+
+## Red MES: perfiles y aportes (2026-10-26)
+
+- Migración 0017: graduates.member_type/employment_confirmed y user_posts.post_type/reference_url, sin reconstruir tablas ni cambiar IDs.
+- Catálogos y marca en src/lib/site.ts. PROFILE_TYPES anticipa etapas futuras; MEMBER_TYPES filtra exclusivamente perfiles laborales habilitados en el registro inicial.
+- Registro completo exige employmentConfirmed y perfil profesional; /api/auth/affiliation permite actualizar únicamente el vínculo de la sesión y devuelve a pending a miembros ordinarios. Admin/institution deben verificar la declaración antes de aprobar.
+- /miembros y /api/members comparten la implementación segura heredada; /institucion comparte el panel de /universidad. Las rutas anteriores continúan siendo compatibles.
+- graduation_year=0 es una marca interna para perfiles sin año, se serializa como null y no se muestra. Los datos académicos dejan de ser obligatorios.
+- Aportes con tipos update/publication/project/call/question y enlace HTTP(S) validado. Filtros de actividad por tipo; no se afirman DOI verificados ni expedientes de proyectos independientes.

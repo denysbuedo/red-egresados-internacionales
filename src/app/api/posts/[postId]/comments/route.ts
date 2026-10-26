@@ -70,7 +70,7 @@ export async function POST(
 
     if (!userGraduate || userGraduate.length === 0) {
       return NextResponse.json(
-        { error: "No tienes un perfil de egresado registrado" },
+        { error: "No tienes un perfil registrado" },
         { status: 400 }
       );
     }
@@ -171,7 +171,7 @@ export async function POST(
           postAuthor[0].userId,
           "post_commented",
           `${session.username} comentó tu publicación`,
-          `/egresados/${graduateId}`
+          `/miembros/${graduateId}`
         );
       }
     }

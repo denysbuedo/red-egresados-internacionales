@@ -1,5 +1,5 @@
 [Unit]
-Description=Red de Egresados Internacionales (Next.js)
+Description=Red MES - Red profesional y academica (Next.js)
 After=network.target
 StartLimitIntervalSec=60
 StartLimitBurst=5

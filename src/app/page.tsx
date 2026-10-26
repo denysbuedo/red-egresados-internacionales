@@ -1,3 +1,4 @@
+import { POST_TYPES } from "@/lib/site";
 import Link from "next/link";
 import { db } from "@/db";
 import { graduates, adminPosts, userPosts } from "@/db/schema";
@@ -12,7 +13,9 @@ import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+  const params = await searchParams;
+  const selectedType = POST_TYPES.find((type) => type.value === params.type)?.value;
   const session = await getSession({ allowPending: true });
   
   // Redirigir usuarios pendientes a la página de espera
@@ -23,28 +26,11 @@ export default async function Home() {
   const isLoggedIn = !!session;
   if (session?.status === "approved") await checkAndSendEventNotifications();
 
-  const stats = await Promise.all([
-    db.select({ count: sql<number>`count(*)` }).from(graduates),
-  ]);
-
-  const totalGraduates = stats[0][0]?.count || 0;
-
-  const countriesResult = await db
-    .select({
-      country: graduates.country,
-      count: sql<number>`count(*)`,
-    })
-    .from(graduates)
-    .groupBy(graduates.country)
-    .orderBy(sql`count(*) DESC`)
-    .limit(6);
-
-  const recentGraduates = await db
-    .select()
-    .from(graduates)
-    .where(sql`EXISTS (SELECT 1 FROM users WHERE users.id = ${graduates.userId} AND users.status = 'approved')`)
-    .orderBy(desc(graduates.createdAt))
-    .limit(6);
+  const approvedProfiles = sql`EXISTS (SELECT 1 FROM users WHERE users.id = ${graduates.userId} AND users.status = 'approved')`;
+  const stats = db.select({ count: sql<number>`count(*)`, institutions: sql<number>`count(distinct ${graduates.university})` })
+    .from(graduates).where(approvedProfiles).get();
+  const totalMembers = stats?.count || 0;
+  const totalInstitutions = stats?.institutions || 0;
 
   // Get posts for logged-in users
   let adminPostsData: any[] = [];
@@ -78,6 +64,8 @@ export default async function Home() {
         id: userPosts.id,
         content: userPosts.content,
         imageUrl: userPosts.imageUrl,
+        postType: userPosts.postType,
+        referenceUrl: userPosts.referenceUrl,
         likes: userPosts.likes,
         commentsCount: userPosts.commentsCount,
         createdAt: userPosts.createdAt,
@@ -89,6 +77,7 @@ export default async function Home() {
       })
       .from(userPosts)
       .leftJoin(graduates, eq(userPosts.graduateId, graduates.id))
+      .where(sql`EXISTS (SELECT 1 FROM users WHERE users.id = ${graduates.userId} AND users.status = 'approved') ${selectedType ? sql`AND ${userPosts.postType} = ${selectedType}` : sql``}`)
       .orderBy(desc(userPosts.createdAt))
       .limit(20);
   }
@@ -118,7 +107,7 @@ export default async function Home() {
               {/* Welcome Card */}
               <div className="bg-[#003f8f] rounded-xl p-6 text-white">
                 <h2 className="text-lg font-bold mb-1">¡Hola, {session?.username}!</h2>
-                <p className="text-sm text-blue-200">Red de Egresados Internacionales</p>
+                <p className="text-sm text-blue-200">Red MES</p>
               </div>
 
               {/* Stats */}
@@ -126,12 +115,12 @@ export default async function Home() {
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Estadísticas</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Egresados</span>
-                    <span className="text-xl font-bold text-[#003f8f]">{totalGraduates}</span>
+                    <span className="text-sm text-gray-600">Miembros</span>
+                    <span className="text-xl font-bold text-[#003f8f]">{totalMembers}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Países</span>
-                    <span className="text-xl font-bold text-[#003f8f]">{countriesResult.length}</span>
+                    <span className="text-sm text-gray-600">Instituciones</span>
+                    <span className="text-xl font-bold text-[#003f8f]">{totalInstitutions}</span>
                   </div>
                 </div>
               </div>
@@ -143,7 +132,7 @@ export default async function Home() {
                   <Link href="/directorio" className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">📋 Directorio</Link>
                   <Link href="/conexiones" className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">🤝 Conexiones</Link>
                   {userGraduateId && (
-                    <Link href={`/egresados/${userGraduateId}`} className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">👤 Mi Perfil</Link>
+                    <Link href={`/miembros/${userGraduateId}`} className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">👤 Mi Perfil</Link>
                   )}
                   <Link href="/eventos" className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">📅 Eventos</Link>
                   <Link href="/comunidades" className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">👥 Comunidades</Link>
@@ -158,7 +147,11 @@ export default async function Home() {
             <div className="flex-1 min-w-0 space-y-6">
               {/* Create Post */}
               <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
-                <CreatePost />
+                {userGraduateId ? <CreatePost /> : <div className="p-6">
+                  <h2 className="text-lg font-semibold text-gray-900">Completa tu perfil profesional</h2>
+                  <p className="mt-2 text-sm text-gray-600">Indica tu institución y actividad laboral para compartir resultados y participar en conversaciones profesionales.</p>
+                  <Link href="/miembros/registro" className="mt-4 inline-block font-semibold text-blue-800 underline">Crear mi perfil</Link>
+                </div>}
               </div>
 
               {/* Pinned News */}
@@ -190,7 +183,12 @@ export default async function Home() {
 
               {/* Activity Feed */}
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Feed de Actividad</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Actividad profesional y académica</h2>
+                <div className="mb-5 flex flex-wrap gap-2" aria-label="Tipos de aportes">
+                  <Link href="/" aria-current={!selectedType ? "page" : undefined} className={`rounded-full border px-3 py-1.5 text-sm ${!selectedType ? "border-blue-800 bg-blue-800 text-white" : "border-gray-200 bg-white text-gray-700"}`}>Todos</Link>
+                  {POST_TYPES.map((type) => <Link key={type.value} href={`/?type=${type.value}`} aria-current={selectedType === type.value ? "page" : undefined}
+                    className={`rounded-full border px-3 py-1.5 text-sm ${selectedType === type.value ? "border-blue-800 bg-blue-800 text-white" : "border-gray-200 bg-white text-gray-700"}`}>{type.label}</Link>)}
+                </div>
                 {userPostsData.length > 0 ? (
                   <div className="space-y-4">
                     {userPostsData.map((post) => (
@@ -199,6 +197,8 @@ export default async function Home() {
                         id={post.id}
                         content={post.content}
                         imageUrl={post.imageUrl}
+                        postType={post.postType}
+                        referenceUrl={post.referenceUrl}
                         likes={post.likes}
                         commentsCount={post.commentsCount}
                         createdAt={post.createdAt}
@@ -212,7 +212,7 @@ export default async function Home() {
                   </div>
                 ) : (
                   <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-                    <p className="text-gray-500">Sé el primero en publicar</p>
+                    <p className="text-gray-500">Aún no hay aportes en esta sección. Comparte un resultado, un proyecto o una oportunidad de colaboración.</p>
                   </div>
                 )}
               </div>
@@ -265,13 +265,13 @@ export default async function Home() {
         {/* Izquierda: Info de la red - Fondo azul */}
         <div className="hidden lg:flex lg:w-1/2 bg-[#003f8f] flex-col justify-center px-16 xl:px-24 text-white">
           <h1 className="text-4xl xl:text-5xl font-bold leading-tight">
-            Red de Egresados Internacionales
+            Red MES
             <span className="block mt-2 text-2xl xl:text-3xl font-normal text-blue-200">
-              de la Educación Superior Cubana
+              del Ministerio de Educación Superior
             </span>
           </h1>
           <p className="text-blue-100 text-lg max-w-md mt-8 leading-relaxed">
-            Conecta con profesionales que estudiaron en universidades cubanas. Comparte investigación, colaboraciones académicas y crece junto a tu red.
+            Conecta con profesionales del MES y sus instituciones. Comparte resultados científicos, participa en proyectos y encuentra oportunidades de colaboración.
           </p>
           <div className="mt-10 flex gap-6 text-sm">
             <Link href="/estatutos" className="flex items-center gap-2 text-blue-200 hover:text-white transition-colors">
@@ -290,7 +290,7 @@ export default async function Home() {
           <div className="w-full max-w-sm">
             {/* Mobile header */}
             <div className="lg:hidden text-center mb-8">
-              <h1 className="text-2xl font-bold text-[#003f8f]">Red de Egresados</h1>
+              <h1 className="text-2xl font-bold text-[#003f8f]">Red MES</h1>
               <p className="text-[#003f8f]/70 text-sm mt-1">Educación Superior Cubana</p>
             </div>
 
@@ -311,7 +311,7 @@ export default async function Home() {
                 Regístrate
               </Link>
               <p className="text-xs text-gray-400 mt-4 leading-relaxed">
-                Tu cuenta será revisada por tu universidad antes de ser aprobada.
+                Tu cuenta será revisada por tu institución o por la administración de la red.
               </p>
             </div>
 
@@ -330,7 +330,7 @@ export default async function Home() {
 
       {/* Footer full-width */}
       <footer className="bg-[#002860] py-3 text-center text-sm text-blue-300 shrink-0">
-        © 2026 Red de Egresados Internacionales · Ministerio de Educación Superior
+        © 2026 Red MES · Ministerio de Educación Superior
       </footer>
     </main>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { memberTypeLabel } from "@/lib/site";
 import { useState, useEffect } from "react";
 
 interface PendingUser {
@@ -12,6 +13,10 @@ interface PendingUser {
   graduateName: string | null;
   graduateUniversity: string | null;
   graduateCountry: string | null;
+  memberType: string | null;
+  employmentConfirmed: boolean | null;
+  currentProfession: string | null;
+  currentCompany: string | null;
 }
 
 export default function ApprovalsPage() {
@@ -74,7 +79,7 @@ export default function ApprovalsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Aprobación de Registros</h1>
-        <p className="text-gray-500 mt-1">Revisa y aprueba las solicitudes de registro</p>
+        <p className="text-gray-500 mt-1">Verifica el vínculo laboral de cada persona antes de aprobar su acceso</p>
       </div>
 
       {loading ? (
@@ -89,7 +94,7 @@ export default function ApprovalsPage() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Usuario</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Universidad</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Institución</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">País</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Fecha</th>
                 <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Acciones</th>

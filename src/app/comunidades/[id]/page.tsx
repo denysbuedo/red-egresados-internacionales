@@ -330,7 +330,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                   {group.members?.map((member) => (
                     <Link
                       key={member.id}
-                      href={`/egresados/${member.graduateId}`}
+                      href={`/miembros/${member.graduateId}`}
                       className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors"
                     >
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
@@ -387,13 +387,13 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                   {group.posts.map((post) => (
                     <div key={post.id} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                       <div className="flex items-start gap-3 mb-3">
-                        <Link href={`/egresados/${post.graduateId}`}>
+                        <Link href={`/miembros/${post.graduateId}`}>
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#003f8f] to-[#0050b8] flex items-center justify-center text-white text-sm font-bold shrink-0">
                             {post.graduateName?.charAt(0).toUpperCase()}
                           </div>
                         </Link>
                         <div>
-                          <Link href={`/egresados/${post.graduateId}`} className="font-semibold text-gray-900 hover:text-[#003f8f]">
+                          <Link href={`/miembros/${post.graduateId}`} className="font-semibold text-gray-900 hover:text-[#003f8f]">
                             {post.graduateName}
                           </Link>
                           <p className="text-xs text-gray-500">

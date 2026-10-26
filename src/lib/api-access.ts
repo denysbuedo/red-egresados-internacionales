@@ -17,12 +17,12 @@ export function checkRequestOrigin(request: Request): NextResponse | null {
   return null;
 }
 
-export async function authorizeApi(request: Request, roles?: SessionUser["role"][]) {
+export async function authorizeApi(request: Request, roles?: SessionUser["role"][], options: { allowPending?: boolean } = {}) {
   const originError = checkRequestOrigin(request);
   if (originError) return originError;
   const session = await getSession({ allowPending: true });
   if (!session) return NextResponse.json({ error: "Debes iniciar sesión" }, { status: 401 });
-  if (session.status !== "approved") {
+  if (session.status !== "approved" && !(options.allowPending && session.status === "pending")) {
     return NextResponse.json({ error: "Tu cuenta debe estar aprobada", redirect: "/pendiente" }, { status: 403 });
   }
   if (roles && !roles.includes(session.role)) {

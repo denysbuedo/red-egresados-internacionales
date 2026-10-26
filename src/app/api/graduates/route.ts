@@ -1,3 +1,4 @@
+import { MEMBER_TYPES, type MemberType } from "@/lib/site";
 import { validateProfileInput } from "@/lib/profile-input";
 import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
@@ -13,7 +14,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search");
     const country = searchParams.get("country");
-    const university = searchParams.get("university");
+    const university = searchParams.get("institution") || searchParams.get("university");
+    const memberType = searchParams.get("memberType");
     const career = searchParams.get("career");
     const yearFrom = searchParams.get("yearFrom");
     const yearTo = searchParams.get("yearTo");
@@ -24,6 +26,10 @@ export async function GET(request: Request) {
       conditions.push(
         sql`${graduates.name} LIKE ${"%" + search + "%"}`
       );
+    }
+    if (memberType) {
+      if (!MEMBER_TYPES.some((type) => type.value === memberType)) return NextResponse.json({ error: "Tipo de miembro inválido" }, { status: 400 });
+      conditions.push(eq(graduates.memberType, memberType as MemberType));
     }
     if (country) {
       conditions.push(eq(graduates.country, country));
@@ -53,27 +59,27 @@ export async function GET(request: Request) {
     const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
     const allGraduates = await query.orderBy(graduates.createdAt).limit(limit).offset(offset);
 
-    const publicProfiles = allGraduates.map(({ email, phone, userId, linkedin, website, ...profile }) => profile);
+    const publicProfiles = allGraduates.map(({ email, phone, userId, linkedin, website, ...profile }) => ({ ...profile, graduationYear: profile.graduationYear || null, institution: profile.university }));
     return NextResponse.json(publicProfiles);
   } catch (error) {
     console.error("Error fetching graduates:", error);
     return NextResponse.json(
-      { error: "Error al obtener egresados" },
+      { error: "Error al obtener miembros" },
       { status: 500 }
     );
   }
 }
 
 export async function POST(request: NextRequest) {
-  const denied = await authorizeApi(request);
+  const denied = await authorizeApi(request, undefined, { allowPending: true });
   if (denied) return denied;
   try {
     // Verificar autenticación
-    const session = await getSession();
+    const session = await getSession({ allowPending: true });
     
     if (!session) {
       return NextResponse.json(
-        { error: "Debes iniciar sesión para registrarte como egresado" },
+        { error: "Debes iniciar sesión para crear tu perfil" },
         { status: 401 }
       );
     }
@@ -81,8 +87,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const invalid = validateProfileInput(body);
     if (invalid) return invalid;
+    if (!MEMBER_TYPES.some((type) => type.value === body.memberType) || body.employmentConfirmed !== true) {
+      return NextResponse.json({ error: "Selecciona tu perfil profesional y confirma tu vínculo laboral" }, { status: 400 });
+    }
+    const institution = body.institution ?? body.university;
+    if (typeof institution !== "string" || !institution.trim() || institution.length > 200 ||
+        typeof body.name !== "string" || !body.name.trim() || body.name.length > 150 ||
+        typeof body.country !== "string" || !body.country.trim() || body.country.length > 100 ||
+        typeof body.currentProfession !== "string" || !body.currentProfession.trim() || body.currentProfession.length > 200) {
+      return NextResponse.json({ error: "Completa nombre, país, institución y cargo laboral" }, { status: 400 });
+    }
 
-    // Verificar si el usuario ya tiene un perfil de egresado
+    // Verificar si el usuario ya tiene un perfil de miembro
     const existingGraduate = await db
       .select()
       .from(graduates)
@@ -91,22 +107,23 @@ export async function POST(request: NextRequest) {
 
     if (existingGraduate.length > 0) {
       return NextResponse.json(
-        { error: "Ya tienes un perfil de egresado registrado" },
+        { error: "Ya tienes un perfil registrado" },
         { status: 400 }
       );
     }
 
-    const newGraduate = await db
-      .insert(graduates)
-      .values({
+    const newGraduate = db.transaction((tx) => {
+      const profile = tx.insert(graduates).values({
         userId: session.id,
+        memberType: body.memberType,
+        employmentConfirmed: true,
         name: body.name,
         email: body.email || session.email,
         country: body.country,
         city: body.city || null,
-        university: body.university,
-        career: body.career,
-        graduationYear: body.graduationYear,
+        university: institution.trim(),
+        career: body.career || "",
+        graduationYear: body.graduationYear ? Number(body.graduationYear) : 0,
         currentProfession: body.currentProfession,
         currentCompany: body.currentCompany || null,
         bio: body.bio || null,
@@ -117,20 +134,17 @@ export async function POST(request: NextRequest) {
         languages: body.languages || null,
         interests: body.interests || null,
         website: body.website || null,
-      })
-      .returning();
+      }).returning().get();
+      tx.update(users).set({ graduateId: profile.id, pendingUniversity: institution.trim(),
+        status: session.role === "user" ? "pending" : session.status }).where(eq(users.id, session.id)).run();
+      return profile;
+    });
 
-    // Actualizar el usuario con el graduateId
-    await db
-      .update(users)
-      .set({ graduateId: newGraduate[0].id })
-      .where(eq(users.id, session.id));
-
-    return NextResponse.json(newGraduate[0], { status: 201 });
+    return NextResponse.json({ ...newGraduate, graduationYear: newGraduate.graduationYear || null, institution: newGraduate.university }, { status: 201 });
   } catch (error) {
     console.error("Error creating graduate:", error);
     return NextResponse.json(
-      { error: "Error al crear egresado" },
+      { error: "Error al crear perfil" },
       { status: 500 }
     );
   }

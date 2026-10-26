@@ -258,7 +258,7 @@ export default function EventDetailPage() {
                     {event.attendees.filter(a => a.status === "attending").map((attendee) => (
                       <Link
                         key={attendee.id}
-                        href={`/egresados/${attendee.graduateId}`}
+                        href={`/miembros/${attendee.graduateId}`}
                         className="flex items-center gap-2 p-2 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
                       >
                         <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold">
@@ -279,7 +279,7 @@ export default function EventDetailPage() {
                     {event.attendees.filter(a => a.status === "maybe").map((attendee) => (
                       <Link
                         key={attendee.id}
-                        href={`/egresados/${attendee.graduateId}`}
+                        href={`/miembros/${attendee.graduateId}`}
                         className="flex items-center gap-2 p-2 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors"
                       >
                         <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-white text-xs font-bold">

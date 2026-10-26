@@ -1,3 +1,4 @@
+import { SITE_FULL_NAME, SITE_DESCRIPTION } from "@/lib/site";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
@@ -14,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Red de Egresados Internacionales de la Educación Superior Cubana",
+  title: SITE_FULL_NAME,
   description:
-    "Red social para egresados internacionales de la educación superior cubana. Conecta con profesionales de todo el mundo.",
+    SITE_DESCRIPTION,
 };
 
 export default function RootLayout({

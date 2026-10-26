@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { postTypeLabel } from "@/lib/site";
 import { PostComments } from "./PostComments";
 
 interface UserPostCardProps {
   id: number;
   content: string;
   imageUrl: string | null;
+  postType?: string;
+  referenceUrl?: string | null;
   likes: number;
   commentsCount: number;
   createdAt: Date | null;
@@ -22,7 +25,8 @@ export function UserPostCard({
   id,
   content,
   imageUrl,
-  likes,
+  postType,
+  referenceUrl,
   commentsCount,
   createdAt,
   graduateId,
@@ -34,25 +38,7 @@ export function UserPostCard({
   const [isExpanded, setIsExpanded] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [localCommentsCount, setLocalCommentsCount] = useState(commentsCount);
-  const [localLikes, setLocalLikes] = useState(likes);
-  const [likeLoading, setLikeLoading] = useState(false);
 
-  const handleLike = async () => {
-    setLikeLoading(true);
-    try {
-      const response = await fetch(`/api/posts/${id}/like`, {
-        method: "POST",
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setLocalLikes(data.likes);
-      }
-    } catch (error) {
-      console.error("Error liking post:", error);
-    } finally {
-      setLikeLoading(false);
-    }
-  };
 
   const PREVIEW_LENGTH = 300;
   const shouldTruncate = content.length > PREVIEW_LENGTH;
@@ -77,10 +63,11 @@ export function UserPostCard({
 
   return (
     <article className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="border-b border-blue-100 bg-blue-50 px-5 py-2 text-xs font-semibold text-blue-800">{postTypeLabel(postType)}</div>
       {/* Header del post */}
       <div className="p-5 border-b border-gray-100">
         <div className="flex items-start gap-3">
-          <Link href={`/egresados/${graduateId}`}>
+          <Link href={`/miembros/${graduateId}`}>
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#003f8f] to-[#0050b8] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
               {graduatePhoto ? (
                 <img src={graduatePhoto} alt={graduateName} className="w-full h-full object-cover" />
@@ -90,13 +77,13 @@ export function UserPostCard({
             </div>
           </Link>
           <div className="flex-1 min-w-0">
-            <Link href={`/egresados/${graduateId}`}>
+            <Link href={`/miembros/${graduateId}`}>
               <h3 className="font-semibold text-gray-900 hover:text-[#003f8f] transition-colors">
                 {graduateName}
               </h3>
             </Link>
             <p className="text-sm text-gray-500 truncate">
-              {graduateProfession || "Egresado"}
+              {graduateProfession || "Miembro"}
             </p>
             <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
               <span>{formattedDate}</span>
@@ -143,15 +130,12 @@ export function UserPostCard({
           </div>
         )}
 
+        {referenceUrl && /^https?:\/\//i.test(referenceUrl) && <div className="mt-4">
+          <a href={referenceUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-blue-800 underline">Consultar recurso original ↗</a>
+        </div>}
         {/* Stats y acciones */}
         <div className="flex items-center justify-between mt-5 pt-4 border-t border-gray-100">
           <div className="flex items-center gap-4 text-sm text-gray-500">
-            {localLikes > 0 && (
-              <span className="flex items-center gap-1">
-                <span className="text-[#003f8f]">👍</span>
-                {localLikes}
-              </span>
-            )}
             {localCommentsCount > 0 && (
               <span className="flex items-center gap-1">
                 <span>💬</span>
@@ -161,15 +145,8 @@ export function UserPostCard({
           </div>
 
           <div className="flex items-center gap-2">
-            <button 
-              onClick={handleLike}
-              disabled={likeLoading}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-              </svg>
-              {likeLoading ? "..." : "Like"}
+            <button onClick={() => setShowComments(!showComments)} className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-800 hover:bg-blue-50">
+              {showComments ? "Cerrar conversación" : "Conversar sobre este aporte"}
             </button>
           </div>
         </div>

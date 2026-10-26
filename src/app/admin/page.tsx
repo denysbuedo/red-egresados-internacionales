@@ -70,7 +70,7 @@ export default async function AdminDashboard() {
           color="blue"
         />
         <StatCard
-          title="Egresados"
+          title="Miembros"
           value={totalGraduates[0]?.count || 0}
           icon={
             <path
@@ -169,11 +169,11 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {/* Egresados Recientes */}
+        {/* Miembros recientes */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
-              Egresados Recientes
+              Miembros recientes
             </h2>
             <Link
               href="/directorio"
@@ -220,7 +220,7 @@ export default async function AdminDashboard() {
               ))
             ) : (
               <div className="px-6 py-8 text-center text-gray-500">
-                No hay egresados registrados
+                No hay miembros registrados
               </div>
             )}
           </div>
@@ -304,7 +304,7 @@ export default async function AdminDashboard() {
             </div>
             <div>
               <p className="font-medium text-green-900">Ver Directorio</p>
-              <p className="text-sm text-green-600">Explorar egresados</p>
+              <p className="text-sm text-green-600">Explorar la comunidad</p>
             </div>
           </Link>
         </div>

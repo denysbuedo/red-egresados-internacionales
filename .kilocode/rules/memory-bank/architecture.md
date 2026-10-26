@@ -1,4 +1,4 @@
-# Arquitectura: Red de Egresados Internacionales
+# Arquitectura: Red MES
 
 ## Componentes
 
@@ -20,3 +20,11 @@ El frontal HTTPS/HAProxy y el DNS del dominio conecta.reduniv.edu.cu se preparan
 ## Validación
 
 npm ci utiliza el único package-lock.json. npm test cubre migración y sesiones; npm run test:http crea base y servidor propios para probar autorización y flujos de registro/aprobación. Los datos reales no se usan para crear cuentas de prueba. Ver SEGURIDAD_DESPLIEGUE.md para evidencia y límites de la revisión.
+
+
+## Reconversión profesional y académica
+
+- La identidad y los catálogos están en src/lib/site.ts. Los tipos de perfil profesional son distintos de los roles de autorización. El registro inicial solo habilita categorías de trabajadores; estudiante permanece deshabilitado en cliente y servidor.
+- La migración 0017 añade member_type/employment_confirmed a graduates y post_type/reference_url a user_posts. Las tablas e IDs heredados permanecen estables, con aliases /miembros y /api/members.
+- El vínculo laboral se declara al registrarse o en /completar-perfil y lo valida una institución o un administrador. El endpoint /api/auth/affiliation solo modifica el perfil de la sesión; un miembro ordinario vuelve a pending cuando cambia su vínculo.
+- Los aportes se clasifican y enlazan recursos externos; no son todavía expedientes de proyectos ni bibliografía verificada. Se priorizan instituciones y colaboración frente a países de origen y métricas de likes.

@@ -1,3 +1,4 @@
+import { MEMBER_TYPES } from "@/lib/site";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, graduates } from "@/db/schema";
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
   }
   if (session.role === "institution" && !session.institutionName) {
-    return NextResponse.json({ error: "Tu cuenta no tiene una universidad asignada" }, { status: 403 });
+    return NextResponse.json({ error: "Tu cuenta no tiene una institución asignada" }, { status: 403 });
   }
   const conditions = [eq(users.status, status), eq(users.role, "user")];
   if (session.role === "institution") conditions.push(eq(users.pendingUniversity, session.institutionName!));
@@ -22,6 +23,8 @@ export async function GET(request: NextRequest) {
     id: users.id, username: users.username, email: users.email, role: users.role,
     status: users.status, rejectionReason: users.rejectionReason, createdAt: users.createdAt,
     graduateId: users.graduateId, graduateName: graduates.name,
+    memberType: graduates.memberType, employmentConfirmed: graduates.employmentConfirmed,
+    currentProfession: graduates.currentProfession, currentCompany: graduates.currentCompany,
     graduateUniversity: users.pendingUniversity, graduateCountry: graduates.country,
   }).from(users).leftJoin(graduates, eq(users.id, graduates.userId))
     .where(and(...conditions)).orderBy(desc(users.createdAt)).all();
@@ -47,6 +50,12 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "No puedes gestionar esta solicitud" }, { status: 403 });
   }
   if (target.status !== "pending") return NextResponse.json({ error: "La solicitud ya fue resuelta" }, { status: 409 });
+  if (action === "approve") {
+    const profile = db.select().from(graduates).where(eq(graduates.userId, id)).get();
+    if (!profile?.employmentConfirmed || !profile.university.trim() || !profile.currentProfession.trim() || !MEMBER_TYPES.some((type) => type.value === profile.memberType) || profile.university !== target.pendingUniversity) {
+      return NextResponse.json({ error: "La persona debe completar su vínculo laboral antes de ser aprobada" }, { status: 409 });
+    }
+  }
   const updated = db.transaction((tx) => {
     const result = tx.update(users).set({ status: action === "approve" ? "approved" : "rejected",
       rejectionReason: action === "reject" ? reason.trim() : null, updatedAt: new Date() })

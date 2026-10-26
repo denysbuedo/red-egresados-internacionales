@@ -78,7 +78,7 @@ export async function POST(
 
     if (!userGraduate || userGraduate.length === 0) {
       return NextResponse.json(
-        { error: "No tienes perfil de egresado" },
+        { error: "No tienes perfil de miembro" },
         { status: 400 }
       );
     }

@@ -133,7 +133,7 @@ export default function NewPostPage() {
                   setFormData({ ...formData, title: e.target.value })
                 }
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Ej: Nueva convocatoria de empleo para egresados"
+                placeholder="Ej: Convocatoria de colaboración para la comunidad"
                 required
                 minLength={5}
               />

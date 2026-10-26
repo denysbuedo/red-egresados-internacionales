@@ -1,3 +1,4 @@
+import { POST_TYPES, type PostType } from "@/lib/site";
 import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
@@ -15,8 +16,14 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const graduateId = searchParams.get("graduateId");
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const offset = parseInt(searchParams.get("offset") || "0");
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20") || 20));
+    const offset = Math.max(0, parseInt(searchParams.get("offset") || "0") || 0);
+    const postType = searchParams.get("type");
+    const conditions = [sql`EXISTS (SELECT 1 FROM users WHERE users.id = ${graduates.userId} AND users.status = 'approved')`];
+    if (postType) {
+      if (!POST_TYPES.some((type) => type.value === postType)) return NextResponse.json({ error: "Tipo de aporte inválido" }, { status: 400 });
+      conditions.push(eq(userPosts.postType, postType as PostType));
+    }
 
     let query;
 
@@ -27,6 +34,8 @@ export async function GET(request: NextRequest) {
           id: userPosts.id,
           content: userPosts.content,
           imageUrl: userPosts.imageUrl,
+          postType: userPosts.postType,
+          referenceUrl: userPosts.referenceUrl,
           likes: userPosts.likes,
           commentsCount: userPosts.commentsCount,
           createdAt: userPosts.createdAt,
@@ -38,7 +47,7 @@ export async function GET(request: NextRequest) {
         })
         .from(userPosts)
         .leftJoin(graduates, eq(userPosts.graduateId, graduates.id))
-        .where(eq(userPosts.graduateId, parseInt(graduateId)))
+        .where(and(...conditions, eq(userPosts.graduateId, parseInt(graduateId))))
         .orderBy(desc(userPosts.createdAt))
         .limit(limit)
         .offset(offset);
@@ -49,6 +58,8 @@ export async function GET(request: NextRequest) {
           id: userPosts.id,
           content: userPosts.content,
           imageUrl: userPosts.imageUrl,
+          postType: userPosts.postType,
+          referenceUrl: userPosts.referenceUrl,
           likes: userPosts.likes,
           commentsCount: userPosts.commentsCount,
           createdAt: userPosts.createdAt,
@@ -60,6 +71,7 @@ export async function GET(request: NextRequest) {
         })
         .from(userPosts)
         .leftJoin(graduates, eq(userPosts.graduateId, graduates.id))
+        .where(and(...conditions))
         .orderBy(desc(userPosts.createdAt))
         .limit(limit)
         .offset(offset);
@@ -99,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     if (!userGraduate || userGraduate.length === 0) {
       return NextResponse.json(
-        { error: "No tienes un perfil de egresado registrado" },
+        { error: "No tienes un perfil registrado" },
         { status: 400 }
       );
     }
@@ -107,9 +119,20 @@ export async function POST(request: NextRequest) {
     const graduateId = userGraduate[0].graduateId;
     const body = await request.json();
     const { content, imageUrl } = body;
+    const postType = body.postType || "update";
+    if (!POST_TYPES.some((type) => type.value === postType)) return NextResponse.json({ error: "Tipo de aporte inválido" }, { status: 400 });
+    let referenceUrl: string | null = null;
+    if (body.referenceUrl) {
+      try {
+        if (typeof body.referenceUrl !== "string" || body.referenceUrl.length > 2000) throw new Error("url");
+        const url = new URL(body.referenceUrl);
+        if (!["http:", "https:"].includes(url.protocol)) throw new Error("url");
+        referenceUrl = url.toString();
+      } catch { return NextResponse.json({ error: "El enlace debe usar http o https" }, { status: 400 }); }
+    }
 
     // Validaciones
-    if (!content || content.trim().length < 5) {
+    if (typeof content !== "string" || content.trim().length < 5) {
       return NextResponse.json(
         { error: "El contenido debe tener al menos 5 caracteres" },
         { status: 400 }
@@ -158,6 +181,8 @@ export async function POST(request: NextRequest) {
       .values({
         graduateId,
         content: content.trim(),
+        postType: postType as PostType,
+        referenceUrl,
         imageUrl: imageUrl || null,
         likes: 0,
         commentsCount: 0,

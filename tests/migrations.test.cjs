@@ -21,7 +21,7 @@ test("fresh database has the columns needed by authentication and approvals", (t
     for (const column of ["status", "rejection_reason", "institution_name", "pending_university"]) {
       assert.ok(columns.includes(column), column);
     }
-    assert.equal(db.prepare("SELECT count(*) AS n FROM app_migrations").get().n, 17);
+    assert.equal(db.prepare("SELECT count(*) AS n FROM app_migrations").get().n, 18);
     assert.equal(db.pragma("integrity_check", { simple: true }), "ok");
   } finally { db.close(); }
 });
@@ -61,4 +61,23 @@ test("rejects edited migrations and accepts CRLF-only changes", (t) => {
   writeFileSync(file, "CREATE TABLE example (id integer);\r\n"); migrate(path, migrations);
   writeFileSync(file, "CREATE TABLE example (id text);\n");
   assert.throws(() => migrate(path, migrations), /modificada/);
+});
+
+
+test("professional profile migration preserves history without inventing employment", (t) => {
+  const { path } = fixture(t);
+  migrate(path);
+  const db = new Database(path);
+  db.exec("INSERT INTO graduates (id,name,email,country,university,career,graduation_year,current_profession) VALUES (1,'Existing','existing@example.test','Cuba','Institution','Medicine',2020,'Professional'); INSERT INTO user_posts (graduate_id,content) VALUES (1,'Existing contribution')");
+  db.exec("ALTER TABLE graduates DROP COLUMN member_type; ALTER TABLE graduates DROP COLUMN employment_confirmed; ALTER TABLE user_posts DROP COLUMN post_type; ALTER TABLE user_posts DROP COLUMN reference_url; DELETE FROM app_migrations WHERE name='0017_generalize_member_profiles.sql'");
+  const before = db.prepare("SELECT * FROM graduates").get();
+  db.close(); migrate(path); migrate(path);
+  const migrated = new Database(path);
+  try {
+    const { member_type, employment_confirmed, ...original } = migrated.prepare("SELECT * FROM graduates").get();
+    assert.deepEqual(original,before);
+    assert.equal(member_type,'unspecified'); assert.equal(employment_confirmed,0);
+    const post=migrated.prepare("SELECT * FROM user_posts").get();
+    assert.equal(post.content,'Existing contribution'); assert.equal(post.post_type,'update'); assert.equal(post.reference_url,null);
+  } finally { migrated.close(); }
 });
