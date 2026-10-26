@@ -79,3 +79,28 @@ correctas, compilación y typecheck correctos en Windows/Linux, y lint sin error
 todos los valores originales de las 19 tablas, con integridad y claves foráneas
 correctas. El cambio de aprobación de cuentas históricas no forma parte de estas
 pruebas ni se aplica por defecto.
+
+
+## Despliegue verificado
+
+Implementación publicada en el commit c6bf55c y aplicada a la VM. Se comparó un
+manifiesto de 117 fuentes y configuración con el build Linux prevalidado. Las
+dependencias no cambiaron; el build se preparó antes del reinicio para reducir
+la interrupción. La copia pre-cutover.db se tomó con el servicio detenido y la
+migración se aplicó sobre la base operativa, conservando todos sus valores previos.
+
+El servicio volvió a estado activo. Nginx y la portada pública HTTPS devolvieron
+200 con la identidad Red MES. La nueva API de miembros requiere autenticación y
+coincide con la API heredada para los mismos IDs. La contraseña administradora
+existente permanece válida; no se cambió durante la reconversión.
+
+Se conservan 8 cuentas, 7 perfiles, 5 aportes de miembros, 8 noticias y 8 conexiones.
+No se modificaron los estados de aprobación de las cuentas históricas, a la espera
+de que el operador elija su revalidación. Sus perfiles aparecen con vínculo por
+actualizar y pueden declararlo desde el menú Vínculo laboral o desde su perfil.
+El registro nuevo solo admite categorías laborales habilitadas, con declaración
+y revisión institucional; no se habilitó el registro como estudiante.
+
+El respaldo y el recibo de la operación se encuentran en
+/var/backups/red-egresados/pre-red-mes-20261026. No se modificaron DNS, certificados
+ni configuración HAProxy en esta entrega.

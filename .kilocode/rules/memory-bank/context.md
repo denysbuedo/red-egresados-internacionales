@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Status**: Servicio activo en la VM, sesiones y permisos corregidos y flujos HTTP validados; publicación del dominio nuevo pendiente de DNS/TLS/HAProxy
+**Status**: Red MES profesional y académica activa en https://conecta.reduniv.edu.cu; registro inicial para trabajadores y estudiantes deshabilitados. Cuentas históricas conservan su aprobación mientras el operador decide su revalidación.
 
 Red social para egresados internacionales de la educación superior cubana. Permite gestionar perfiles, conectar egresados por criterios de afinidad, y crear listas de distribución de correo.
 
@@ -124,10 +124,15 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 ## Reconversión a Red MES — 2026-10-26
 
 - Objetivo confirmado: red profesional y académica para trabajadores del MES y sus instituciones. No replicar Facebook; combinar contactos profesionales y colaboración científica. Estudiantes fuera de la primera etapa, con posibilidad de inclusión futura.
-- En preparación: identidad institucional, perfiles laborales, institución libre con validación, formación opcional, directorio por tipo profesional y rutas /miembros y /institucion con compatibilidad de las rutas históricas.
-- Registro exige tipo laboral habilitado y declaración de empleo; aprobar exige completar el vínculo. Nuevas categorías no conceden permisos administrativos. Se prepara /completar-perfil para revalidar afiliación sin perder datos.
+- Implementados: identidad institucional, perfiles laborales, institución libre con validación, formación opcional, directorio por tipo profesional y rutas /miembros y /institucion con compatibilidad de las rutas históricas.
+- Registro exige tipo laboral habilitado y declaración de empleo; aprobar exige completar el vínculo. Nuevas categorías no conceden permisos administrativos. Implementado /completar-perfil para revalidar afiliación sin perder datos.
 - Aportes clasificados por actualización, publicación científica, proyecto, convocatoria o consulta; enlaces a recursos y filtros. Sin fingir bibliografía verificada ni expedientes de proyectos completos.
 - Migración 0017 aditiva. Perfiles históricos sin tipo ni empleo declarado se marcan por actualizar; no se modifica su aprobación automáticamente. Pendiente la elección del operador sobre la revalidación de las siete cuentas históricas de miembros.
 - Respaldo verificado en /var/backups/red-egresados/pre-red-mes-20261026. Snapshot: 8 usuarios, 7 perfiles, 5 aportes, 8 noticias y 8 conexiones. El servicio continúa activo durante preparación y pruebas.
-- Pruebas Windows: typecheck/build correctos, siete pruebas unitarias y trece HTTP correctas; lint con cero errores y 44 advertencias. Validación sobre copia real en Linux correcta: valores originales de las 19 tablas conservados, integridad y claves foráneas OK. Falta aplicar el despliegue.
+- Pruebas Windows: typecheck/build correctos, siete pruebas unitarias y trece HTTP correctas; lint con cero errores y 44 advertencias. Validación sobre copia real en Linux correcta: valores originales de las 19 tablas conservados, integridad y claves foráneas OK. Desplegado como c6bf55c; servicio activo y verificación pública HTTPS 200.
 - Ver RECONVERSION_RED_MES.md para alcance, conservación de datos y límites de esta etapa.
+
+- Corte del 26 de octubre: compilación Linux prevalidada y manifiesto de 117 fuentes verificado; se migró la base real en su ubicación, sin sustituirla por una copia. Snapshot adicional pre-cutover.db antes de la migración.
+- Conservados todos los valores anteriores de las 19 tablas, incluyendo contraseñas, roles y estados de aprobación. Permanecen 8 cuentas, 7 perfiles, 5 aportes, 8 noticias y 8 conexiones. No se crearon usuarios de prueba ni se reclasificó a antiguos miembros como trabajadores verificados.
+- Verificación real: portada/formulario nuevos 200, API /members privada, API canónica y heredada equivalentes, credencial admin válida y logout revocado. Servicio sin reinicios inesperados. DNS, TLS y HAProxy no se modificaron; comprobada portada pública HTTPS con Red MES.
+- Pendiente de elección del operador la revalidación de las siete cuentas históricas. Hasta recibirla, se conserva su estado actual y se permite completar el vínculo laboral desde el menú/perfil.
