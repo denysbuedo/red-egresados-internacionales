@@ -25,3 +25,8 @@ Tras aprobar la solicitud se completan cargo, formación, presentación, enlaces
 20 pruebas HTTP de autenticación, permisos, perfiles y negocio, incluyendo pertenencia persistente, reintentos, edición administrativa de comunidades ajenas y registro/aprobación/completado. Sin migraciones ni reinicio de datos.
 
 Respaldo: `/var/backups/red-egresados/pre-conecta-refinements-20261027`.
+
+
+- Desplegado como `9b088df`. Linux: compilación/typecheck/lint y 20 pruebas HTTP correctas. Navegador: ocho rutas y cinco tamaños, gestión admin de comunidad ajena, pertenencia persistente y controles de presentación correctos.
+- Producción/HTTPS: perfil/editor, registro reducido, cabecera personal, gestión de comunidades, ancho de Noticias y membresía real verificados sin modificar datos de negocio. La comunidad existente conserva sus miembros; no se crearon usuarios ni solicitudes de prueba.
+- Las 19 tablas conservan todas sus filas y valores durante el corte; estado observado: 4 cuentas, 4 perfiles, 1 aporte, 6 conexiones y 1 comunidad. Imágenes y credenciales preservadas. Servicio activo con NRestarts=0. Manifiesto de 174 archivos coincide con la compilación Linux y la VM; respaldo pre-cutover y compilación anterior disponibles.

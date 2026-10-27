@@ -240,3 +240,8 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Respaldo verificado: /var/backups/red-egresados/pre-conecta-refinements-20261027. Conservar todos los datos actuales, sin reinicio ni migraciones.
 
 - Windows: build/typecheck, 20 pruebas HTTP y 8 de sesión/datos correctas; lint sin errores. Chrome: ocho rutas a 320/390/768/1024/1440 px, pertenencia tras recarga, edición admin de comunidad ajena y bloqueo de miembro, etiquetas de formación, sombras ausentes, ancho de Noticias y cabecera personal sin columna izquierda, sin overflow ni errores JS.
+
+
+- Desplegado como `9b088df`. Linux: compilación/typecheck/lint y 20 pruebas HTTP correctas. Navegador: ocho rutas y cinco tamaños, gestión admin de comunidad ajena, pertenencia persistente y controles de presentación correctos.
+- Producción/HTTPS: perfil/editor, registro reducido, cabecera personal, gestión de comunidades, ancho de Noticias y membresía real verificados sin modificar datos de negocio. La comunidad existente conserva sus miembros; no se crearon usuarios ni solicitudes de prueba.
+- Las 19 tablas conservan todas sus filas y valores durante el corte; estado observado: 4 cuentas, 4 perfiles, 1 aporte, 6 conexiones y 1 comunidad. Imágenes y credenciales preservadas. Servicio activo con NRestarts=0. Manifiesto de 174 archivos coincide con la compilación Linux y la VM; respaldo pre-cutover y compilación anterior disponibles.
