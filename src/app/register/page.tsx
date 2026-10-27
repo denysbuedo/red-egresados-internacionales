@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState } from "react";
 import Link from "next/link";
 import { MemberTypeSelect } from "@/components/MemberTypeSelect";
@@ -75,12 +77,9 @@ export default function RegistroPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-900">Solicitar acceso a CONECTA</h1>
-          <p className="text-gray-600 mt-2">Una red profesional y académica para trabajadores del MES y sus instituciones</p>
-        </div>
+    <main className="ui-page min-h-screen bg-gray-50">
+      <div className="ui-content max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <PageHeader title="Solicitar acceso a CONECTA" description="Una red profesional y académica para trabajadores del MES y sus instituciones." eyebrow="EMPIEZA A CONECTAR" compact />
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">

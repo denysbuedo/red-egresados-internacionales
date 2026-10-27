@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -195,8 +197,8 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 py-8 text-center">
+      <main className="ui-page min-h-screen bg-gray-50">
+        <div className="ui-content max-w-6xl mx-auto px-4 py-8 text-center">
           <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500">Cargando grupo...</p>
         </div>
@@ -206,10 +208,10 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
 
   if (!group) {
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main className="ui-page min-h-screen bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Grupo no encontrado</h2>
+            <PageHeader title="Grupo no encontrado" description="Este espacio no existe o ya no está disponible." eyebrow="CONECTA · SIGAMOS EXPLORANDO" compact />
             <Link href="/comunidades" className="text-[#102B46] hover:underline">
               ← Volver a comunidades
             </Link>
@@ -220,9 +222,10 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="ui-page min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
+        <PageHeader title={group.name} description="Un espacio para compartir experiencias, preguntas y nuevas iniciativas." eyebrow="COMUNIDADES · CONOCIMIENTO EN COMÚN" />
         <div className="mb-6">
           <Link href="/comunidades" className="text-[#102B46] hover:underline text-sm font-medium">
             ← Volver a comunidades
@@ -240,7 +243,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
           <aside className="lg:w-80 shrink-0">
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm sticky top-24">
               <div className="flex items-start justify-between mb-4">
-                <h1 className="text-2xl font-bold text-gray-900">{group.name}</h1>
+                <h2 className="text-2xl font-bold text-gray-900">{group.name}</h2>
                 {isCreator && (
                   <button
                     onClick={() => setShowEditForm(!showEditForm)}
@@ -339,7 +342,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-gray-900 truncate">{member.graduateName}</p>
                         {member.role === "admin" && (
-                          <span className="text-xs text-purple-600">Creador</span>
+                          <span className="text-xs text-teal-600">Creador</span>
                         )}
                       </div>
                     </Link>

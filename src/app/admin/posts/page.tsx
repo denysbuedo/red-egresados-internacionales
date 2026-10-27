@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -55,16 +57,11 @@ export default function AdminPostsPage() {
 
 
   return (
-    <div className="space-y-6">
+    <div className="ui-surface space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Noticias</h1>
-          <p className="text-gray-500 mt-1">Publica y administra las noticias de la red</p>
-        </div>
-        <Link
+      <PageHeader title="Gestión de Noticias" description="Comparte la actualidad institucional y administra las noticias de la red." eyebrow="GESTIÓN · COMUNICACIÓN" actions={<Link
           href="/admin/posts/new"
-          className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+          className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
         >
           <svg
             className="w-5 h-5"
@@ -80,8 +77,7 @@ export default function AdminPostsPage() {
             />
           </svg>
           Nueva Noticia
-        </Link>
-      </div>
+        </Link>} compact />
 
       {/* Posts List */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -89,7 +85,7 @@ export default function AdminPostsPage() {
           {loading ? (
             <div className="px-6 py-12 text-center text-gray-500">
               <div className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
                 Cargando noticias...
               </div>
             </div>
@@ -118,7 +114,7 @@ export default function AdminPostsPage() {
               </p>
               <Link
                 href="/admin/posts/new"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors"
               >
                 <svg
                   className="w-5 h-5"
@@ -222,8 +218,8 @@ export default function AdminPostsPage() {
 
       {/* Stats */}
       {posts.length > 0 && (
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-          <p className="text-sm text-purple-700">
+        <div className="bg-teal-50 border border-teal-200 rounded-xl p-4">
+          <p className="text-sm text-teal-700">
             <span className="font-semibold">📊 Total:</span> {posts.length}{" "}
             {posts.length === 1 ? "noticia publicada" : "noticias publicadas"}
           </p>

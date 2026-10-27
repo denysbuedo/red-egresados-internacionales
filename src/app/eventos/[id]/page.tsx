@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -97,8 +99,8 @@ export default function EventDetailPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+      <main className="ui-page min-h-screen bg-gray-50">
+        <div className="ui-content max-w-4xl mx-auto px-4 py-8 text-center">
           <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500">Cargando evento...</p>
         </div>
@@ -108,10 +110,10 @@ export default function EventDetailPage() {
 
   if (!event) {
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main className="ui-page min-h-screen bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Evento no encontrado</h2>
+            <PageHeader title="Evento no encontrado" description="Este espacio no existe o ya no está disponible." eyebrow="CONECTA · SIGAMOS EXPLORANDO" compact />
             <Link href="/eventos" className="text-[#102B46] hover:underline">
               ← Volver a eventos
             </Link>
@@ -125,7 +127,7 @@ export default function EventDetailPage() {
   const maybeCount = event.attendees.filter(a => a.status === "maybe").length;
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="ui-page min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
@@ -134,14 +136,12 @@ export default function EventDetailPage() {
           </Link>
         </div>
 
+        <PageHeader title={event.title} eyebrow="AGENDA · ENCUENTRO DE LA COMUNIDAD" compact />
+
         {/* Event Info */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm mb-6">
           {/* Type Banner */}
-          <div className={`px-6 py-4 ${
-            event.type === "virtual" 
-              ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white" 
-              : "bg-gradient-to-r from-green-600 to-green-500 text-white"
-          }`}>
+          <div className="ui-event-banner px-6 py-4">
             <div className="flex items-center justify-between">
               <span className="text-lg font-bold">
                 {event.type === "virtual" ? "🖥️ Evento Virtual" : "📍 Evento Presencial"}
@@ -154,7 +154,6 @@ export default function EventDetailPage() {
 
           {/* Content */}
           <div className="p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-3">{event.title}</h1>
             <p className="text-gray-600 mb-6 whitespace-pre-wrap">{event.description}</p>
 
             {/* Details Grid */}
@@ -231,7 +230,7 @@ export default function EventDetailPage() {
                   disabled={rsvpLoading}
                   className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     userStatus === "maybe"
-                      ? "bg-yellow-500 text-white"
+                      ? "bg-yellow-100 text-yellow-800"
                       : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                   } disabled:bg-gray-400`}
                 >

@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { memberTypeLabel } from "@/lib/site";
 import { useState, useEffect } from "react";
 
@@ -76,11 +78,8 @@ export default function ApprovalsPage() {
 
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Aprobación de Registros</h1>
-        <p className="text-gray-500 mt-1">Verifica el vínculo laboral de cada persona antes de aprobar su acceso</p>
-      </div>
+    <div className="ui-surface space-y-6">
+      <PageHeader title="Aprobación de Registros" description="Revisa el vínculo laboral antes de habilitar el acceso a la comunidad." eyebrow="GESTIÓN · ACCESO INSTITUCIONAL" compact />
 
       {loading ? (
         <div className="text-center py-12">
@@ -88,7 +87,7 @@ export default function ApprovalsPage() {
           <p className="text-gray-500">Cargando solicitudes...</p>
         </div>
       ) : pendingUsers.length > 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-x-auto shadow-sm ui-table-scroll" tabIndex={0} role="region" aria-label="Solicitudes de acceso">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>

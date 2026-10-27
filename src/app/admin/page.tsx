@@ -1,3 +1,5 @@
+
+import { PageHeader } from "@/components/PageHeader";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
@@ -53,7 +55,7 @@ export default async function AdminDashboard() {
   ]);
 
   return (
-    <div className="space-y-6">
+    <div className="ui-surface space-y-6"><PageHeader title="Administración de CONECTA" description="Una visión de la comunidad y las herramientas para acompañar su crecimiento." eyebrow="GESTIÓN · RESUMEN INSTITUCIONAL" compact />
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
@@ -235,9 +237,9 @@ export default async function AdminDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Link
             href="/admin/posts/new"
-            className="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
+            className="flex items-center gap-3 p-4 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors"
           >
-            <div className="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center text-purple-700">
+            <div className="w-10 h-10 bg-teal-200 rounded-lg flex items-center justify-center text-teal-700">
               <svg
                 className="w-5 h-5"
                 fill="none"
@@ -253,8 +255,8 @@ export default async function AdminDashboard() {
               </svg>
             </div>
             <div>
-              <p className="font-medium text-purple-900">Nueva Noticia</p>
-              <p className="text-sm text-purple-600">Publicar anuncio</p>
+              <p className="font-medium text-teal-900">Nueva Noticia</p>
+              <p className="text-sm text-teal-600">Publicar anuncio</p>
             </div>
           </Link>
 
@@ -327,7 +329,7 @@ function StatCard({
   const colorClasses = {
     blue: "bg-blue-50 text-blue-700",
     green: "bg-green-50 text-green-700",
-    purple: "bg-purple-50 text-purple-700",
+    purple: "bg-teal-50 text-teal-700",
     orange: "bg-orange-50 text-orange-700",
   };
 

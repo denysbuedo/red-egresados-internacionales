@@ -296,7 +296,7 @@ export function Navbar() {
                     {["admin", "editor"].includes(user.role) && (
                       <Link
                         href="/admin"
-                        className="block px-4 py-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50 text-sm transition-colors font-medium"
+                        className="block px-4 py-2 text-teal-600 hover:text-teal-700 hover:bg-teal-50 text-sm transition-colors font-medium"
                         onClick={() => setUserMenuOpen(false)}
                       >
                         🛡️ Panel Admin
@@ -446,8 +446,11 @@ function NavLink({
   href: string;
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const active = !href.includes("?") && (href === "/" ? pathname === href : pathname === href || pathname.startsWith(href + "/"));
   return (
     <Link
+      aria-current={active ? "page" : undefined}
       href={href}
       className="px-2 py-2 whitespace-nowrap text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
     >
@@ -465,8 +468,11 @@ function MobileNavLink({
   children: React.ReactNode;
   onClick: () => void;
 }) {
+  const pathname = usePathname();
+  const active = !href.includes("?") && (href === "/" ? pathname === href : pathname === href || pathname.startsWith(href + "/"));
   return (
     <Link
+      aria-current={active ? "page" : undefined}
       href={href}
       onClick={onClick}
       className="px-2 py-2 whitespace-nowrap text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"

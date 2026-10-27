@@ -184,7 +184,7 @@ export function AdminPostCard({
                   <span className="w-6 h-6 rounded-full bg-yellow-100 flex items-center justify-center text-xs border-2 border-white">🎉</span>
                 )}
                 {reactions.insightful > 0 && (
-                  <span className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-xs border-2 border-white">💡</span>
+                  <span className="w-6 h-6 rounded-full bg-teal-100 flex items-center justify-center text-xs border-2 border-white">💡</span>
                 )}
               </div>
               <span className="text-sm text-gray-500">

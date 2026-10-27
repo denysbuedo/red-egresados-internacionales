@@ -1,9 +1,11 @@
+
+import { PageHeader } from "@/components/PageHeader";
 export default function TerminosPage() {
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main className="ui-page min-h-screen bg-gray-50">
+      <div className="ui-content max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Términos y Condiciones</h1>
+          <PageHeader title="Términos y Condiciones" description="Participación responsable y colaboración en la red." eyebrow="CONECTA · NORMAS DE PARTICIPACIÓN" compact />
           <p className="text-sm text-gray-500 mb-8">Última actualización: Octubre 2026</p>
 
           <div className="space-y-6 text-gray-700">

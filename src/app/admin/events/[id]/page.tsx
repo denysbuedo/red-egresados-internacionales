@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -91,7 +93,7 @@ export default function AdminEventDetailPage() {
   if (!event) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Evento no encontrado</p>
+        <PageHeader title="Evento no encontrado" description="Vuelve a la agenda para consultar los encuentros disponibles." eyebrow="GESTIÓN · EVENTOS" compact />
         <Link href="/eventos" className="text-[#102B46] hover:underline mt-2 inline-block">
           ← Volver a eventos
         </Link>
@@ -108,16 +110,11 @@ export default function AdminEventDetailPage() {
   const declinedCount = event.attendees.filter(a => a.status === "declined").length;
 
   return (
-    <div className="space-y-6">
+    <div className="ui-surface space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Detalle del Evento</h1>
-          <Link href="/eventos" className="text-[#102B46] hover:underline text-sm mt-1 inline-block">
+      <PageHeader title="Detalle del Evento" description="Consulta la información del encuentro y gestiona su participación." eyebrow="GESTIÓN · SEGUIMIENTO DE EVENTOS" actions={<Link href="/eventos" className="text-[#102B46] hover:underline text-sm mt-1 inline-block">
             ← Volver a eventos
-          </Link>
-        </div>
-      </div>
+          </Link>} compact />
 
       {/* Info del evento */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
@@ -163,7 +160,7 @@ export default function AdminEventDetailPage() {
         <h3 className="text-lg font-bold text-gray-900 mb-4">
           Resumen de Asistentes ({event.attendeeCount})
         </h3>
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="ui-event-summary grid grid-cols-3 gap-4 mb-6">
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
             <p className="text-3xl font-bold text-green-700">{attendingCount}</p>
             <p className="text-sm text-green-600">Asistirán</p>
@@ -179,10 +176,11 @@ export default function AdminEventDetailPage() {
         </div>
 
         {/* Filtros */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           {(["all", "attending", "maybe", "declined"] as const).map((f) => (
             <button
               key={f}
+              aria-pressed={filter === f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 filter === f
@@ -204,7 +202,7 @@ export default function AdminEventDetailPage() {
             {filteredAttendees.map((attendee) => (
               <div
                 key={attendee.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                className="ui-attendee-row flex flex-wrap items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <Link href={`/miembros/${attendee.graduateId}`}>

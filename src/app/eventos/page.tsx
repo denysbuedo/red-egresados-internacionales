@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -91,15 +93,10 @@ export default function EventsPage() {
 
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main className="ui-page min-h-screen bg-gray-50">
+      <div className="ui-content max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Eventos</h1>
-          <p className="text-gray-600 mt-1">
-            Encuentros, webinars y actividades de la red
-          </p>
-        </div>
+        <PageHeader title="Eventos" description="Encuentros para compartir experiencias, aprender y crear en conjunto." eyebrow="AGENDA · NOS ENCONTRAMOS" />
 
         {/* Lista de eventos */}
         {loading ? (

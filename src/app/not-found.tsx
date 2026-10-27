@@ -1,20 +1,5 @@
 import Link from "next/link";
-
+import { PageHeader } from "@/components/PageHeader";
 export default function NotFound() {
-  return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-white mb-4">404</h1>
-        <p className="text-neutral-400 text-lg mb-8">
-          Esta página no existe
-        </p>
-        <Link
-          href="/"
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
-        >
-          Volver al Inicio
-        </Link>
-      </div>
-    </main>
-  );
+  return <main className="ui-page"><div className="ui-content ui-content-reading"><PageHeader eyebrow="CONECTA · PÁGINA NO ENCONTRADA" title="Sigamos conectando." description="Esta página no existe o no está disponible para tu cuenta." /><section className="ui-empty"><span aria-hidden="true">◇</span><h2>Hay otras formas de continuar</h2><p>Vuelve al inicio o explora las personas de la comunidad.</p><div><Link href="/" className="conecta-cta">Ir al inicio →</Link><Link href="/directorio" className="ui-text-link">Explorar Personas</Link></div></section></div></main>;
 }

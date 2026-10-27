@@ -1,3 +1,5 @@
+
+import { PageHeader } from "@/components/PageHeader";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession, getGraduateByUserId } from "@/lib/session";
@@ -10,10 +12,9 @@ export default async function PendingPage() {
   if (session.status === "approved") redirect("/");
   const profile = await getGraduateByUserId(session.id);
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-16">
+    <main className="ui-page min-h-screen bg-gray-50 px-4 py-16">
       <div className="mx-auto max-w-xl rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-        <p className="mb-2 text-sm font-semibold text-blue-700">Registro recibido</p>
-        <h1 className="mb-4 text-3xl font-bold text-gray-900">Tu solicitud está pendiente de aprobación</h1>
+        <PageHeader title="Tu solicitud está pendiente de aprobación" description="La validación institucional es el siguiente paso para comenzar a colaborar." eyebrow="CONECTA · REGISTRO RECIBIDO" compact />
         <p className="mb-4 text-gray-600">Hola, {session.username}. Tu institución o la administración revisará tus datos antes de habilitar el acceso a la red.</p>
         {session.pendingUniversity && <p className="mb-6 font-medium text-gray-800">{session.pendingUniversity}</p>}
         {!profile?.employmentConfirmed && <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">

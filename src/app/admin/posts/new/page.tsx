@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -74,7 +76,7 @@ export default function NewPostPage() {
 
   if (checkingAuth || !user) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main className="ui-page min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500">Verificando permisos...</p>
@@ -84,25 +86,15 @@ export default function NewPostPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main className="ui-page min-h-screen bg-gray-50">
+      <div className="ui-content max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Nueva Noticia
-            </h1>
-            <p className="text-gray-500 mt-1">
-              Publicar una noticia en la página de inicio
-            </p>
-          </div>
-          <Link
+        <PageHeader title="Nueva Noticia" description="Comparte una convocatoria, un resultado o una novedad institucional." eyebrow="GESTIÓN · CREAR NOTICIA" actions={<Link
             href="/"
             className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
           >
             ← Volver al inicio
-          </Link>
-        </div>
+          </Link>} compact />
 
         {/* Error Message */}
         {error && (

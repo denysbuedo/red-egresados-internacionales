@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, IBM_Plex_Mono } from "next/font/google";
 import { SITE_FULL_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/site";
+import { PageFooter } from "@/components/PageFooter";
 import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 
@@ -16,5 +17,5 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "CONECTA · El conocimiento nos conecta", description: SITE_DESCRIPTION, images: ["/brand/og-conecta-1200x630.png"] },
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="es"><body className={`${inter.variable} ${plexMono.variable} font-sans antialiased bg-gray-50 text-gray-900`}><AppShell />{children}</body></html>;
+  return <html lang="es"><body className={`${inter.variable} ${plexMono.variable} font-sans antialiased bg-gray-50 text-gray-900`}><AppShell />{children}<PageFooter /></body></html>;
 }

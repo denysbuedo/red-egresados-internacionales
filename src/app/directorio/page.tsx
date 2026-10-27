@@ -1,3 +1,5 @@
+
+import { PageHeader } from "@/components/PageHeader";
 import { MEMBER_TYPES } from "@/lib/site";
 import { db } from "@/db";
 import { graduates } from "@/db/schema";
@@ -77,16 +79,11 @@ export default async function DirectorioPage({
     .orderBy(graduates.career);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Directorio</h1>
-          <p className="text-gray-600 mt-1">
-            Encuentra personas de la comunidad por institución, vínculo o área de conocimiento
-          </p>
-        </div>
+    <main className="ui-page min-h-screen bg-gray-50">
+      <div className="ui-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <PageHeader title="Directorio" description="Descubre personas, capacidades y afinidades para tu próxima colaboración." eyebrow="PERSONAS · COMUNIDAD CONECTA" />
 
-        <form className="mb-8 space-y-4">
+        <form className="ui-filter-panel mb-8 space-y-4">
           <div className="flex gap-3">
             <input
               type="text"
@@ -189,6 +186,7 @@ export default async function DirectorioPage({
             {allGraduates.map((g) => (
               <GraduateCard
                 key={g.id}
+                isOwn={g.userId === session.id}
                 id={g.id}
                 name={g.name}
                 country={g.country}

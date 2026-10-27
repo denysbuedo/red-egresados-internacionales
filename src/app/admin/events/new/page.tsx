@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -56,20 +58,14 @@ export default function NewEventPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="ui-surface space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Crear Evento</h1>
-          <p className="text-gray-500 mt-1">Publicar un nuevo evento para la red</p>
-        </div>
-        <Link
+      <PageHeader title="Crear Evento" description="Abre un espacio para el encuentro y el intercambio de conocimiento." eyebrow="GESTIÓN · CREAR ENCUENTRO" actions={<Link
           href="/eventos"
           className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
         >
           ← Volver a eventos
-        </Link>
-      </div>
+        </Link>} compact />
 
       {/* Error Message */}
       {error && (

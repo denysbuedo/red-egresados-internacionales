@@ -97,3 +97,8 @@ bun db:migrate     # Run migrations (auto in sandbox)
 ## Imágenes persistentes
 
 Sharp 0.35.5: validar y convertir JPG/PNG/WebP a WebP sin EXIF, máximo 8 MB / 25 MP y lado 2048px. Las imágenes se almacenan en UPLOADS_PATH (/var/lib/red-egresados/uploads en la VM), fuera del árbol compilado y de Git; respaldo conjunto con SQLite. Lectura y subida privadas mediante /api/media. Los enlaces externos no se cachean automáticamente.
+
+
+## Sistema visual compartido
+
+PageHeader unifica cabeceras; AdminNav aplica navegación activa y enlaces por rol sin sustituir las autorizaciones del servidor; PageFooter comparte enlaces institucionales. Las clases ui-* organizan páginas, tarjetas, formularios, tablas y estados. Mantener mensajes de error y acciones destructivas distinguibles; reutilizar estos elementos en nuevas páginas.

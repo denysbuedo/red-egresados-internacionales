@@ -198,3 +198,11 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 
 - Linux: compilación/typecheck/lint y 17 pruebas HTTP correctas. Manifiesto de 168 archivos validado. HTTPS público: perfil propio y editor 200; anónimo dirigido al login. No se modificó el perfil real para las pruebas.
 - Corte: todos los valores de las 19 tablas y las imágenes persistentes conservados. Se mantiene una cuenta, un perfil y el aporte nuevo que el operador publicó después del reinicio anterior. Servicio activo y NRestarts=0; respaldo pre-cutover y compilación anterior disponibles.
+
+## Diseño de toda la plataforma — 2026-10-27
+
+- Extendida identidad CONECTA a comunidad, agenda, detalle, registro/vínculo, espera, información institucional, administración y correo. Componentes compartidos PageHeader/AdminNav/PageFooter y reglas ui-* de tarjetas/formularios/tablas/estados.
+- Panel de gestión renovado con navegación activa por rol y presentación adaptable. Eliminado el tema oscuro aislado de listas de correo. Directorio con acceso al perfil propio, sin botón de conexión consigo mismo.
+- Se conservan portada, espacio de trabajo y perfil aprobados. Sin cambios de API, permisos, esquema ni operaciones de negocio.
+- Chrome real: 44 vistas/variantes, tamaños 320–1440px y roles admin/editor/institución/pendiente/sin perfil, sin desbordamiento ni errores JS. Windows: build y 17 pruebas HTTP correctas; lint sin errores.
+- Respaldo verificado en /var/backups/red-egresados/pre-conecta-platform-20261027, incluidas imágenes. Publicación en preparación. Conservar todos los datos actuales; no ejecutar nuevamente el reinicio de base solicitado anteriormente.

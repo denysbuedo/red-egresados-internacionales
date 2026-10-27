@@ -1,3 +1,5 @@
+
+import { PageHeader } from "@/components/PageHeader";
 import { db } from "@/db";
 import { adminPosts } from "@/db/schema";
 import { desc, sql } from "drizzle-orm";
@@ -31,15 +33,10 @@ export default async function NoticiasPage() {
   const regularPosts = allPosts.filter((p) => !isPinned(p.pinnedUntil));
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main className="ui-page min-h-screen bg-gray-50">
+      <div className="ui-content max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Noticias</h1>
-          <p className="text-gray-600 mt-1">
-            Comunicados y actualizaciones oficiales de la Red
-          </p>
-        </div>
+        <PageHeader title="Noticias" description="Comunicados, iniciativas y novedades de la educación superior cubana." eyebrow="ACTUALIDAD INSTITUCIONAL" />
 
         {/* Noticias fijadas */}
         {pinnedPosts.length > 0 && (

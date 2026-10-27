@@ -5,6 +5,7 @@ import { memberTypeLabel } from "@/lib/site";
 import { useState, useEffect } from "react";
 
 interface GraduateCardProps {
+  isOwn?: boolean;
   id: number;
   name: string;
   country: string;
@@ -18,6 +19,7 @@ interface GraduateCardProps {
 }
 
 export function GraduateCard({
+  isOwn = false,
   id,
   name,
   country,
@@ -33,7 +35,7 @@ export function GraduateCard({
     "none" | "pending-sent" | "pending-received" | "connected" | "error"
   >("none");
   const [loading, setLoading] = useState(false);
-  const [checking, setChecking] = useState(true);
+  const [checking, setChecking] = useState(!isOwn);
 
   async function checkConnectionStatus() {
     setChecking(true);
@@ -94,12 +96,12 @@ export function GraduateCard({
     .slice(0, 2);
 
   useEffect(() => {
-    checkConnectionStatus();
-  }, [id]);
+    if (!isOwn) checkConnectionStatus();
+  }, [id, isOwn]);
 
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all group">
+    <div className="ui-person-card bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all group">
       <div className="flex items-start gap-4">
         <Link href={`/miembros/${id}`}>
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
@@ -168,7 +170,7 @@ export function GraduateCard({
           <p className="mt-2 text-xs font-medium text-blue-700">{memberTypeLabel(memberType)}</p>
           {/* Botón de conectar */}
           <div className="mt-3">
-            {checking ? (
+            {isOwn ? <Link href={`/miembros/${id}`} className="flex w-full items-center justify-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-800">Ver mi perfil <span aria-hidden="true">↗</span></Link> : checking ? (
               <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-400 text-sm rounded-lg">
                 <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
               </div>
@@ -211,7 +213,7 @@ export function GraduateCard({
                 Solicitud enviada
               </div>
             ) : connectionStatus === "pending-received" ? (
-              <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-purple-50 text-purple-700 text-sm font-medium rounded-lg border border-purple-200">
+              <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-teal-50 text-teal-700 text-sm font-medium rounded-lg border border-teal-200">
                 <svg
                   className="w-4 h-4"
                   fill="none"

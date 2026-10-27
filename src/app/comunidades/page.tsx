@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -97,7 +99,7 @@ export default function CommunitiesPage() {
   };
 
   const typeColors = {
-    university: "bg-purple-50 text-purple-700 border-purple-200",
+    university: "bg-teal-50 text-teal-700 border-teal-200",
     career: "bg-blue-50 text-blue-700 border-blue-200",
     country: "bg-green-50 text-green-700 border-green-200",
     interest: "bg-orange-50 text-orange-700 border-orange-200",
@@ -125,23 +127,15 @@ export default function CommunitiesPage() {
 
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main className="ui-page min-h-screen bg-gray-50">
+      <div className="ui-content max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Comunidades</h1>
-            <p className="text-gray-600 mt-1">
-              Comunidades por institución, área de conocimiento, país o intereses
-            </p>
-          </div>
-          <button
+        <PageHeader title="Comunidades" description="Encuentra tu espacio para intercambiar conocimiento y desarrollar ideas en común." eyebrow="ESPACIOS PARA COLABORAR" actions={<button
             onClick={() => setShowCreateForm(!showCreateForm)}
             className="px-4 py-2 bg-[#102B46] hover:bg-[#0C1D30] text-white rounded-lg text-sm font-medium transition-colors"
           >
             + Crear Grupo
-          </button>
-        </div>
+          </button>} />
 
         {/* Formulario crear grupo */}
         {showCreateForm && (

@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 
 interface EmailList {
@@ -109,54 +111,44 @@ export default function ListasCorreoPage() {
   }
 
   return (
-    <main className="min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-white">
-              Listas de Correo
-            </h1>
-            <p className="text-neutral-400 mt-1">
-              Crea listas de distribución por criterios de afinidad
-            </p>
-          </div>
-          <button
+    <main className="ui-page min-h-screen">
+      <div className="ui-content max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <PageHeader title="Listas de Correo" description="Organiza la comunicación institucional por áreas, instituciones e intereses." eyebrow="GESTIÓN · COMUNICACIÓN INSTITUCIONAL" actions={<button
             onClick={() => setShowForm(!showForm)}
             className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-sm transition-colors"
           >
             {showForm ? "Cancelar" : "+ Nueva Lista"}
-          </button>
-        </div>
+          </button>} />
 
         {showForm && (
           <form
             onSubmit={saveList}
-            className="mb-8 bg-neutral-800/30 border border-neutral-700/50 rounded-xl p-6"
+            className="mb-8 bg-white border border-gray-200 rounded-xl p-6"
           >
-            <h2 className="text-lg font-semibold text-white mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
               Crear Lista de Correo
             </h2>
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     Nombre de la Lista *
                   </label>
                   <input
                     name="name"
                     required
                     placeholder="Ej: Personal de Ciencias de la Salud"
-                    className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 text-sm"
+                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-300 mb-1.5">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     Descripción
                   </label>
                   <input
                     name="description"
                     placeholder="Descripción de la lista..."
-                    className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 text-sm"
+                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 text-sm"
                   />
                 </div>
               </div>
@@ -164,7 +156,7 @@ export default function ListasCorreoPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 <select
                   name="filterUniversity"
-                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500"
                 >
                   <option value="">Todas las instituciones</option>
                   {universities.map((u) => (
@@ -175,7 +167,7 @@ export default function ListasCorreoPage() {
                 </select>
                 <select
                   name="filterCareer"
-                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500"
                 >
                   <option value="">Todas las áreas de conocimiento</option>
                   {careers.map((c) => (
@@ -186,7 +178,7 @@ export default function ListasCorreoPage() {
                 </select>
                 <select
                   name="filterCountry"
-                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500"
                 >
                   <option value="">Todos los países</option>
                   {countries.map((c) => (
@@ -201,7 +193,7 @@ export default function ListasCorreoPage() {
                   placeholder="Año desde"
                   min={1960}
                   max={2030}
-                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500"
                 />
                 <input
                   name="filterYearTo"
@@ -209,14 +201,14 @@ export default function ListasCorreoPage() {
                   placeholder="Año hasta"
                   min={1960}
                   max={2030}
-                  className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-700 text-white rounded-xl font-medium text-sm transition-colors"
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-xl font-medium text-sm transition-colors"
               >
                 {loading ? "Guardando..." : "Guardar Lista"}
               </button>
@@ -224,15 +216,15 @@ export default function ListasCorreoPage() {
           </form>
         )}
 
-        <div className="mb-8 bg-neutral-800/30 border border-neutral-700/50 rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">
+        <div className="mb-8 bg-white border border-gray-200 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Vista Previa de Correos
           </h2>
           <form onSubmit={previewList} className="space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               <select
                 name="filterUniversity"
-                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+                className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500"
               >
                 <option value="">Todas las instituciones</option>
                 {universities.map((u) => (
@@ -243,7 +235,7 @@ export default function ListasCorreoPage() {
               </select>
               <select
                 name="filterCareer"
-                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+                className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500"
               >
                 <option value="">Todas las áreas de conocimiento</option>
                 {careers.map((c) => (
@@ -254,7 +246,7 @@ export default function ListasCorreoPage() {
               </select>
               <select
                 name="filterCountry"
-                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+                className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500"
               >
                 <option value="">Todos los países</option>
                 {countries.map((c) => (
@@ -269,7 +261,7 @@ export default function ListasCorreoPage() {
                 placeholder="Año desde"
                 min={1960}
                 max={2030}
-                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+                className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500"
               />
               <input
                 name="filterYearTo"
@@ -277,13 +269,13 @@ export default function ListasCorreoPage() {
                 placeholder="Año hasta"
                 min={1960}
                 max={2030}
-                className="px-3 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
+                className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 bg-neutral-700 hover:bg-neutral-600 text-white rounded-xl font-medium text-sm transition-colors"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-sm transition-colors"
             >
               {loading ? "Consultando..." : "Vista Previa"}
             </button>
@@ -292,8 +284,8 @@ export default function ListasCorreoPage() {
           {preview && (
             <div className="mt-6 space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-neutral-300 text-sm">
-                  <span className="text-white font-semibold">
+                <p className="text-gray-700 text-sm">
+                  <span className="text-gray-900 font-semibold">
                     {preview.count}
                   </span>{" "}
                   miembro{preview.count !== 1 && "s"} encontrado
@@ -306,8 +298,8 @@ export default function ListasCorreoPage() {
                   {copied ? "Copiado!" : "Copiar Correos"}
                 </button>
               </div>
-              <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-4 max-h-48 overflow-y-auto">
-                <p className="text-neutral-400 text-xs font-mono break-all leading-relaxed">
+              <div className="bg-white border border-gray-200 rounded-lg p-4 max-h-48 overflow-y-auto">
+                <p className="text-gray-500 text-xs font-mono break-all leading-relaxed">
                   {preview.emails || "No se encontraron correos"}
                 </p>
               </div>
@@ -317,18 +309,18 @@ export default function ListasCorreoPage() {
 
         {lists.length > 0 && (
           <section>
-            <h2 className="text-xl font-semibold text-white mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Listas Guardadas
             </h2>
             <div className="space-y-3">
               {lists.map((list) => (
                 <div
                   key={list.id}
-                  className="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-5"
+                  className="bg-gray-50 border border-gray-200 rounded-xl p-5"
                 >
-                  <h3 className="text-white font-semibold">{list.name}</h3>
+                  <h3 className="text-gray-900 font-semibold">{list.name}</h3>
                   {list.description && (
-                    <p className="text-neutral-400 text-sm mt-1">
+                    <p className="text-gray-500 text-sm mt-1">
                       {list.description}
                     </p>
                   )}
@@ -361,8 +353,8 @@ export default function ListasCorreoPage() {
 
 function FilterBadge({ label, value }: { label: string; value: string }) {
   return (
-    <span className="inline-flex items-center gap-1 text-xs bg-neutral-700/50 text-neutral-300 px-2.5 py-1 rounded-md">
-      <span className="text-neutral-500">{label}:</span> {value}
+    <span className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md">
+      <span className="text-gray-500">{label}:</span> {value}
     </span>
   );
 }

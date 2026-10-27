@@ -1,25 +1,6 @@
 "use client";
-
-export default function Error({
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
-  return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-white mb-4">Algo salió mal</h1>
-        <p className="text-neutral-400 text-lg mb-8">
-          Ha ocurrido un error inesperado
-        </p>
-        <button
-          onClick={reset}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
-        >
-          Intentar de Nuevo
-        </button>
-      </div>
-    </main>
-  );
+import Link from "next/link";
+import { PageHeader } from "@/components/PageHeader";
+export default function ErrorPage({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  return <main className="ui-page"><div className="ui-content ui-content-reading"><PageHeader eyebrow="CONECTA · INTÉNTALO DE NUEVO" title="No pudimos cargar esta página." description="Puedes volver a intentarlo o continuar desde el inicio." /><section className="ui-empty"><span aria-hidden="true">↻</span><h2>Retomemos la conversación</h2><p>Si el problema persiste, consulta con la administración de la plataforma.</p><div><button onClick={reset} className="conecta-cta">Volver a intentar</button><Link href="/" className="ui-text-link">Ir al inicio</Link></div></section></div></main>;
 }

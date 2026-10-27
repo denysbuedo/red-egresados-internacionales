@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -123,21 +125,16 @@ export default function ConnectionsPage() {
 
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main className="ui-page min-h-screen bg-gray-50">
+      <div className="ui-content max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Mis Conexiones</h1>
-          <p className="text-gray-600 mt-1">
-            Construye tu red de contactos profesionales
-          </p>
-        </div>
+        <PageHeader title="Mis Conexiones" description="Una conversación abre nuevas posibilidades. Construye tu red profesional." eyebrow="RELACIONES QUE GENERAN CONOCIMIENTO" />
 
         {/* Tabs */}
         <div className="bg-white border border-gray-200 rounded-xl mb-6 overflow-hidden">
-          <div className="flex border-b border-gray-200">
+          <div className="ui-tabs flex border-b border-gray-200">
             <button
-              onClick={() => setActiveTab("pending")}
+              aria-pressed={activeTab === "pending"} onClick={() => setActiveTab("pending")}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors relative ${
                 activeTab === "pending"
                   ? "text-blue-600 bg-blue-50"
@@ -160,7 +157,7 @@ export default function ConnectionsPage() {
               )}
             </button>
             <button
-              onClick={() => setActiveTab("sent")}
+              aria-pressed={activeTab === "sent"} onClick={() => setActiveTab("sent")}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors relative ${
                 activeTab === "sent"
                   ? "text-blue-600 bg-blue-50"
@@ -178,7 +175,7 @@ export default function ConnectionsPage() {
               )}
             </button>
             <button
-              onClick={() => setActiveTab("friends")}
+              aria-pressed={activeTab === "friends"} onClick={() => setActiveTab("friends")}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors relative ${
                 activeTab === "friends"
                   ? "text-blue-600 bg-blue-50"
@@ -209,7 +206,7 @@ export default function ConnectionsPage() {
             pendingRequests.length > 0 ? (
               <div className="divide-y divide-gray-100">
                 {pendingRequests.map((request) => (
-                  <div key={request.id} className="p-6 flex items-center justify-between gap-4">
+                  <div key={request.id} className="ui-connection-row p-6 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1">
                       <Link href={`/miembros/${request.senderId}`}>
                         <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
@@ -276,7 +273,7 @@ export default function ConnectionsPage() {
             sentRequests.length > 0 ? (
               <div className="divide-y divide-gray-100">
                 {sentRequests.map((request) => (
-                  <div key={request.id} className="p-6 flex items-center justify-between gap-4">
+                  <div key={request.id} className="ui-connection-row p-6 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1">
                       <Link href={`/miembros/${request.receiverId}`}>
                         <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">

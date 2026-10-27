@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -113,7 +115,7 @@ export default function RegistroPage() {
 
   if (checkingAuth) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50">
+      <main className="ui-page min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Verificando autenticación...</p>
@@ -123,21 +125,10 @@ export default function RegistroPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Únete a CONECTA
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Completa tu perfil profesional
-          </p>
-          {user && (
-            <p className="text-[#102B46] mt-2 text-sm">
-              Registrando como: <span className="font-medium">{user.username}</span> ({user.email})
-            </p>
-          )}
-        </div>
+    <main className="ui-page min-h-screen bg-gray-50">
+      <div className="ui-content max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <PageHeader title="Únete a CONECTA" description="Presenta tu experiencia y tu vínculo laboral con la educación superior cubana." eyebrow="TU PERFIL · PRIMEROS PASOS" compact />
+        {user && <p className="ui-context-label">Registrando como: <strong>{user.username}</strong> · {user.email}</p>}
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">

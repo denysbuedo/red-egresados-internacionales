@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHeader } from "@/components/PageHeader";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -84,14 +86,9 @@ export default function AdminUsersPage() {
 
 
   return (
-    <div className="space-y-6">
+    <div className="ui-surface space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
-          <p className="text-gray-500 mt-1">Administra las cuentas de usuario de la red</p>
-        </div>
-      </div>
+      <PageHeader title="Gestión de Usuarios" description="Gestiona las cuentas y los permisos de la comunidad institucional." eyebrow="GESTIÓN · CUENTAS Y PERMISOS" compact />
 
       {/* Filters */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
@@ -202,7 +199,7 @@ export default function AdminUsersPage() {
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer ${
                             user.role === "admin"
-                              ? "bg-purple-100 text-purple-800"
+                              ? "bg-teal-100 text-teal-800"
                               : "bg-gray-100 text-gray-800"
                           }`}
                           onClick={() => setEditingUser(user)}
