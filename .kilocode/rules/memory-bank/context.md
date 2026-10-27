@@ -176,3 +176,10 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 
 - Tarjetas originales publicadas como 2cd3cb8. Navegador real: cuatro tarjetas visibles entre 320 y 1440px, sin desbordamiento ni ilustración en la cabecera. Linux: compilación/typecheck/lint y 15 pruebas HTTP correctas.
 - Producción: inicio autenticado 200 con las cuatro tarjetas, sin imagen generada ni cifras. Portada pública HTTPS 200 conservada. Manifiesto de 158 archivos verificado; todas las filas de las 19 tablas conservadas. Respaldo: /var/backups/red-egresados/pre-conecta-clean-banner-20261027.
+
+## Imágenes locales y reinicio solicitado — 2026-10-27
+
+- El operador autoriza expresamente vaciar los datos de la red y conservar solo dinfo, sin publicaciones. Se conserva también su perfil asociado y credencial actual. Esta decisión sustituye la consulta pendiente de revalidación de cuentas históricas.
+- Implementada carga directa de imágenes y alternativa URL en aportes y noticias, con vista previa, errores y WebP optimizado. Nuevas rutas privadas /api/media, directorio persistente UPLOADS_PATH y Sharp como dependencia directa; sin migraciones.
+- Script transaccional reset-network.cjs conserva exactamente cuenta/perfil/sesiones de dinfo y migraciones, elimina los demás datos. Prueba aislada y ensayo sobre copia antes de producción.
+- Respaldo verificado: /var/backups/red-egresados/pre-conecta-uploads-reset-20261027. Implementación y reinicio en preparación; ver IMAGENES_Y_REINICIO.md.

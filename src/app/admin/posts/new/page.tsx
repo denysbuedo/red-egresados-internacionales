@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ImageAttachment } from "@/components/ImageAttachment";
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function NewPostPage() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<{ role: string } | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const [previewImage, setPreviewImage] = useState<string>("");
+  const [uploading, setUploading] = useState(false);
 
   async function checkAuth() {
     try {
@@ -41,6 +42,7 @@ export default function NewPostPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (uploading) return;
     setError("");
     setLoading(true);
 
@@ -63,12 +65,6 @@ export default function NewPostPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const url = e.target.value;
-    setFormData({ ...formData, imageUrl: url });
-    setPreviewImage(url);
   };
 
   useEffect(() => {
@@ -142,45 +138,7 @@ export default function NewPostPage() {
               </p>
             </div>
 
-            <div className="mb-6">
-              <label
-                htmlFor="imageUrl"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                URL de la Imagen (opcional)
-              </label>
-              <input
-                type="url"
-                id="imageUrl"
-                value={formData.imageUrl}
-                onChange={handleImageUrlChange}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="https://ejemplo.com/imagen.jpg"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                URL directa de una imagen (jpg, png, webp)
-              </p>
-              
-              {previewImage && (
-                <div className="mt-3">
-                  <p className="text-xs font-medium text-gray-600 mb-2">Vista previa:</p>
-                  <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                    <img
-                      src={previewImage}
-                      alt="Vista previa"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                        const parent = (e.target as HTMLImageElement).parentElement;
-                        if (parent) {
-                          parent.innerHTML = '<p class="text-gray-400 text-sm flex items-center justify-center h-full">URL de imagen no válida</p>';
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+            <div className="mb-6"><ImageAttachment value={formData.imageUrl} onChange={(url) => setFormData((previous) => ({ ...previous, imageUrl: url }))} disabled={loading} onBusyChange={setUploading} /></div>
 
             <div>
               <label
@@ -231,7 +189,7 @@ export default function NewPostPage() {
           <div className="flex items-center gap-4">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || uploading}
               className="flex-1 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white rounded-xl font-semibold text-base transition-colors shadow-lg shadow-blue-600/20"
             >
               {loading ? "Publicando..." : "Publicar Noticia"}

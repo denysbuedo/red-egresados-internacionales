@@ -49,3 +49,6 @@ next-env.d.ts
 *.db-shm
 *.db-journal
 /backups/
+
+# Uploaded user images are persistent runtime data, never source.
+/uploads/

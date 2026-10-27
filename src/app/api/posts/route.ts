@@ -1,3 +1,4 @@
+import { validImageUrl } from "@/lib/media";
 import { POST_TYPES, type PostType } from "@/lib/site";
 import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
@@ -130,6 +131,8 @@ export async function POST(request: NextRequest) {
         referenceUrl = url.toString();
       } catch { return NextResponse.json({ error: "El enlace debe usar http o https" }, { status: 400 }); }
     }
+
+    if (imageUrl && !validImageUrl(imageUrl)) return NextResponse.json({ error: "Usa una imagen subida a CONECTA o un enlace http/https válido." }, { status: 400 });
 
     // Validaciones
     if (typeof content !== "string" || content.trim().length < 5) {

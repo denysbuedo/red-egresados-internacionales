@@ -12,6 +12,7 @@ WorkingDirectory=/var/www/red-egresados-internacionales
 Environment=NODE_ENV=production
 Environment=PORT=3000
 Environment=DATABASE_PATH=/var/lib/red-egresados/dev.db
+Environment=UPLOADS_PATH=/var/lib/red-egresados/uploads
 Environment=NEXT_TELEMETRY_DISABLED=1
 Environment=PATH=/opt/red-egresados/node/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EnvironmentFile=-/etc/red-egresados/environment

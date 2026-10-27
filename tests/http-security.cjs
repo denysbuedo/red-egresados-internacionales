@@ -48,7 +48,7 @@ before(async () => {
   const listener = net.createServer(); listener.listen(0,"127.0.0.1"); await once(listener,"listening");
   const port = listener.address().port; await new Promise(r=>listener.close(r)); base = `http://127.0.0.1:${port}`;
   server = spawn(process.execPath,["node_modules/next/dist/bin/next","start","-H","127.0.0.1","-p",String(port)],
-    { cwd: process.cwd(), env: {...process.env, DATABASE_PATH:file,NODE_ENV:"production",NEXT_TELEMETRY_DISABLED:"1"}, stdio:["ignore","pipe","pipe"] });
+    { cwd: process.cwd(), env: {...process.env, DATABASE_PATH:file,UPLOADS_PATH:join(dir,"uploads"),NODE_ENV:"production",NEXT_TELEMETRY_DISABLED:"1"}, stdio:["ignore","pipe","pipe"] });
   // Drain output without printing request bodies, cookies or fixture passwords.
   server.stdout.resume(); server.stderr.resume();
   for (let i=0;i<80;i++) {
@@ -266,4 +266,31 @@ test("workspace shows real upcoming events and approved people without exposing 
     const pending=await call('/',{cookie:cookies.otherPending});assert.equal(pending.status,200);
     assert.ok(!(await pending.text()).includes('TU ESPACIO EN CONECTA'));
   } finally { db.prepare('DELETE FROM events WHERE id IN (?,?)').run(upcoming,expired); }
+});
+
+test("image uploads validate content, protect access and survive as local post attachments", async () => {
+  const sharp=require('sharp');
+  const bytes=await sharp({create:{width:2400,height:1200,channels:3,background:'#49DCCB'}}).png().withMetadata({orientation:1}).toBuffer();
+  const upload=async (cookie,content=bytes,type='image/png',origin=base) => {
+    const form=new FormData();form.set('file',new Blob([content],{type}),'uploaded.png');
+    return fetch(base+'/api/media',{method:'POST',headers:{Origin:origin,...(cookie?{Cookie:cookie}:{})},body:form});
+  };
+  assert.equal((await upload()).status,401);
+  assert.equal((await upload(cookies.editor,bytes,'image/png','https://attacker.test')).status,403);
+  const pending=await login('centralworker');assert.equal((await upload(pending)).status,403);
+  assert.equal((await upload(cookies.editor,Buffer.from('<svg></svg>'),'image/svg+xml')).status,400);
+  assert.equal((await upload(cookies.editor,Buffer.from('<svg></svg>'),'image/png')).status,400);
+  assert.equal((await upload(cookies.editor,Buffer.alloc(8*1024*1024+1))).status,413);
+  const response=await upload(cookies.editor);assert.equal(response.status,201);
+  const {url}=await response.json();assert.match(url,/^\/api\/media\/[a-f0-9-]+\.webp$/);
+  assert.equal((await call(url)).status,401);
+  assert.equal((await call(url,{cookie:pending})).status,403);
+  const image=await call(url,{cookie:cookies.editor});assert.equal(image.status,200);
+  assert.equal(image.headers.get('content-type'),'image/webp');assert.equal(image.headers.get('cache-control'),'private, no-store');
+  const saved=Buffer.from(await image.arrayBuffer());const metadata=await sharp(saved).metadata();
+  assert.equal(metadata.format,'webp');assert.ok(metadata.width<=2048 && metadata.height<=2048);assert.equal(metadata.exif,undefined);
+  assert.equal((await call('/api/media/not-a-filename',{cookie:cookies.editor})).status,404);
+  const news=await call('/api/admin/posts',{method:'POST',cookie:cookies.editor,body:{title:'Imagen almacenada',content:'Noticia con imagen guardada directamente en CONECTA.',imageUrl:url}});
+  assert.equal(news.status,201);assert.equal((await news.json()).imageUrl,url);
+  assert.equal((await call('/api/admin/posts',{method:'POST',cookie:cookies.editor,body:{title:'Imagen invalida',content:'Una imagen con direccion no permitida.',imageUrl:'file:///etc/passwd'}})).status,400);
 });

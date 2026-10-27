@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { ImageAttachment } from "./ImageAttachment";
 import { POST_TYPES } from "@/lib/site";
 import { useRouter } from "next/navigation";
 
@@ -11,6 +12,7 @@ export function CreatePost() {
   const [referenceUrl, setReferenceUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [showImageInput, setShowImageInput] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [limitInfo, setLimitInfo] = useState<{
@@ -123,7 +125,7 @@ export function CreatePost() {
       {/* Área de texto */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-gray-700">Tipo de aporte
-          <select value={postType} onChange={(event) => setPostType(event.target.value)} disabled={!limitInfo.canPost || loading}
+          <select value={postType} onChange={(event) => setPostType(event.target.value)} disabled={!limitInfo.canPost || loading || uploading}
             className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900">
             {POST_TYPES.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
           </select>
@@ -137,14 +139,14 @@ export function CreatePost() {
           }}
           placeholder="Comparte un resultado, presenta un proyecto, plantea una consulta o invita a colaborar..."
           className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] focus:border-transparent transition-all resize-none min-h-[100px]"
-          disabled={!limitInfo.canPost || loading}
+          disabled={!limitInfo.canPost || loading || uploading}
           maxLength={2000}
         />
 
         <label className="block text-sm font-medium text-gray-700">Enlace al recurso (opcional)
           <input type="url" value={referenceUrl} onChange={(event) => setReferenceUrl(event.target.value)} maxLength={2000}
             placeholder="https://doi.org/... o enlace al proyecto, convocatoria o documento"
-            disabled={!limitInfo.canPost || loading} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+            disabled={!limitInfo.canPost || loading || uploading} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" />
         </label>
         {/* Contador de caracteres */}
         <div className="flex items-center justify-between text-xs">
@@ -158,51 +160,11 @@ export function CreatePost() {
           )}
         </div>
 
-        {/* Input de imagen */}
-        {showImageInput && (
-          <div className="space-y-2">
-            <input
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="URL de la imagen (opcional)"
-              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] text-sm"
-              disabled={loading}
-            />
-            {imageUrl && (
-              <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                <img
-                  src={imageUrl}
-                  alt="Vista previa"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    const parent = (e.target as HTMLImageElement).parentElement;
-                    if (parent) {
-                      parent.innerHTML = '<p class="text-gray-400 text-sm flex items-center justify-center h-full">URL no válida</p>';
-                    }
-                  }}
-                />
-                <button
-                  onClick={() => {
-                    setImageUrl("");
-                    setShowImageInput(false);
-                  }}
-                  className="absolute top-2 right-2 bg-white/90 hover:bg-white text-gray-700 rounded-full p-1 shadow"
-                  type="button"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+        {showImageInput && <ImageAttachment value={imageUrl} onChange={setImageUrl} disabled={!limitInfo.canPost || loading} onBusyChange={setUploading} />}
 
         {/* Error message */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
             {error}
           </div>
         )}
@@ -211,9 +173,9 @@ export function CreatePost() {
         <div className="flex items-center justify-between pt-3 border-t border-gray-200">
           <button
             type="button"
-            onClick={() => setShowImageInput(!showImageInput)}
+            onClick={() => { if (showImageInput) setImageUrl(""); setShowImageInput(!showImageInput); }}
             className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
-            disabled={!limitInfo.canPost || loading}
+            disabled={!limitInfo.canPost || loading || uploading}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -223,7 +185,7 @@ export function CreatePost() {
 
           <button
             onClick={handleSubmit}
-            disabled={!limitInfo.canPost || loading || !content.trim() || content.length < 5}
+            disabled={!limitInfo.canPost || loading || uploading || !content.trim() || content.length < 5}
             className="px-6 py-2.5 bg-[#102B46] hover:bg-[#0C1D30] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-colors"
           >
             {loading ? 'Publicando...' : 'Publicar'}

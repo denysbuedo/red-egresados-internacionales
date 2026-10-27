@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { postTypeLabel } from "@/lib/site";
+import { PostImage } from "./PostImage";
 import { PostComments } from "./PostComments";
 
 interface UserPostCardProps {
@@ -115,20 +116,7 @@ export function UserPostCard({
         )}
 
         {/* Imagen */}
-        {imageUrl && (
-          <div className="mt-4 rounded-xl overflow-hidden bg-gray-100">
-            <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-              <img
-                src={imageUrl}
-                alt="Post image"
-                className="absolute inset-0 w-full h-full object-contain bg-gray-100"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            </div>
-          </div>
-        )}
+        {imageUrl && <div className="mt-4 overflow-hidden rounded-xl"><PostImage src={imageUrl} alt="Imagen adjunta al aporte" /></div>}
 
         {referenceUrl && /^https?:\/\//i.test(referenceUrl) && <div className="mt-4">
           <a href={referenceUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-blue-800 underline">Consultar recurso original ↗</a>

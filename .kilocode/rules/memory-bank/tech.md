@@ -92,3 +92,8 @@ bun db:migrate     # Run migrations (auto in sandbox)
 - /miembros y /api/members comparten la implementación segura heredada; /institucion comparte el panel de /universidad. Las rutas anteriores continúan siendo compatibles.
 - graduation_year=0 es una marca interna para perfiles sin año, se serializa como null y no se muestra. Los datos académicos dejan de ser obligatorios.
 - Aportes con tipos update/publication/project/call/question y enlace HTTP(S) validado. Filtros de actividad por tipo; no se afirman DOI verificados ni expedientes de proyectos independientes.
+
+
+## Imágenes persistentes
+
+Sharp 0.35.5: validar y convertir JPG/PNG/WebP a WebP sin EXIF, máximo 8 MB / 25 MP y lado 2048px. Las imágenes se almacenan en UPLOADS_PATH (/var/lib/red-egresados/uploads en la VM), fuera del árbol compilado y de Git; respaldo conjunto con SQLite. Lectura y subida privadas mediante /api/media. Los enlaces externos no se cachean automáticamente.

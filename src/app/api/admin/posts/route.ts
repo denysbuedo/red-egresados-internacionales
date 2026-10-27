@@ -1,3 +1,4 @@
+import { validImageUrl } from "@/lib/media";
 import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
@@ -56,6 +57,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { title, content, imageUrl, pinDays } = body;
+
+    if (imageUrl && !validImageUrl(imageUrl)) return NextResponse.json({ error: "Usa una imagen subida a CONECTA o un enlace http/https válido." }, { status: 400 });
 
     // Validaciones
     if (!title || !content) {
