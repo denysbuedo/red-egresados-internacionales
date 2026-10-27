@@ -205,4 +205,8 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Panel de gestión renovado con navegación activa por rol y presentación adaptable. Eliminado el tema oscuro aislado de listas de correo. Directorio con acceso al perfil propio, sin botón de conexión consigo mismo.
 - Se conservan portada, espacio de trabajo y perfil aprobados. Sin cambios de API, permisos, esquema ni operaciones de negocio.
 - Chrome real: 44 vistas/variantes, tamaños 320–1440px y roles admin/editor/institución/pendiente/sin perfil, sin desbordamiento ni errores JS. Windows: build y 17 pruebas HTTP correctas; lint sin errores.
-- Respaldo verificado en /var/backups/red-egresados/pre-conecta-platform-20261027, incluidas imágenes. Publicación en preparación. Conservar todos los datos actuales; no ejecutar nuevamente el reinicio de base solicitado anteriormente.
+- Respaldo verificado en /var/backups/red-egresados/pre-conecta-platform-20261027, incluidas imágenes. Publicado como 8d3e7e9. Conservar todos los datos actuales; no ejecutar nuevamente el reinicio de base solicitado anteriormente.
+
+- Linux: build/typecheck/lint y 17 pruebas HTTP correctas. 44 vistas y variantes comprobadas con Chrome, incluidos miembros regulares y estados vacíos, sin desbordamiento entre 320–1440px.
+- HTTPS real: diseño compartido en público/comunidad/gestión; perfil y editor propios disponibles; admin y logout verificados. Manifiesto de 171 archivos coincide con la compilación validada.
+- Conservados todos los valores de las 19 tablas durante el corte y las imágenes persistentes. Estado observado: 4 cuentas, 4 perfiles, 1 aporte y 6 conexiones. Snapshot pre-cutover y compilación anterior respaldados. Servicio activo y NRestarts=0; sin pruebas con datos nuevos en producción.

@@ -31,3 +31,11 @@ Las rutas históricas de perfiles, registro e institución heredan sus vistas ca
 Chrome real sobre una base efímera con miembros, solicitudes, conexiones, comunidad, noticias y evento: 44 vistas y variantes revisadas entre 320 y 1440px, sin desbordamiento horizontal ni errores JavaScript. Incluye sesiones de administrador, editor, institución, cuenta pendiente, cuenta sin perfil y miembro regular. Apertura de creación de comunidad/lista de correo, búsqueda sin resultados, detalles no disponibles y estados vacíos comprobados. Capturas de escritorio y móvil revisadas.
 
 Respaldo previo verificado de fuentes, SQLite e imágenes en `/var/backups/red-egresados/pre-conecta-platform-20261027`. Cambio visual sin migraciones ni reinicio de datos; todos los datos actuales y nuevos registros deben conservarse en el corte.
+
+## Publicación verificada
+
+Implementación `8d3e7e9` publicada el 27 de octubre. TypeScript, compilación Windows/Linux y 17 pruebas HTTP correctas; lint sin errores (40 advertencias). Se revisaron 44 vistas y variantes, incluidos miembros regulares y estados vacíos, entre 320 y 1440px. Los enlaces de gestión mantienen su separación por rol.
+
+Verificación pública HTTPS y Nginx: cabeceras compartidas en páginas públicas, directorio, conexiones, agenda, comunidades, noticias, listas de correo y gestión. Perfil propio y editor disponibles. Sesión de administrador y logout correctos. No se crearon cuentas ni publicaciones de prueba en producción.
+
+Manifiesto de 171 fuentes/recursos coincide con la versión validada. Se conservaron todos los valores de las 19 tablas en el corte y las imágenes persistentes; snapshot adicional `pre-cutover.db` y compilación anterior respaldados. Estado observado al verificar: cuatro cuentas, cuatro perfiles, un aporte y seis conexiones. Servicio activo, sin reinicios inesperados. DNS, TLS y HAProxy conservan su configuración.
