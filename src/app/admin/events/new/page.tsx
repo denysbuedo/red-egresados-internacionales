@@ -90,7 +90,7 @@ export default function NewEventPage() {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] focus:border-transparent"
               placeholder="Ej: Webinar sobre Inteligencia Artificial"
               required
               minLength={5}
@@ -105,7 +105,7 @@ export default function NewEventPage() {
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent resize-none"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] focus:border-transparent resize-none"
               placeholder="Describe el evento, temática, objetivos..."
               required
               minLength={20}
@@ -158,7 +158,7 @@ export default function NewEventPage() {
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f]"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#102B46]"
                 required
               />
             </div>
@@ -170,7 +170,7 @@ export default function NewEventPage() {
                 type="time"
                 value={formData.time}
                 onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f]"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#102B46]"
                 required
               />
             </div>
@@ -186,7 +186,7 @@ export default function NewEventPage() {
                 type="text"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f]"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46]"
                 placeholder="Ej: Auditorio Principal, Universidad de La Habana"
                 required={formData.type === "in-person"}
               />
@@ -200,7 +200,7 @@ export default function NewEventPage() {
                 type="url"
                 value={formData.link}
                 onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f]"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46]"
                 placeholder="https://meet.google.com/xxx-xxxx-xxx"
                 required={formData.type === "virtual"}
               />
@@ -216,7 +216,7 @@ export default function NewEventPage() {
               type="number"
               value={formData.maxAttendees}
               onChange={(e) => setFormData({ ...formData, maxAttendees: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f]"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46]"
               placeholder="Dejar vacío para sin límite"
               min={1}
             />
@@ -228,7 +228,7 @@ export default function NewEventPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-8 py-3.5 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold text-base transition-colors"
+            className="flex-1 px-8 py-3.5 bg-[#102B46] hover:bg-[#0C1D30] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold text-base transition-colors"
           >
             {loading ? "Creando..." : "Crear Evento"}
           </button>

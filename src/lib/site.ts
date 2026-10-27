@@ -1,6 +1,8 @@
-export const SITE_NAME = "Red MES";
-export const SITE_FULL_NAME = "Red profesional y académica del Ministerio de Educación Superior";
-export const SITE_DESCRIPTION = "Conecta con trabajadores del MES y sus instituciones para compartir conocimiento, resultados científicos y oportunidades de colaboración.";
+export const SITE_NAME = "CONECTA";
+export const SITE_FULL_NAME = "CONECTA | Ciencia, tecnología y colaboración en la educación superior cubana";
+export const SITE_DESCRIPTION = "Conecta con profesionales de la educación superior cubana. Comparte resultados científicos, descubre iniciativas y colabora entre instituciones.";
+export const SITE_URL = "https://conecta.reduniv.edu.cu";
+export const SITE_TAGLINE = "Conecta conocimiento. Impulsa innovación.";
 
 // The catalogue anticipates later stages; only enabled categories can register.
 export const PROFILE_TYPES = [

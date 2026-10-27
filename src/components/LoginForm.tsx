@@ -1,82 +1,38 @@
 "use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export function LoginForm() {
-  const router = useRouter();
-  const [formData, setFormData] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Error al iniciar sesión");
-      }
-
-      window.location.href = "/";
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-1">Iniciar Sesión</h2>
-      <p className="text-sm text-gray-500 mb-5">Ingresa con tu cuenta aprobada</p>
-
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <input
-            type="text"
-            value={formData.username}
-            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent"
-            placeholder="Username o email"
-            required
-            autoComplete="username"
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent"
-            placeholder="Contraseña"
-            required
-            autoComplete="current-password"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-3 bg-[#003f8f] text-white text-center rounded-lg font-semibold hover:bg-[#002860] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
-        </button>
-      </form>
-    </div>
-  );
+  const [username,setUsername] = useState("");
+  const [password,setPassword] = useState("");
+  const [error,setError] = useState("");
+  const [loading,setLoading] = useState(false);
+  return <div className="conecta-form">
+    <h1>Bienvenido a CONECTA</h1>
+    <p className="conecta-form-subtitle">Accede al ecosistema de colaboración de la educación superior cubana.</p>
+    {error && <p role="alert" className="mb-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}
+    <form onSubmit={async(event)=>{
+      event.preventDefault();setError("");setLoading(true);
+      try {
+        const response=await fetch("/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,password})});
+        const result=await response.json();
+        if(!response.ok) throw new Error(result.error||"No pudimos iniciar tu sesión. Inténtalo de nuevo.");
+        let destination="/";
+        const requested=new URLSearchParams(window.location.search).get("redirect");
+        if(requested?.startsWith("/") && !requested.startsWith("//") && !requested.includes("\\")) {
+          const url=new URL(requested,window.location.origin);
+          if(url.origin===window.location.origin) destination=url.pathname+url.search+url.hash;
+        }
+        window.location.assign(result.pending?"/pendiente":destination);
+      } catch(reason) { setError(reason instanceof Error?reason.message:"Revisa tu conexión e inténtalo de nuevo."); }
+      finally { setLoading(false); }
+    }}>
+      <label htmlFor="login-username" className="conecta-field">Correo electrónico o usuario
+        <input id="login-username" name="username" type="text" autoComplete="username" placeholder="Tu correo o nombre de usuario" required value={username} onChange={(event)=>setUsername(event.target.value)} />
+      </label>
+      <label htmlFor="login-password" className="conecta-field">Contraseña
+        <input id="login-password" name="password" type="password" autoComplete="current-password" placeholder="Tu contraseña" required value={password} onChange={(event)=>setPassword(event.target.value)} />
+      </label>
+      <button type="submit" className="conecta-form-submit" disabled={loading}>{loading?"Iniciando sesión...":"Iniciar sesión"}</button>
+    </form>
+  </div>;
 }

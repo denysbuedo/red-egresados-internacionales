@@ -1,0 +1,45 @@
+{
+  "brand": "CONECTA",
+  "strapline": "Conecta conocimiento. Impulsa innovación.",
+  "hero": {
+    "eyebrow": "CIENCIA · TECNOLOGÍA · COLABORACIÓN",
+    "title": "Donde la ciencia y la tecnología se encuentran.",
+    "description": "CONECTA es el ecosistema digital que reúne talento, conocimiento e innovación de la educación superior cubana. Descubre profesionales, comparte resultados científicos, participa en proyectos y colabora en el desarrollo de soluciones tecnológicas.",
+    "primaryCTA": "Explorar CONECTA",
+    "secondaryCTA": "Solicitar acceso"
+  },
+  "login": {
+    "title": "Bienvenido a CONECTA",
+    "subtitle": "Accede al ecosistema de colaboración de la educación superior cubana.",
+    "button": "Iniciar sesión",
+    "register": "Solicitar acceso",
+    "note": "Las solicitudes de registro están sujetas a revisión institucional."
+  },
+  "modules": [
+    {
+      "id": "personas",
+      "title": "Personas"
+    },
+    {
+      "id": "ciencia",
+      "title": "Ciencia"
+    },
+    {
+      "id": "proyectos",
+      "title": "Proyectos"
+    },
+    {
+      "id": "codigo",
+      "title": "Código"
+    },
+    {
+      "id": "comunidades",
+      "title": "Comunidades"
+    },
+    {
+      "id": "oportunidades",
+      "title": "Oportunidades"
+    }
+  ],
+  "institutionalFooter": "Ministerio de Educación Superior de Cuba · RedUniv"
+}

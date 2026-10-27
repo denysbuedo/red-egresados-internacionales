@@ -99,7 +99,7 @@ export default function EventDetailPage() {
     return (
       <main className="min-h-screen bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 py-8 text-center">
-          <div className="w-8 h-8 border-4 border-[#003f8f] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500">Cargando evento...</p>
         </div>
       </main>
@@ -112,7 +112,7 @@ export default function EventDetailPage() {
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
             <h2 className="text-xl font-bold text-gray-900 mb-2">Evento no encontrado</h2>
-            <Link href="/eventos" className="text-[#003f8f] hover:underline">
+            <Link href="/eventos" className="text-[#102B46] hover:underline">
               ← Volver a eventos
             </Link>
           </div>
@@ -129,7 +129,7 @@ export default function EventDetailPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/eventos" className="text-[#003f8f] hover:underline text-sm font-medium">
+          <Link href="/eventos" className="text-[#102B46] hover:underline text-sm font-medium">
             ← Volver a eventos
           </Link>
         </div>
@@ -221,7 +221,7 @@ export default function EventDetailPage() {
                   className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     userStatus === "attending"
                       ? "bg-green-600 text-white"
-                      : "bg-[#003f8f] hover:bg-[#002860] text-white"
+                      : "bg-[#102B46] hover:bg-[#0C1D30] text-white"
                   } disabled:bg-gray-400`}
                 >
                   {userStatus === "attending" ? "✓ Confirmado" : "✓ Asistiré"}

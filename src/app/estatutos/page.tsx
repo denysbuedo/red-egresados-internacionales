@@ -4,12 +4,12 @@ export default function EstatutosPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Estatutos de la Red</h1>
-          <p className="text-sm text-gray-500 mb-8">Red del Ministerio de Educación Superior</p>
+          <p className="text-sm text-gray-500 mb-8">CONECTA</p>
 
           <div className="space-y-6 text-gray-700">
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">Capítulo I: Disposiciones Generales</h2>
-              <p><strong>Artículo 1.</strong> La Red del Ministerio de Educación Superior es una plataforma digital creada para conectar a docentes, investigadores, especialistas, técnicos, directivos y demás trabajadores del Ministerio de Educación Superior y sus instituciones.</p>
+              <p><strong>Artículo 1.</strong> La CONECTA es una plataforma digital creada para conectar a docentes, investigadores, especialistas, técnicos, directivos y demás trabajadores del Ministerio de Educación Superior y sus instituciones.</p>
               <p className="mt-2"><strong>Artículo 2.</strong> La Red tiene como fines principales:</p>
               <ul className="list-disc ml-6 mt-2 space-y-1">
                 <li>Fomentar la colaboración académica y científica entre miembros</li>
@@ -65,7 +65,7 @@ export default function EstatutosPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <a href="/" className="text-[#003f8f] hover:underline">← Volver al inicio</a>
+          <a href="/" className="text-[#102B46] hover:underline">← Volver al inicio</a>
         </div>
       </div>
     </main>

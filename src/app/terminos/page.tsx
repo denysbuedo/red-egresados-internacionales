@@ -9,7 +9,7 @@ export default function TerminosPage() {
           <div className="space-y-6 text-gray-700">
             <section>
               <h2 className="text-xl font-semibold text-gray-900 mb-3">1. Aceptación de los Términos</h2>
-              <p>Al registrarse y utilizar la Red del Ministerio de Educación Superior, usted acepta cumplir con estos Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no podrá acceder al servicio.</p>
+              <p>Al registrarse y utilizar la CONECTA, usted acepta cumplir con estos Términos y Condiciones. Si no está de acuerdo con alguna parte de estos términos, no podrá acceder al servicio.</p>
             </section>
 
             <section>
@@ -67,7 +67,7 @@ export default function TerminosPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <a href="/" className="text-[#003f8f] hover:underline">← Volver al inicio</a>
+          <a href="/" className="text-[#102B46] hover:underline">← Volver al inicio</a>
         </div>
       </div>
     </main>

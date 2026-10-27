@@ -1,0 +1,4 @@
+/* Fontes recomendadas, no se incluyen archivos binarios. Requiere conexión a Google Fonts. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+:root { --brand-font:'Inter',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+        --brand-font-code:'IBM Plex Mono',ui-monospace,SFMono-Regular,Consolas,monospace; }

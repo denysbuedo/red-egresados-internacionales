@@ -115,7 +115,7 @@ export default function RegistroPage() {
     return (
       <main className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-[#003f8f] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Verificando autenticación...</p>
         </div>
       </main>
@@ -127,13 +127,13 @@ export default function RegistroPage() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-gray-900">
-            Únete a Red MES
+            Únete a CONECTA
           </h1>
           <p className="text-gray-600 mt-2">
             Completa tu perfil profesional
           </p>
           {user && (
-            <p className="text-[#003f8f] mt-2 text-sm">
+            <p className="text-[#102B46] mt-2 text-sm">
               Registrando como: <span className="font-medium">{user.username}</span> ({user.email})
             </p>
           )}
@@ -275,7 +275,7 @@ export default function RegistroPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-colors"
+            className="w-full py-3.5 bg-[#102B46] hover:bg-[#0C1D30] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-colors"
           >
             {loading ? "Registrando..." : "Completar Registro"}
           </button>
@@ -336,7 +336,7 @@ function InputField({
         max={max}
         defaultValue={defaultValue}
         disabled={disabled}
-        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] focus:border-transparent transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
       />
     </div>
   );
@@ -362,7 +362,7 @@ function SelectField({
       <select
         name={name}
         required={required}
-        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent transition-colors text-sm"
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#102B46] focus:border-transparent transition-colors text-sm"
       >
         <option value="">Seleccionar...</option>
         {options.map((opt) => (
@@ -395,7 +395,7 @@ function TextAreaField({
         name={name}
         placeholder={placeholder}
         rows={rows}
-        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent transition-colors text-sm resize-none"
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] focus:border-transparent transition-colors text-sm resize-none"
       />
     </div>
   );

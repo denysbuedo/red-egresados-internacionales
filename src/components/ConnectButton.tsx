@@ -45,7 +45,7 @@ export function ConnectButton({ graduateId, graduateName }: { graduateId: number
       <button
         onClick={handleConnect}
         disabled={loading}
-        className="px-6 py-3 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
+        className="px-6 py-3 bg-[#102B46] hover:bg-[#0C1D30] disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
       >
         {loading ? "Enviando..." : "Enviar Solicitud"}
       </button>

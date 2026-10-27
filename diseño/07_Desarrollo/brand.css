@@ -1,0 +1,11 @@
+@import url('../03_Tipografia/fuentes-web.css');
+@import url('../02_Colores/tokens.css');
+/* Ejemplo visual: no sustituye la hoja de estilos de la aplicación */
+body { color:var(--conecta-text); background:var(--conecta-bg); font-family:var(--conecta-font-sans); }
+a { color:var(--conecta-action); }
+a:focus-visible, button:focus-visible { outline:3px solid var(--conecta-accent); outline-offset:3px; }
+.brand-btn { display:inline-flex;justify-content:center;align-items:center;gap:8px;background:var(--conecta-primary);color:white;border-radius:12px;font-weight:600;padding:14px 22px;border:0;cursor:pointer; }
+.brand-btn:hover { background:var(--conecta-primary-deep); }
+.brand-btn--secondary {background:#E9FBF7;color:var(--conecta-primary);border:1px solid #A0D9D3;}
+.brand-card { border:1px solid var(--conecta-border); background:var(--conecta-bg); border-radius:20px; padding:24px; }
+.brand-muted { color:var(--conecta-text-muted); }

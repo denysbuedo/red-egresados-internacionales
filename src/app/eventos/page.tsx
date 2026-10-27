@@ -104,7 +104,7 @@ export default function EventsPage() {
         {/* Lista de eventos */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="w-8 h-8 border-4 border-[#003f8f] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-gray-500">Cargando eventos...</p>
           </div>
         ) : events.length > 0 ? (
@@ -136,7 +136,7 @@ export default function EventsPage() {
                 {/* Contenido */}
                 <div className="p-6">
                   <Link href={`/eventos/${event.id}`}>
-                    <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-[#003f8f] transition-colors">
+                    <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-[#102B46] transition-colors">
                       {event.title}
                     </h2>
                   </Link>
@@ -181,7 +181,7 @@ export default function EventsPage() {
                     <button
                       onClick={() => handleRSVP(event.id, "attending")}
                       disabled={rsvpLoading === event.id}
-                      className="px-4 py-2 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 text-white rounded-lg text-sm font-medium transition-colors"
+                      className="px-4 py-2 bg-[#102B46] hover:bg-[#0C1D30] disabled:bg-gray-400 text-white rounded-lg text-sm font-medium transition-colors"
                     >
                       {rsvpLoading === event.id ? "..." : "✓ Asistiré"}
                     </button>

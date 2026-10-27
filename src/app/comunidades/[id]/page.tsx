@@ -197,7 +197,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
     return (
       <main className="min-h-screen bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 py-8 text-center">
-          <div className="w-8 h-8 border-4 border-[#003f8f] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500">Cargando grupo...</p>
         </div>
       </main>
@@ -210,7 +210,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
             <h2 className="text-xl font-bold text-gray-900 mb-2">Grupo no encontrado</h2>
-            <Link href="/comunidades" className="text-[#003f8f] hover:underline">
+            <Link href="/comunidades" className="text-[#102B46] hover:underline">
               ← Volver a comunidades
             </Link>
           </div>
@@ -224,7 +224,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/comunidades" className="text-[#003f8f] hover:underline text-sm font-medium">
+          <Link href="/comunidades" className="text-[#102B46] hover:underline text-sm font-medium">
             ← Volver a comunidades
           </Link>
         </div>
@@ -280,7 +280,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                     <button
                       onClick={handleEditGroup}
                       disabled={saving}
-                      className="flex-1 px-3 py-2 bg-[#003f8f] text-white rounded-lg text-sm font-medium disabled:bg-gray-400"
+                      className="flex-1 px-3 py-2 bg-[#102B46] text-white rounded-lg text-sm font-medium disabled:bg-gray-400"
                     >
                       {saving ? "..." : "Guardar"}
                     </button>
@@ -314,7 +314,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                 ) : (
                   <button
                     onClick={handleJoin}
-                    className="px-4 py-2 bg-[#003f8f] hover:bg-[#002860] text-white rounded-lg text-sm font-medium transition-colors"
+                    className="px-4 py-2 bg-[#102B46] hover:bg-[#0C1D30] text-white rounded-lg text-sm font-medium transition-colors"
                   >
                     Unirse al grupo
                   </button>
@@ -359,7 +359,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                   value={newPost}
                   onChange={(e) => setNewPost(e.target.value)}
                   placeholder="Comparte algo con el grupo..."
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] resize-none min-h-[100px]"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] resize-none min-h-[100px]"
                   maxLength={2000}
                   disabled={posting}
                 />
@@ -368,7 +368,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                   <button
                     onClick={handleCreatePost}
                     disabled={posting || !newPost.trim() || newPost.length < 5}
-                    className="px-6 py-2.5 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+                    className="px-6 py-2.5 bg-[#102B46] hover:bg-[#0C1D30] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
                   >
                     {posting ? "Publicando..." : "Publicar"}
                   </button>
@@ -388,12 +388,12 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
                     <div key={post.id} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                       <div className="flex items-start gap-3 mb-3">
                         <Link href={`/miembros/${post.graduateId}`}>
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#003f8f] to-[#0050b8] flex items-center justify-center text-white text-sm font-bold shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#102B46] to-[#2776C9] flex items-center justify-center text-white text-sm font-bold shrink-0">
                             {post.graduateName?.charAt(0).toUpperCase()}
                           </div>
                         </Link>
                         <div>
-                          <Link href={`/miembros/${post.graduateId}`} className="font-semibold text-gray-900 hover:text-[#003f8f]">
+                          <Link href={`/miembros/${post.graduateId}`} className="font-semibold text-gray-900 hover:text-[#102B46]">
                             {post.graduateName}
                           </Link>
                           <p className="text-xs text-gray-500">

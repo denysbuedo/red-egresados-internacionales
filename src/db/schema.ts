@@ -1,5 +1,5 @@
 /**
- * Schema de Base de Datos — Red MES
+ * Schema de Base de Datos — CONECTA
  *
  * Tablas principales:
  * - users: Autenticación y gestión de cuentas

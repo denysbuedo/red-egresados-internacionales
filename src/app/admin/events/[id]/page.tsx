@@ -82,7 +82,7 @@ export default function AdminEventDetailPage() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="w-8 h-8 border-4 border-[#003f8f] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
         <p className="text-gray-500">Cargando evento...</p>
       </div>
     );
@@ -92,7 +92,7 @@ export default function AdminEventDetailPage() {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500">Evento no encontrado</p>
-        <Link href="/eventos" className="text-[#003f8f] hover:underline mt-2 inline-block">
+        <Link href="/eventos" className="text-[#102B46] hover:underline mt-2 inline-block">
           ← Volver a eventos
         </Link>
       </div>
@@ -113,7 +113,7 @@ export default function AdminEventDetailPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Detalle del Evento</h1>
-          <Link href="/eventos" className="text-[#003f8f] hover:underline text-sm mt-1 inline-block">
+          <Link href="/eventos" className="text-[#102B46] hover:underline text-sm mt-1 inline-block">
             ← Volver a eventos
           </Link>
         </div>
@@ -146,7 +146,7 @@ export default function AdminEventDetailPage() {
           {event.link && (
             <div>
               <span className="text-gray-500">Enlace:</span>
-              <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-[#003f8f] hover:underline block">
+              <a href={event.link} target="_blank" rel="noopener noreferrer" className="text-[#102B46] hover:underline block">
                 {event.link}
               </a>
             </div>
@@ -186,7 +186,7 @@ export default function AdminEventDetailPage() {
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 filter === f
-                  ? "bg-[#003f8f] text-white"
+                  ? "bg-[#102B46] text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
@@ -208,12 +208,12 @@ export default function AdminEventDetailPage() {
               >
                 <div className="flex items-center gap-3">
                   <Link href={`/miembros/${attendee.graduateId}`}>
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#003f8f] to-[#0050b8] flex items-center justify-center text-white text-sm font-bold shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#102B46] to-[#2776C9] flex items-center justify-center text-white text-sm font-bold shrink-0">
                       {attendee.graduateName?.charAt(0).toUpperCase()}
                     </div>
                   </Link>
                   <div>
-                    <Link href={`/miembros/${attendee.graduateId}`} className="font-medium text-gray-900 hover:text-[#003f8f]">
+                    <Link href={`/miembros/${attendee.graduateId}`} className="font-medium text-gray-900 hover:text-[#102B46]">
                       {attendee.graduateName}
                     </Link>
                     <p className="text-xs text-gray-500">{attendee.graduateProfession}</p>
@@ -253,7 +253,7 @@ export default function AdminEventDetailPage() {
               alert("Error al enviar notificaciones");
             }
           }}
-          className="px-4 py-2 bg-[#003f8f] hover:bg-[#002860] text-white rounded-lg text-sm font-medium transition-colors"
+          className="px-4 py-2 bg-[#102B46] hover:bg-[#0C1D30] text-white rounded-lg text-sm font-medium transition-colors"
         >
           🔔 Notificar a {attendingCount} asistentes confirmados
         </button>

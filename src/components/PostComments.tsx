@@ -162,7 +162,7 @@ export function PostComments({ postId, currentGraduateId, onCountChange }: PostC
 
       {/* Formulario para agregar comentario */}
       <div className="flex gap-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#003f8f] to-[#0050b8] flex items-center justify-center text-white text-xs font-bold shrink-0">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#102B46] to-[#2776C9] flex items-center justify-center text-white text-xs font-bold shrink-0">
           T
         </div>
         <div className="flex-1">
@@ -170,7 +170,7 @@ export function PostComments({ postId, currentGraduateId, onCountChange }: PostC
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Escribe un comentario..."
-            className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] resize-none min-h-[60px]"
+            className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] resize-none min-h-[60px]"
             maxLength={500}
             disabled={loading}
           />
@@ -181,7 +181,7 @@ export function PostComments({ postId, currentGraduateId, onCountChange }: PostC
             <button
               onClick={handleSubmit}
               disabled={loading || !newComment.trim() || newComment.length < 2}
-              className="px-4 py-1.5 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+              className="px-4 py-1.5 bg-[#102B46] hover:bg-[#0C1D30] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
             >
               {loading ? "..." : "Comentar"}
             </button>

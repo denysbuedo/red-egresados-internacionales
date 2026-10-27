@@ -78,7 +78,7 @@ export default function RegistroPage() {
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-900">Únete a Red MES</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Solicitar acceso a CONECTA</h1>
           <p className="text-gray-600 mt-2">Una red profesional y académica para trabajadores del MES y sus instituciones</p>
         </div>
 
@@ -146,14 +146,14 @@ export default function RegistroPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-colors"
+            className="w-full py-3.5 bg-[#102B46] hover:bg-[#0C1D30] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-colors"
           >
             {loading ? "Registrando..." : "Enviar Registro"}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <Link href="/login" className="text-[#003f8f] hover:underline text-sm">
+          <Link href="/login" className="text-[#102B46] hover:underline text-sm">
             ← Ya tengo cuenta
           </Link>
         </div>
@@ -186,7 +186,7 @@ function InputField({ label, name, type = "text", required, placeholder, min, ma
         max={max}
         minLength={minLength}
         maxLength={maxLength}
-        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent text-sm"
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] focus:border-transparent text-sm"
       />
     </div>
   );
@@ -201,7 +201,7 @@ function SelectField({ label, name, required, options }: any) {
       <select
         name={name}
         required={required}
-        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent text-sm"
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#102B46] focus:border-transparent text-sm"
       >
         <option value="">Seleccionar...</option>
         {options.map((opt: string) => (
@@ -220,7 +220,7 @@ function TextAreaField({ label, name, placeholder, rows = 3 }: any) {
         name={name}
         placeholder={placeholder}
         rows={rows}
-        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent text-sm resize-none"
+        className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] focus:border-transparent text-sm resize-none"
       />
     </div>
   );

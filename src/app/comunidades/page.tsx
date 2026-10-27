@@ -137,7 +137,7 @@ export default function CommunitiesPage() {
           </div>
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="px-4 py-2 bg-[#003f8f] hover:bg-[#002860] text-white rounded-lg text-sm font-medium transition-colors"
+            className="px-4 py-2 bg-[#102B46] hover:bg-[#0C1D30] text-white rounded-lg text-sm font-medium transition-colors"
           >
             + Crear Grupo
           </button>
@@ -161,7 +161,7 @@ export default function CommunitiesPage() {
                   type="text"
                   value={newGroup.name}
                   onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f]"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#102B46]"
                   placeholder="Ej: Comunidad de Ciencias de la Salud"
                   required
                   minLength={3}
@@ -172,7 +172,7 @@ export default function CommunitiesPage() {
                 <textarea
                   value={newGroup.description}
                   onChange={(e) => setNewGroup({ ...newGroup, description: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f] resize-none"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#102B46] resize-none"
                   placeholder="Describe el propósito del grupo..."
                   required
                   minLength={10}
@@ -185,7 +185,7 @@ export default function CommunitiesPage() {
                   <select
                     value={newGroup.type}
                     onChange={(e) => setNewGroup({ ...newGroup, type: e.target.value as Group["type"] })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f]"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#102B46]"
                   >
                     <option value="university">Institución</option>
                     <option value="career">Carrera</option>
@@ -199,7 +199,7 @@ export default function CommunitiesPage() {
                     type="text"
                     value={newGroup.category}
                     onChange={(e) => setNewGroup({ ...newGroup, category: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003f8f]"
+                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#102B46]"
                     placeholder="Ej: Universidad de La Habana"
                   />
                 </div>
@@ -208,7 +208,7 @@ export default function CommunitiesPage() {
                 <button
                   type="submit"
                   disabled={creating}
-                  className="px-6 py-2.5 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
+                  className="px-6 py-2.5 bg-[#102B46] hover:bg-[#0C1D30] disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
                 >
                   {creating ? "Creando..." : "Crear Grupo"}
                 </button>
@@ -232,7 +232,7 @@ export default function CommunitiesPage() {
               onClick={() => setFilter(type)}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 filter === type
-                  ? "bg-[#003f8f] text-white"
+                  ? "bg-[#102B46] text-white"
                   : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"
               }`}
             >
@@ -244,7 +244,7 @@ export default function CommunitiesPage() {
         {/* Lista de grupos */}
         {loading ? (
           <div className="text-center py-12">
-            <div className="w-8 h-8 border-4 border-[#003f8f] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-gray-500">Cargando grupos...</p>
           </div>
         ) : groups.length > 0 ? (
@@ -281,7 +281,7 @@ export default function CommunitiesPage() {
                         e.preventDefault();
                         handleJoinGroup(group.id);
                       }}
-                      className="px-4 py-2 bg-[#003f8f] hover:bg-[#002860] text-white rounded-lg text-sm font-medium transition-colors"
+                      className="px-4 py-2 bg-[#102B46] hover:bg-[#0C1D30] text-white rounded-lg text-sm font-medium transition-colors"
                     >
                       Unirse
                     </button>
@@ -305,7 +305,7 @@ export default function CommunitiesPage() {
             </p>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="px-6 py-3 bg-[#003f8f] hover:bg-[#002860] text-white rounded-lg font-medium transition-colors"
+              className="px-6 py-3 bg-[#102B46] hover:bg-[#0C1D30] text-white rounded-lg font-medium transition-colors"
             >
               Crear Primer Grupo
             </button>

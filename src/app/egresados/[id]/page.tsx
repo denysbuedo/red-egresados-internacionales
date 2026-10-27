@@ -198,7 +198,7 @@ export default async function GraduateProfilePage({
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {graduate.userId === session.id && <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
-          <p className="text-sm text-gray-700">{graduate.employmentConfirmed ? "Mantén actualizada tu institución y actividad profesional." : "Completa tu vínculo laboral para la nueva etapa de Red MES."}</p>
+          <p className="text-sm text-gray-700">{graduate.employmentConfirmed ? "Mantén actualizada tu institución y actividad profesional." : "Completa tu vínculo laboral para la nueva etapa de CONECTA."}</p>
           <Link href="/completar-perfil" className="text-sm font-semibold text-blue-800 underline">Actualizar vínculo laboral</Link>
         </div>}
         {/* Header del perfil */}
@@ -312,7 +312,7 @@ export default async function GraduateProfilePage({
                     <p className="text-sm font-medium text-gray-700 mb-2">Idiomas</p>
                     <div className="flex flex-wrap gap-2">
                       {graduate.languages.split(",").map((lang, idx) => (
-                        <span key={idx} className="text-sm bg-[#003f8f]/10 text-[#003f8f] px-3 py-1.5 rounded-full">
+                        <span key={idx} className="text-sm bg-[#102B46]/10 text-[#102B46] px-3 py-1.5 rounded-full">
                           {lang.trim()}
                         </span>
                       ))}

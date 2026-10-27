@@ -1,4 +1,4 @@
-# Red MES — Ministerio de Educación Superior
+# CONECTA — Ciencia, tecnología y colaboración
 
 > Red profesional y académica para trabajadores del MES y de sus instituciones.
 
@@ -10,6 +10,8 @@
 ## 📋 Descripción
 
 Red profesional y académica para docentes, investigadores, especialistas, técnicos, directivos y demás trabajadores del Ministerio de Educación Superior y sus instituciones. Permite crear perfiles, establecer contactos y compartir resultados, proyectos, convocatorias y consultas. El registro de estudiantes no está habilitado en esta primera etapa.
+
+Identidad visual y recursos oficiales integrados desde `diseño/`. Ver [IDENTIDAD_CONECTA.md](IDENTIDAD_CONECTA.md) para alcance y comprobaciones.
 
 ## ✨ Características
 

@@ -136,3 +136,10 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Conservados todos los valores anteriores de las 19 tablas, incluyendo contraseñas, roles y estados de aprobación. Permanecen 8 cuentas, 7 perfiles, 5 aportes, 8 noticias y 8 conexiones. No se crearon usuarios de prueba ni se reclasificó a antiguos miembros como trabajadores verificados.
 - Verificación real: portada/formulario nuevos 200, API /members privada, API canónica y heredada equivalentes, credencial admin válida y logout revocado. Servicio sin reinicios inesperados. DNS, TLS y HAProxy no se modificaron; comprobada portada pública HTTPS con Red MES.
 - Pendiente de elección del operador la revalidación de las siete cuentas históricas. Hasta recibirla, se conserva su estado actual y se permite completar el vínculo laboral desde el menú/perfil.
+
+## Identidad CONECTA — 2026-10-26
+
+- Adoptados nombre, logos originales, favicon, imagen social, colores y tipografías del paquete `diseño/`. Ver IDENTIDAD_CONECTA.md.
+- Portada institucional adaptable, login compartido, navegación y paleta privada actualizados; ayuda y privacidad reales. Código/repositorios claramente futuro.
+- Sin cambios de esquema ni datos: trabajadores solamente, aprobación institucional y cuentas históricas conservadas.
+- Windows: typecheck/build y 21 pruebas correctas; lint sin errores. Capturas y flujos en Chrome real sobre base efímera. Respaldo de VM verificado; publicación Linux en preparación.

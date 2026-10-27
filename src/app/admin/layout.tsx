@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Panel de Administración",
-  description: "Gestión de la Red MES",
+  description: "Gestión de la CONECTA",
 };
 
 export default async function AdminLayout({

@@ -1,0 +1,19 @@
+/* CONECTA - Design tokens v1.0 */
+:root {
+ --conecta-primary:#102B46;
+ --conecta-primary-deep:#0C1D30;
+ --conecta-accent:#49DCCB;
+ --conecta-teal:#13B9AA;
+ --conecta-action:#2776C9;
+ --conecta-text:#102B46;
+ --conecta-text-muted:#4B6278;
+ --conecta-bg:#FFFFFF;
+ --conecta-surface:#F5F9FC;
+ --conecta-border:#D8E5ED;
+ --conecta-accent-bg:#E9FBF7;
+ --conecta-font-sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+ --conecta-font-mono:"IBM Plex Mono",ui-monospace,monospace;
+ --conecta-radius-sm:8px;
+ --conecta-radius-md:12px;
+ --conecta-radius-lg:20px;
+}

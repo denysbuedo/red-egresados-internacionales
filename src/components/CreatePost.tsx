@@ -136,7 +136,7 @@ export function CreatePost() {
             handleTextareaResize();
           }}
           placeholder="Comparte un resultado, presenta un proyecto, plantea una consulta o invita a colaborar..."
-          className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] focus:border-transparent transition-all resize-none min-h-[100px]"
+          className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] focus:border-transparent transition-all resize-none min-h-[100px]"
           disabled={!limitInfo.canPost || loading}
           maxLength={2000}
         />
@@ -166,7 +166,7 @@ export function CreatePost() {
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               placeholder="URL de la imagen (opcional)"
-              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003f8f] text-sm"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#102B46] text-sm"
               disabled={loading}
             />
             {imageUrl && (
@@ -224,7 +224,7 @@ export function CreatePost() {
           <button
             onClick={handleSubmit}
             disabled={!limitInfo.canPost || loading || !content.trim() || content.length < 5}
-            className="px-6 py-2.5 bg-[#003f8f] hover:bg-[#002860] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-colors"
+            className="px-6 py-2.5 bg-[#102B46] hover:bg-[#0C1D30] disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-colors"
           >
             {loading ? 'Publicando...' : 'Publicar'}
           </button>

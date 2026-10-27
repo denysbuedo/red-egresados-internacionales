@@ -1,0 +1,54 @@
+{
+  "brand": {
+    "name": "CONECTA",
+    "version": "1.0"
+  },
+  "color": {
+    "brand": {
+      "primary": "#102B46",
+      "deep": "#0C1D30",
+      "accent": "#49DCCB",
+      "teal": "#13B9AA",
+      "action": "#2776C9"
+    },
+    "text": {
+      "primary": "#102B46",
+      "secondary": "#4B6278",
+      "inverse": "#FFFFFF"
+    },
+    "surface": {
+      "base": "#FFFFFF",
+      "muted": "#F5F9FC",
+      "accent": "#E9FBF7"
+    },
+    "border": {
+      "default": "#D8E5ED"
+    }
+  },
+  "typography": {
+    "sans": "Inter, system-ui, -apple-system, Segoe UI, sans-serif",
+    "mono": "IBM Plex Mono, ui-monospace, monospace",
+    "weights": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700,
+      "extrabold": 800
+    }
+  },
+  "radius": {
+    "sm": "8px",
+    "md": "12px",
+    "lg": "20px",
+    "xl": "28px"
+  },
+  "spacing": {
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "6": "24px",
+    "8": "32px",
+    "12": "48px"
+  }
+}

@@ -233,3 +233,17 @@ test("pending accounts without a profile can complete only their own employment 
   assert.equal((await call('/api/admin/approvals',{method:'PUT',cookie:cookies.institution,body:{userId:Number(id),action:'approve'}})).status,200);
   assert.equal((await call('/api/members',{cookie})).status,200);
 });
+
+test("CONECTA identity, logos, metadata and public links match the supplied kit", async () => {
+  const home=await call('/'); assert.equal(home.status,200); const html=await home.text();
+  assert.ok(html.includes('Donde la ciencia y la tecnología se encuentran.'));
+  assert.ok(html.includes('conecta-logo-principal.svg')); assert.ok(html.includes('og-conecta-1200x630.png'));
+  assert.ok(html.includes('Próximamente')); assert.ok(!html.includes('Red MES'));
+  for(const path of ['/ayuda','/privacidad','/login','/register']) assert.equal((await call(path)).status,200,path);
+  const login=await (await call('/login')).text();
+  assert.ok(login.includes('Bienvenido a CONECTA')); assert.ok(login.includes('Correo electrónico o usuario'));
+  const logo=await call('/brand/conecta-logo-principal.svg'); assert.equal(logo.status,200);
+  const fs=require('node:fs');
+  assert.deepEqual(Buffer.from(await logo.arrayBuffer()),fs.readFileSync('diseño/01_Logotipos/SVG/conecta-logo-principal.svg'));
+  const icon=await call('/brand/favicon.svg'); assert.equal(icon.status,200);
+});

@@ -1,3 +1,4 @@
+import { BrandLogo } from "@/components/BrandLogo";
 import { POST_TYPES } from "@/lib/site";
 import Link from "next/link";
 import { db } from "@/db";
@@ -7,7 +8,7 @@ import { getSession } from "@/lib/session";
 import { AdminPostCard } from "@/components/AdminPostCard";
 import { CreatePost } from "@/components/CreatePost";
 import { UserPostCard } from "@/components/UserPostCard";
-import { LoginForm } from "@/components/LoginForm";
+import { PublicLanding } from "@/components/PublicLanding";
 import { checkAndSendEventNotifications } from "@/lib/event-notifications";
 import { redirect } from "next/navigation";
 
@@ -23,6 +24,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
     redirect("/pendiente");
   }
   
+  if (!session) return <PublicLanding />;
   const isLoggedIn = !!session;
   if (session?.status === "approved") await checkAndSendEventNotifications();
 
@@ -105,9 +107,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
             {/* Sidebar */}
             <aside className="lg:w-72 shrink-0 space-y-6">
               {/* Welcome Card */}
-              <div className="bg-[#003f8f] rounded-xl p-6 text-white">
+              <div className="bg-[#102B46] rounded-xl p-6 text-white">
+                <BrandLogo inverse className="mb-5 max-w-[150px]" />
                 <h2 className="text-lg font-bold mb-1">¡Hola, {session?.username}!</h2>
-                <p className="text-sm text-blue-200">Red MES</p>
+                <p className="text-sm text-blue-200">CONECTA</p>
               </div>
 
               {/* Stats */}
@@ -116,11 +119,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Miembros</span>
-                    <span className="text-xl font-bold text-[#003f8f]">{totalMembers}</span>
+                    <span className="text-xl font-bold text-[#102B46]">{totalMembers}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Instituciones</span>
-                    <span className="text-xl font-bold text-[#003f8f]">{totalInstitutions}</span>
+                    <span className="text-xl font-bold text-[#102B46]">{totalInstitutions}</span>
                   </div>
                 </div>
               </div>
@@ -242,7 +245,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                     ))}
                   </div>
                   <div className="text-center mt-4">
-                    <Link href="/noticias" className="text-[#003f8f] hover:underline text-sm font-medium">
+                    <Link href="/noticias" className="text-[#102B46] hover:underline text-sm font-medium">
                       Ver todas las noticias →
                     </Link>
                   </div>
@@ -256,82 +259,5 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   }
 
   // ============================================
-  // HOME PÚBLICO - Rediseñado
-  // ============================================
-  return (
-    <main className="fixed inset-0 z-50 flex flex-col overflow-hidden">
-      {/* Contenido dividido */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Izquierda: Info de la red - Fondo azul */}
-        <div className="hidden lg:flex lg:w-1/2 bg-[#003f8f] flex-col justify-center px-16 xl:px-24 text-white">
-          <h1 className="text-4xl xl:text-5xl font-bold leading-tight">
-            Red MES
-            <span className="block mt-2 text-2xl xl:text-3xl font-normal text-blue-200">
-              del Ministerio de Educación Superior
-            </span>
-          </h1>
-          <p className="text-blue-100 text-lg max-w-md mt-8 leading-relaxed">
-            Conecta con profesionales del MES y sus instituciones. Comparte resultados científicos, participa en proyectos y encuentra oportunidades de colaboración.
-          </p>
-          <div className="mt-10 flex gap-6 text-sm">
-            <Link href="/estatutos" className="flex items-center gap-2 text-blue-200 hover:text-white transition-colors">
-              <span className="text-lg">📖</span>
-              <span className="underline">Estatutos</span>
-            </Link>
-            <Link href="/terminos" className="flex items-center gap-2 text-blue-200 hover:text-white transition-colors">
-              <span className="text-lg">📄</span>
-              <span className="underline">Términos</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* Derecha: Login + Registro - Fondo blanco */}
-        <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center items-center px-8 sm:px-12 overflow-y-auto">
-          <div className="w-full max-w-sm">
-            {/* Mobile header */}
-            <div className="lg:hidden text-center mb-8">
-              <h1 className="text-2xl font-bold text-[#003f8f]">Red MES</h1>
-              <p className="text-[#003f8f]/70 text-sm mt-1">Educación Superior Cubana</p>
-            </div>
-
-            {/* Login Form */}
-            <LoginForm />
-
-            {/* Divider */}
-            <div className="flex items-center gap-4 my-8">
-              <div className="flex-1 h-px bg-gray-200"></div>
-              <span className="text-xs text-gray-400 uppercase tracking-wider">o</span>
-              <div className="flex-1 h-px bg-gray-200"></div>
-            </div>
-
-            {/* Registro */}
-            <div className="text-center">
-              <p className="text-base text-gray-700 mb-4">¿No tienes cuenta?</p>
-              <Link href="/register" className="block w-full py-3 border-2 border-[#003f8f] text-[#003f8f] text-center rounded-lg font-semibold hover:bg-[#003f8f] hover:text-white transition-colors">
-                Regístrate
-              </Link>
-              <p className="text-xs text-gray-400 mt-4 leading-relaxed">
-                Tu cuenta será revisada por tu institución o por la administración de la red.
-              </p>
-            </div>
-
-            {/* Mobile links */}
-            <div className="lg:hidden flex justify-center gap-6 text-sm text-gray-500 pt-6 mt-4 border-t border-gray-200">
-              <Link href="/estatutos" className="flex items-center gap-1 text-[#003f8f] hover:underline">
-                📖 Estatutos
-              </Link>
-              <Link href="/terminos" className="flex items-center gap-1 text-[#003f8f] hover:underline">
-                📄 Términos
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer full-width */}
-      <footer className="bg-[#002860] py-3 text-center text-sm text-blue-300 shrink-0">
-        © 2026 Red MES · Ministerio de Educación Superior
-      </footer>
-    </main>
-  );
+  return <PublicLanding />;
 }

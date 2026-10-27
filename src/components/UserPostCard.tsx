@@ -68,7 +68,7 @@ export function UserPostCard({
       <div className="p-5 border-b border-gray-100">
         <div className="flex items-start gap-3">
           <Link href={`/miembros/${graduateId}`}>
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#003f8f] to-[#0050b8] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#102B46] to-[#2776C9] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
               {graduatePhoto ? (
                 <img src={graduatePhoto} alt={graduateName} className="w-full h-full object-cover" />
               ) : (
@@ -78,7 +78,7 @@ export function UserPostCard({
           </Link>
           <div className="flex-1 min-w-0">
             <Link href={`/miembros/${graduateId}`}>
-              <h3 className="font-semibold text-gray-900 hover:text-[#003f8f] transition-colors">
+              <h3 className="font-semibold text-gray-900 hover:text-[#102B46] transition-colors">
                 {graduateName}
               </h3>
             </Link>
@@ -108,7 +108,7 @@ export function UserPostCard({
         {shouldTruncate && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-2 text-[#003f8f] hover:text-[#002860] font-medium text-sm transition-colors"
+            className="mt-2 text-[#102B46] hover:text-[#0C1D30] font-medium text-sm transition-colors"
           >
             {isExpanded ? "Mostrar menos" : "Leer más"}
           </button>

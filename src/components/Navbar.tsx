@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { BrandLogo } from "./BrandLogo";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface User {
   id: number;
@@ -25,6 +26,7 @@ interface Notification {
 
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -138,19 +140,21 @@ export function Navbar() {
   }, []);
 
 
+  if (pathname === "/" && !user) return null;
+
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center gap-3">
-            <span className="text-[#003f8f] font-bold text-xl hidden sm:block">
-              Red MES
-            </span>
+            <BrandLogo priority />
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden xl:flex items-center gap-1">
             <NavLink href="/">Inicio</NavLink>
-            {user && <NavLink href="/directorio">Directorio</NavLink>}
+            {user && <NavLink href="/directorio">Personas</NavLink>}
+            {user && <NavLink href="/?type=publication">Ciencia</NavLink>}
+            {user && <NavLink href="/?type=project">Proyectos</NavLink>}
             {user && user.role === "institution" && (
               <NavLink href="/institucion">
                 <span className="flex items-center gap-1">🏛️ Mi institución</span>
@@ -175,6 +179,7 @@ export function Navbar() {
             {user && (
               <div className="relative">
                 <button
+                  aria-label="Notificaciones"
                   onClick={() => setNotifOpen(!notifOpen)}
                   className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                 >
@@ -271,7 +276,7 @@ export function Navbar() {
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
                     {user.username.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-gray-700">{user.username}</span>
+                  <span className="max-w-24 truncate text-gray-700" title={user.username}>{user.username}</span>
                   <svg
                     className={`w-4 h-4 text-gray-500 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`}
                     fill="none"
@@ -322,21 +327,22 @@ export function Navbar() {
                   href="/login"
                   className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
                 >
-                  Login
+                  Iniciar sesión
                 </Link>
                 <Link
                   href="/register"
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
                 >
-                  Registro
+                  Solicitar acceso
                 </Link>
               </div>
             )}
           </div>
 
           <button
+            aria-label="Menú de navegación" aria-expanded={isOpen}
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-gray-500 hover:text-gray-700"
+            className="xl:hidden p-2 text-gray-500 hover:text-gray-700"
           >
             <svg
               className="w-6 h-6"
@@ -364,12 +370,14 @@ export function Navbar() {
         </div>
 
         {isOpen && (
-          <div className="md:hidden pb-4 border-t border-gray-200 pt-2">
+          <div className="xl:hidden pb-4 border-t border-gray-200 pt-2">
             <div className="flex flex-col gap-1">
               <MobileNavLink href="/" onClick={() => setIsOpen(false)}>
                 Inicio
               </MobileNavLink>
-              {user && <MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Directorio</MobileNavLink>}
+              {user && <MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Personas</MobileNavLink>}
+              {user && <MobileNavLink href="/?type=publication" onClick={() => setIsOpen(false)}>Ciencia</MobileNavLink>}
+              {user && <MobileNavLink href="/?type=project" onClick={() => setIsOpen(false)}>Proyectos</MobileNavLink>}
               {user && <MobileNavLink href="/conexiones" onClick={() => setIsOpen(false)}>🤝 Conexiones</MobileNavLink>}
               {user && user.role === "institution" && (
                 <MobileNavLink href="/institucion" onClick={() => setIsOpen(false)}>🏛️ Mi institución</MobileNavLink>
@@ -413,13 +421,13 @@ export function Navbar() {
                     href="/login"
                     onClick={() => setIsOpen(false)}
                   >
-                    Login
+                    Iniciar sesión
                   </MobileNavLink>
                   <MobileNavLink
                     href="/register"
                     onClick={() => setIsOpen(false)}
                   >
-                    Registro
+                    Solicitar acceso
                   </MobileNavLink>
                 </>
               )}
@@ -441,7 +449,7 @@ function NavLink({
   return (
     <Link
       href={href}
-      className="px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
+      className="px-2 py-2 whitespace-nowrap text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
     >
       {children}
     </Link>
@@ -461,7 +469,7 @@ function MobileNavLink({
     <Link
       href={href}
       onClick={onClick}
-      className="px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
+      className="px-2 py-2 whitespace-nowrap text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors"
     >
       {children}
     </Link>

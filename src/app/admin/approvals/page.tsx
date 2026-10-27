@@ -84,7 +84,7 @@ export default function ApprovalsPage() {
 
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-8 h-8 border-4 border-[#003f8f] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-500">Cargando solicitudes...</p>
         </div>
       ) : pendingUsers.length > 0 ? (
