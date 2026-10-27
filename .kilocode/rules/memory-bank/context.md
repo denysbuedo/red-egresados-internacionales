@@ -254,3 +254,5 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Hasta 1199 px: feed centrado en contenedor máximo de 820 px; paneles de la derecha debajo. En móvil los aportes se muestran primero; columna izquierda oculta y accesos principales disponibles en la navegación existente.
 - Chrome: centro verificado por coordenadas a 320/390/768/1024/1280/1440/1920 px, sin overflow ni errores JS. Comunidades reales, filtros de aportes y estado vacío correctos. Windows build correcto. Sin cambios de permisos, esquema ni registros.
 - Respaldo verificado en /var/backups/red-egresados/pre-conecta-centered-feed-20261027. Esta distribución sustituye el diseño anterior de dos columnas.
+
+- Publicado como `84172c8`. Linux build/typecheck/lint y 20 pruebas HTTP correctas. Producción: inicio con columna de comunidades y perfil en saludo verificado, todas las filas de las 19 tablas e imágenes conservadas. Manifiesto de 174 archivos coincide con la compilación validada. Servicio activo y NRestarts=0.

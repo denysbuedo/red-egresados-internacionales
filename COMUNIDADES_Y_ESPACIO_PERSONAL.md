@@ -37,3 +37,5 @@ Respaldo: `/var/backups/red-egresados/pre-conecta-refinements-20261027`.
 La identidad se mantiene en el saludo. El escritorio pasa a tres columnas con laterales iguales: Mis comunidades y accesos útiles a la izquierda, publicaciones en el centro y personas/agenda/noticias a la derecha. Mis comunidades consulta las pertenencias reales y muestra hasta cuatro enlaces, sin repetir el perfil.
 
 En tablet el feed queda centrado con máximo de 820 px y el apoyo de la derecha se desplaza debajo. En móvil los aportes aparecen primero. Comprobado con Chrome en siete anchos de 320 a 1920 px, incluyendo filtros y estado vacío; sin overflow ni errores JavaScript.
+
+- Publicado como `84172c8`. Linux build/typecheck/lint y 20 pruebas HTTP correctas. Producción: inicio con columna de comunidades y perfil en saludo verificado, todas las filas de las 19 tablas e imágenes conservadas. Manifiesto de 174 archivos coincide con la compilación validada. Servicio activo y NRestarts=0.
