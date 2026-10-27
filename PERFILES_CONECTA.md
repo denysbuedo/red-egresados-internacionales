@@ -15,3 +15,7 @@ Los perfiles completos mantienen acceso para propietario, conexiones aceptadas y
 Chrome con base efímera: editar, guardar, recargar, cancelar cambios, subir/quitar foto y estados vacíos/con datos. Sin desbordamiento entre 320 y 1440px. Prueba HTTP adicional: persistencia del perfil, carga de foto interna, privacidad, editor ajeno 404, conservación exacta de cuenta/permisos/vínculo, email inválido/duplicado y rechazo de cambios institucionales por este formulario.
 
 Respaldo previo: `/var/backups/red-egresados/pre-conecta-profile-20261027`, fuentes, SQLite y carpeta de imágenes verificados. Este cambio no migra ni reinicia la base: conserva la cuenta, perfil, aportes e imágenes existentes.
+
+Publicado como `ccef14d`. TypeScript, compilación Windows/Linux y 17 pruebas HTTP correctas; lint sin errores. Verificación pública HTTPS: perfil y editor propios 200, acceso anónimo redirige al login. Guardar, recargar, cancelar y subir/quitar foto comprobados sobre base efímera; no se editó el perfil real durante las pruebas.
+
+Manifiesto de 168 archivos coincide con la compilación validada. Se conservaron todos los valores de las 19 tablas al cambiar la compilación, así como los archivos persistentes de imágenes. Estado verificado: una cuenta, un perfil y un aporte existente; no se volvió a ejecutar el vaciado. Respaldo adicional `pre-cutover.db` y compilación anterior disponibles. Servicio activo y sin reinicios inesperados.
