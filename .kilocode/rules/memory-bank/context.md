@@ -245,3 +245,12 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Desplegado como `9b088df`. Linux: compilación/typecheck/lint y 20 pruebas HTTP correctas. Navegador: ocho rutas y cinco tamaños, gestión admin de comunidad ajena, pertenencia persistente y controles de presentación correctos.
 - Producción/HTTPS: perfil/editor, registro reducido, cabecera personal, gestión de comunidades, ancho de Noticias y membresía real verificados sin modificar datos de negocio. La comunidad existente conserva sus miembros; no se crearon usuarios ni solicitudes de prueba.
 - Las 19 tablas conservan todas sus filas y valores durante el corte; estado observado: 4 cuentas, 4 perfiles, 1 aporte, 6 conexiones y 1 comunidad. Imágenes y credenciales preservadas. Servicio activo con NRestarts=0. Manifiesto de 174 archivos coincide con la compilación Linux y la VM; respaldo pre-cutover y compilación anterior disponibles.
+
+
+## Publicaciones centradas y apoyo lateral — 2026-10-27
+
+- El operador mantiene foto/cargo/institución en el saludo, pero rechaza el feed alineado a la izquierda. Se adopta una nueva columna izquierda ligera sin perfil repetido: Mis comunidades (hasta cuatro pertenencias reales) y accesos a conexiones, eventos y directorio.
+- Escritorio: tres columnas, laterales de ancho idéntico (240/260 px) y publicaciones en el centro geométrico. Se conserva la derecha con personas, agenda y noticias.
+- Hasta 1199 px: feed centrado en contenedor máximo de 820 px; paneles de la derecha debajo. En móvil los aportes se muestran primero; columna izquierda oculta y accesos principales disponibles en la navegación existente.
+- Chrome: centro verificado por coordenadas a 320/390/768/1024/1280/1440/1920 px, sin overflow ni errores JS. Comunidades reales, filtros de aportes y estado vacío correctos. Windows build correcto. Sin cambios de permisos, esquema ni registros.
+- Respaldo verificado en /var/backups/red-egresados/pre-conecta-centered-feed-20261027. Esta distribución sustituye el diseño anterior de dos columnas.

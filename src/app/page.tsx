@@ -3,7 +3,7 @@ import { EcosystemMosaic } from "@/components/EcosystemMosaic";
 import { POST_TYPES } from "@/lib/site";
 import Link from "next/link";
 import { db } from "@/db";
-import { graduates, adminPosts, userPosts, events } from "@/db/schema";
+import { graduates, adminPosts, userPosts, events, groups, groupMembers } from "@/db/schema";
 import { sql, desc, eq, asc, gte } from "drizzle-orm";
 import { getSession } from "@/lib/session";
 import { CreatePost } from "@/components/CreatePost";
@@ -97,6 +97,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
     });
 
     const news = [...pinned, ...adminPostsData.filter((post) => !pinned.includes(post))].slice(0, 3);
+    const myCommunities = userGraduateId ? db.select({ id: groups.id, name: groups.name, category: groups.category }).from(groups).innerJoin(groupMembers,eq(groupMembers.groupId,groups.id)).where(eq(groupMembers.graduateId,userGraduateId)).orderBy(groups.name).limit(4).all() : [];
     const spaces = [
       { symbol: "◎", name: "Directorio", description: "Encuentra talento y afinidades", href: "/directorio", type: undefined },
       { symbol: "◇", name: "Ciencia", description: "Resultados que abren conversaciones", href: "/?type=publication", type: "publication" },
@@ -117,6 +118,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
         </header>
         <nav className="workspace-spaces" aria-label="Explora el ecosistema">{spaces.map((space) => <Link key={space.name} href={space.href} className={selectedType && selectedType === space.type ? "workspace-space workspace-space-active" : "workspace-space"}><span className="workspace-space-symbol" aria-hidden="true">{space.symbol}</span><span><strong>{space.name}</strong><small>{space.description}</small></span><span className="workspace-space-arrow" aria-hidden="true">↗</span></Link>)}</nav>
         <div className="workspace-grid">
+          <aside className="workspace-community-left" aria-label="Tus espacios de colaboración">
+            <section className="workspace-panel"><div className="workspace-panel-heading"><p className="workspace-kicker">CONSTRUYE EN COMUNIDAD</p><h2>Mis comunidades</h2></div>{myCommunities.length ? <nav aria-label="Comunidades a las que perteneces">{myCommunities.map(community=><Link key={community.id} href={`/comunidades/${community.id}`} className="workspace-community-link"><span className="workspace-community-mark" aria-hidden="true">◎</span><span><strong>{community.name}</strong>{community.category && <small>{community.category}</small>}</span><span aria-hidden="true">↗</span></Link>)}</nav> : <p className="workspace-panel-empty">Encuentra un espacio para compartir experiencias y desarrollar ideas en común.</p>}<Link href="/comunidades" className="workspace-panel-footer">Explorar comunidades <span aria-hidden="true">→</span></Link></section>
+            <nav className="workspace-panel workspace-community-nav" aria-label="Conecta y participa"><p className="workspace-kicker">CONECTA Y PARTICIPA</p><Link href="/conexiones"><span aria-hidden="true">◎</span> Mis conexiones <span aria-hidden="true">↗</span></Link><Link href="/eventos"><span aria-hidden="true">▦</span> Encuentros y eventos <span aria-hidden="true">↗</span></Link><Link href="/directorio"><span aria-hidden="true">↗</span> Directorio profesional <span aria-hidden="true">↗</span></Link></nav>
+          </aside>
           <div className="workspace-center">
             {profile && !profile.employmentConfirmed && <section className="workspace-affiliation"><p>Completa tu vínculo institucional para que tu perfil refleje tu actividad en la red.</p><Link href="/completar-perfil">Actualizar mi vínculo →</Link></section>}
             {profile && (!profile.profession || !profile.institution) && <section className="workspace-affiliation"><p>Tu acceso está aprobado. Añade tu cargo, formación y presentación para que puedan encontrarte.</p><Link href={`/miembros/${profile.id}/editar`}>Completar mi perfil →</Link></section>}
