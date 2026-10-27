@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
+import { EcosystemMosaic } from "./EcosystemMosaic";
 
 const modules = [
   { id: "personas", symbol: "◎", title: "Personas", text: "Descubre perfiles profesionales, áreas de conocimiento y capacidades de nuestra comunidad.", href: "/directorio", action: "Descubrir personas" },
@@ -29,12 +30,7 @@ export function PublicLanding() {
             <div className="conecta-hero-actions"><a href="#ecosistema" className="conecta-cta">Explorar CONECTA <span aria-hidden="true">↗</span></a><Link href="/register" className="conecta-cta conecta-cta-outline">Solicitar acceso</Link></div>
             <p className="conecta-access-note"><span aria-hidden="true">◈</span> Acceso sujeto a validación institucional.</p>
           </div>
-          <div className="conecta-mosaic" aria-hidden="true">
-            <div className="conecta-tile"><span className="conecta-tile-meta">01 / COMUNIDAD</span><span className="conecta-tile-symbol">◎</span><span>Personas</span></div>
-            <div className="conecta-tile"><span className="conecta-tile-meta">02 / CONOCIMIENTO</span><span className="conecta-tile-symbol">✦</span><span>Ciencia</span></div>
-            <div className="conecta-tile"><span className="conecta-tile-meta">03 / COLABORACIÓN</span><span className="conecta-tile-symbol">▦</span><span>Proyectos</span></div>
-            <div className="conecta-tile"><span className="conecta-tile-meta">04 / EN EVOLUCIÓN</span><span className="conecta-tile-symbol conecta-code">{ "{ }" }</span><span>Código</span></div>
-          </div>
+          <EcosystemMosaic />
         </div>
       </section>
       <section id="ecosistema" className="conecta-ecosystem" aria-labelledby="ecosystem-title">

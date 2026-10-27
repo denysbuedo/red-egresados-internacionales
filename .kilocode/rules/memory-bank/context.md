@@ -167,3 +167,9 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 
 - Windows: build/typecheck, lint sin errores y navegador real a 320–1440px correctos. Linux: build/typecheck/lint y 15 pruebas HTTP correctas. Cabecera autenticada sin cifras y con ilustración verificada en producción.
 - Recurso optimizado WebP de 640px: 27 930 bytes, HTTPS 200. Manifiesto de 157 archivos coincide con la compilación validada. Servicio activo; todas las filas de las 19 tablas conservadas, sin migraciones.
+
+## Rechazo de la ilustración — 2026-10-27
+
+- El operador rechaza expresamente la ilustración figurativa de profesionales. Se retira del banner personal; permanece la cabecera con saludo y paleta, sin cifras.
+- El operador indica reutilizar las mismas tarjetas de la portada pública. Se extrae EcosystemMosaic para compartir Personas, Ciencia, Proyectos y Código entre ambas cabeceras, con tamaño adaptado a la zona personal y móvil. Sin cifras ni nueva imagen.
+- Recurso generado conservado sin referencia en la interfaz como historial; no reutilizarlo como propuesta aprobada.

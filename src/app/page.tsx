@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { EcosystemMosaic } from "@/components/EcosystemMosaic";
 import { POST_TYPES } from "@/lib/site";
 import Link from "next/link";
 import { db } from "@/db";
@@ -111,7 +111,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
             <p>Una conversación puede ser el inicio de tu próxima colaboración. Comparte lo que haces y descubre lo que nos une.</p>
             <div className="workspace-welcome-actions"><a href="#compartir" className="conecta-cta">Compartir un aporte <span aria-hidden="true">↗</span></a><Link href="/directorio" className="workspace-quiet-link">Explorar la comunidad <span aria-hidden="true">→</span></Link></div>
           </div>
-          <div className="workspace-welcome-art"><Image src="/brand/conecta-colaboracion-personal.png" alt="Profesionales que construyen conocimiento en conjunto: ciencia abierta, colaboración e innovación compartida." width={1536} height={1024} sizes="(max-width: 767px) 290px, (max-width: 1199px) 40vw, 480px" priority /></div>
+          <EcosystemMosaic />
         </header>
         <nav className="workspace-spaces" aria-label="Explora el ecosistema">{spaces.map((space) => <Link key={space.name} href={space.href} className={selectedType && selectedType === space.type ? "workspace-space workspace-space-active" : "workspace-space"}><span className="workspace-space-symbol" aria-hidden="true">{space.symbol}</span><span><strong>{space.name}</strong><small>{space.description}</small></span><span className="workspace-space-arrow" aria-hidden="true">↗</span></Link>)}</nav>
         <div className="workspace-grid">
