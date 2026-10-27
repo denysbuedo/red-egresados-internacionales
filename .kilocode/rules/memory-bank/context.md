@@ -163,4 +163,7 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Sustituidas las cifras del banner privado por ilustración original generada con imagegen integrado: profesionales colaborando, conocimiento compartido y ciencia abierta, en azul y menta.
 - Recurso en public/brand/conecta-colaboracion-personal.png; prompt y procedencia en diseño/07_Desarrollo/ilustracion-cabecera.md. Imagen original, adaptación CSS y optimización Next Image; saludo accesible conservado.
 - Retiradas consultas de conteo usadas exclusivamente por la cabecera. Sin cambios de datos, permisos o esquema.
-- Respaldo verificado en /var/backups/red-egresados/pre-conecta-personal-banner-20261027; publicación en preparación.
+- Respaldo verificado en /var/backups/red-egresados/pre-conecta-personal-banner-20261027; desplegado como d7f49ef.
+
+- Windows: build/typecheck, lint sin errores y navegador real a 320–1440px correctos. Linux: build/typecheck/lint y 15 pruebas HTTP correctas. Cabecera autenticada sin cifras y con ilustración verificada en producción.
+- Recurso optimizado WebP de 640px: 27 930 bytes, HTTPS 200. Manifiesto de 157 archivos coincide con la compilación validada. Servicio activo; todas las filas de las 19 tablas conservadas, sin migraciones.
