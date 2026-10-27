@@ -136,6 +136,8 @@ export async function PUT(
 
     return NextResponse.json(updated[0]);
   } catch (error) {
+    if (error instanceof SyntaxError) return NextResponse.json({ error: "Datos de perfil inválidos" }, { status: 400 });
+    if ((error as { code?: string }).code === "SQLITE_CONSTRAINT_UNIQUE") return NextResponse.json({ error: "Ese correo de contacto ya está asociado a otro perfil" }, { status: 409 });
     console.error("Error updating graduate:", error);
     return NextResponse.json(
       { error: "Error al actualizar perfil" },

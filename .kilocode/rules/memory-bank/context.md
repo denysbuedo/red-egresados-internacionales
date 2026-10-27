@@ -188,3 +188,10 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Validación Windows/Linux: compilación, typecheck y 24 pruebas correctas; lint sin errores. Ensayo sobre copia real y reversión ante fallo comprobados. Chrome: publicar aporte y noticia con imágenes locales. Manifiesto de 165 archivos verificado contra producción.
 - Prueba pública HTTPS de imagen >1 MB correcta; almacenamiento persistente propiedad del servicio, lectura privada y logout verificados. Imágenes temporales eliminadas; no se crearon usuarios ni publicaciones de prueba en producción. Servicio activo y NRestarts=0.
 - Respaldo adicional pre-cutover.db y compilación/dependencias anteriores conservados. DNS/TLS/HAProxy/Nginx sin cambios; el límite existente de Nginx de 10 MB admite estas cargas.
+
+## Perfil profesional y edición — 2026-10-27
+
+- Rediseñada la vista del perfil con identidad CONECTA y secciones de presentación, trayectoria, conocimientos, intereses, idiomas, contacto y aportes. Avatar con foto privada o iniciales; estados vacíos útiles y accesos por sección.
+- Nuevo editor propio /miembros/[id]/editar, con persistencia por API existente, cancelación, mensaje de éxito y subida/eliminación de foto. Correo de contacto independiente de credenciales. Institución/tipo de vínculo conservan el flujo de validación existente.
+- Propietario, conexiones y administración ven el perfil completo; contactos y editor ajeno protegidos. Se adapta la vista admin a permisos ya existentes de API.
+- Windows: compilación y 17 pruebas HTTP correctas. Chrome real: guardar/recargar/cancelar/foto y tamaños 320–1440px. Respaldo de fuentes, SQLite e imágenes verificado en /var/backups/red-egresados/pre-conecta-profile-20261027. Publicación en preparación; no volver a ejecutar el reinicio de datos anterior.

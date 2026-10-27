@@ -294,3 +294,27 @@ test("image uploads validate content, protect access and survive as local post a
   assert.equal(news.status,201);assert.equal((await news.json()).imageUrl,url);
   assert.equal((await call('/api/admin/posts',{method:'POST',cookie:cookies.editor,body:{title:'Imagen invalida',content:'Una imagen con direccion no permitida.',imageUrl:'file:///etc/passwd'}})).status,400);
 });
+
+test("professional profile editor saves own data and uploaded portrait without changing credentials or affiliation", async () => {
+  const owner=await login('editor');
+  const original=db.prepare('SELECT * FROM users WHERE id=5').get();
+  const profile=db.prepare('SELECT * FROM graduates WHERE id=5').get();
+  const photo=db.prepare("SELECT image_url FROM admin_posts WHERE title='Imagen almacenada'").get().image_url;
+  const editing=await call('/miembros/5/editar',{cookie:owner});assert.equal(editing.status,200);
+  assert.ok((await editing.text()).includes('Un perfil que hable de ti.'));
+  assert.equal((await call('/miembros/2/editar',{cookie:owner})).status,404);
+  const payload={name:'Profesional de prueba actualizado',email:'editor.contact@example.test',country:'Cuba',city:'La Habana',currentProfession:'Investigador',currentCompany:'Centro de prueba',career:'Gestión del conocimiento',graduationYear:null,bio:'Colaboración científica y ciencia abierta.',skills:'Ciencia abierta, Datos',interests:'Redes académicas',languages:'Español, Inglés',phone:'+53 50000000',website:'https://example.test',linkedin:'https://linkedin.com/in/example',photoUrl:photo,userId:1,role:'admin',employmentConfirmed:true};
+  const saved=await call('/api/members/5',{method:'PUT',cookie:owner,body:payload});assert.equal(saved.status,200);
+  const record=db.prepare('SELECT * FROM graduates WHERE id=5').get();assert.equal(record.name,payload.name);assert.equal(record.photo_url,photo);assert.equal(record.graduation_year,0);assert.equal(record.user_id,5);
+  assert.equal(record.member_type,profile.member_type);assert.equal(record.employment_confirmed,profile.employment_confirmed);
+  assert.deepEqual(db.prepare('SELECT * FROM users WHERE id=5').get(),original);
+  const html=await (await call('/miembros/5?actualizado=1',{cookie:owner})).text();
+  assert.ok(html.includes('Tu perfil se actualizó correctamente.'));assert.ok(html.includes(payload.bio));assert.ok(html.includes('Conocimientos y habilidades'));assert.ok(html.includes('href="/miembros/5/editar"'));
+  const locked=await (await call('/miembros/5',{cookie:cookies.member})).text();assert.ok(!locked.includes(payload.email));assert.ok(!locked.includes(payload.phone));assert.ok(!locked.includes('href="/miembros/5/editar"'));
+  assert.equal((await call('/api/members/5',{method:'PUT',cookie:owner,body:{name:'   '}})).status,400);
+  assert.equal((await call('/api/members/5',{method:'PUT',cookie:owner,body:{email:'not-an-email'}})).status,400);
+  assert.equal((await call('/api/members/5',{method:'PUT',cookie:owner,body:{photoUrl:'javascript:alert(1)'}})).status,400);
+  assert.equal((await call('/api/members/5',{method:'PUT',cookie:owner,body:{photoUrl:false}})).status,400);
+  assert.equal((await call('/api/members/5',{method:'PUT',cookie:owner,body:{institution:'Otra institución'}})).status,409);
+  const conflict=await call('/api/members/5',{method:'PUT',cookie:owner,body:{email:'member@example.test'}});assert.equal(conflict.status,409);
+});

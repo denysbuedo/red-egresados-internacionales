@@ -1,3 +1,4 @@
+import { validImageUrl } from "./media";
 import { MEMBER_TYPES } from "./site";
 import { NextResponse } from "next/server";
 
@@ -19,7 +20,12 @@ export function validateProfileInput(input: unknown) {
       return NextResponse.json({ error: `Campo inválido: ${key}` }, { status: 400 });
     }
   }
-  for (const key of ["website", "linkedin", "photoUrl"]) {
+  for (const key of ["name", "email", "country", "currentProfession"]) {
+    if (body[key] !== undefined && (typeof body[key] !== "string" || !(body[key] as string).trim())) return NextResponse.json({ error: `Completa el campo: ${key}` }, { status: 400 });
+  }
+  if (body.email !== undefined && (typeof body.email !== "string" || body.email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email))) return NextResponse.json({ error: "Indica un correo de contacto válido" }, { status: 400 });
+  if (body.photoUrl !== undefined && body.photoUrl !== null && body.photoUrl !== "" && !validImageUrl(body.photoUrl)) return NextResponse.json({ error: "Indica una foto subida a CONECTA o un enlace http/https válido" }, { status: 400 });
+  for (const key of ["website", "linkedin"]) {
     const value = body[key];
     if (value !== undefined && value !== null && value !== "" &&
         (typeof value !== "string" || value.length > 2000 || !/^https?:\/\//i.test(value))) {
