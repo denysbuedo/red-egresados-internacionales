@@ -34,7 +34,7 @@ export default async function NoticiasPage() {
 
   return (
     <main className="ui-page min-h-screen bg-gray-50">
-      <div className="ui-content max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="ui-content ui-primary-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <PageHeader title="Noticias" description="Comunicados, iniciativas y novedades de la educación superior cubana." eyebrow="ACTUALIDAD INSTITUCIONAL" />
 

@@ -2,7 +2,7 @@
 
 import { PageHeader } from "@/components/PageHeader";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -14,11 +14,15 @@ interface Group {
   category: string | null;
   creatorName: string | null;
   memberCount: number;
+  isMember: boolean;
+  canEdit: boolean;
 }
 
 export default function CommunitiesPage() {
   const router = useRouter();
   const [groups, setGroups] = useState<Group[]>([]);
+  const joinLock = useRef(false), fetchSequence = useRef(0);
+  const [joining,setJoining] = useState<number|null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -32,18 +36,18 @@ export default function CommunitiesPage() {
   const [error, setError] = useState("");
 
   async function fetchGroups() {
-    setLoading(true);
+    const version=++fetchSequence.current;
     try {
       const url = filter === "all" ? "/api/groups" : `/api/groups?type=${filter}`;
-      const response = await fetch(url);
+      const response = await fetch(url,{cache:"no-store"});
       if (response.ok) {
         const data = await response.json();
-        setGroups(data);
-      }
+        if(version===fetchSequence.current)setGroups(data);
+      } else { setError("No se pudieron cargar las comunidades."); }
     } catch (error) {
       console.error("Error fetching groups:", error);
     } finally {
-      setLoading(false);
+      if(version===fetchSequence.current)setLoading(false);
     }
   }
 
@@ -76,6 +80,7 @@ export default function CommunitiesPage() {
   };
 
   const handleJoinGroup = async (groupId: number) => {
+    if(joinLock.current)return;joinLock.current=true;++fetchSequence.current;setJoining(groupId);setError("");
     try {
       const response = await fetch("/api/groups", {
         method: "PUT",
@@ -83,26 +88,25 @@ export default function CommunitiesPage() {
         body: JSON.stringify({ groupId, action: "join" }),
       });
 
-      if (response.ok) {
-        fetchGroups();
-      }
-    } catch (error) {
-      console.error("Error joining group:", error);
-    }
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error || "No se pudo unir a la comunidad.");
+      setGroups(previous=>previous.map(group=>group.id===groupId?{...group,isMember:true,memberCount:group.memberCount+(group.isMember?0:1)}:group));
+    } catch (reason) { setError(reason instanceof Error?reason.message:"Revisa tu conexión e inténtalo de nuevo."); }
+    finally {joinLock.current=false;setJoining(null);}
   };
 
   const typeLabels = {
-    university: "🏛️ Institución",
-    career: "📚 Carrera",
-    country: "🌍 País",
-    interest: "💡 Interés",
+    university: "Institución",
+    career: "Área de conocimiento",
+    country: "País",
+    interest: "Interés",
   };
 
   const typeColors = {
     university: "bg-teal-50 text-teal-700 border-teal-200",
     career: "bg-blue-50 text-blue-700 border-blue-200",
     country: "bg-green-50 text-green-700 border-green-200",
-    interest: "bg-orange-50 text-orange-700 border-orange-200",
+    interest: "bg-teal-50 text-teal-700 border-teal-200",
   };
 
   useEffect(() => {
@@ -137,6 +141,7 @@ export default function CommunitiesPage() {
             + Crear Grupo
           </button>} />
 
+        {error && !showCreateForm && <p role="alert" className="connection-page-error">{error}</p>}
         {/* Formulario crear grupo */}
         {showCreateForm && (
           <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
@@ -263,22 +268,23 @@ export default function CommunitiesPage() {
                   </p>
                   {group.category && (
                     <p className="text-xs text-gray-500 mb-3">
-                      📍 {group.category}
+                      {group.category}
                     </p>
                   )}
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                     <span className="text-sm text-gray-500">
                       {group.memberCount} {group.memberCount === 1 ? "miembro" : "miembros"}
                     </span>
-                    <button
+                    {group.isMember ? <span className="community-membership">Ya eres miembro</span> : <button
+                      disabled={joining!==null}
                       onClick={(e) => {
                         e.preventDefault();
                         handleJoinGroup(group.id);
                       }}
                       className="px-4 py-2 bg-[#102B46] hover:bg-[#0C1D30] text-white rounded-lg text-sm font-medium transition-colors"
                     >
-                      Unirse
-                    </button>
+                      {joining===group.id?"Uniéndote…":"Unirse"}
+                    </button>}
                   </div>
                 </div>
               </Link>

@@ -11,12 +11,13 @@ export default async function CompleteAffiliationPage() {
   if (!session) redirect("/login");
   const profile = await getGraduateByUserId(session.id);
   if (!profile) return <ProfileRegistrationPage />;
+  const firstCompletion=session.status==="approved" && !profile.university && profile.memberType==="unspecified";
   return <main className="ui-page mx-auto max-w-2xl px-4 py-12">
     <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-      <PageHeader title="Tu vínculo laboral con la red" description="Confirma tu institución y actividad profesional para solicitar su validación." eyebrow="CONECTA · VÍNCULO LABORAL" compact />
+      <PageHeader title="Tu vínculo laboral con la red" description={firstCompletion ? "Completa tu institución y actividad profesional en tu cuenta aprobada." : "Confirma tu institución y actividad profesional para solicitar su validación."} eyebrow="CONECTA · VÍNCULO LABORAL" compact />
       <p className="mt-3 text-gray-600">CONECTA está dirigida, en esta primera etapa, a trabajadores del Ministerio de Educación Superior y de sus instituciones. Confirma tu institución y actividad profesional.</p>
-      <p className="mt-2 text-sm text-gray-500">Si tienes una cuenta de miembro, el acceso quedará pendiente hasta que la institución valide esta información.</p>
-      <AffiliationForm initial={{ institution: profile.university, memberType: profile.memberType,
+      <p className="mt-2 text-sm text-gray-500">{firstCompletion ? "Tu solicitud de acceso ya fue aprobada. Completa estos datos para presentar tu actividad en la comunidad." : "Si tienes una cuenta de miembro, el acceso quedará pendiente hasta que la institución valide esta información."}</p>
+      <AffiliationForm firstCompletion={firstCompletion} initial={{ institution: profile.university, memberType: profile.memberType,
         currentProfession: profile.currentProfession, currentCompany: profile.currentCompany || "" }} />
     </div>
   </main>;

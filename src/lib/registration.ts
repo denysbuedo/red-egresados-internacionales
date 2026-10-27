@@ -32,10 +32,11 @@ export async function registerAccount(request: NextRequest) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Correo electrónico inválido");
     if (typeof password !== "string" || password.length < 12 || Buffer.byteLength(password) > 72) throw new Error("La contraseña debe tener al menos 12 caracteres y como máximo 72 bytes");
     if (body.institution !== undefined) body.university = body.institution;
-    const university = text("university", 200, true)!;
-    const memberType = body.memberType;
+    const university = text("university", 200) || "";
+    const simplified = !body.memberType && !university;
+    const memberType = simplified ? "unspecified" : body.memberType;
     if (memberType === "student") return NextResponse.json({ error: "El registro de estudiantes no está habilitado en esta primera etapa" }, { status: 403 });
-    if (!MEMBER_TYPES.some((type) => type.value === memberType)) throw new Error("Selecciona tu vínculo laboral con el MES o sus instituciones");
+    if (!simplified && !MEMBER_TYPES.some((type) => type.value === memberType)) throw new Error("Selecciona tu vínculo laboral con el MES o sus instituciones");
     if (body.employmentConfirmed !== true) throw new Error("Debes confirmar tu vínculo laboral con el MES o una de sus instituciones");
     const graduationYear = body.graduationYear == null || body.graduationYear === "" ? 0 : Number(body.graduationYear);
     if (graduationYear !== 0 && (!Number.isInteger(graduationYear) || graduationYear < 1900 || graduationYear > new Date().getFullYear())) throw new Error("Año de graduación inválido");
@@ -48,7 +49,7 @@ export async function registerAccount(request: NextRequest) {
     profile = {
       name: text("name", 150, true)!, email, country: text("country", 100, true)!,
       memberType: memberType as MemberType, employmentConfirmed: true, university, career: text("career", 200) || "", graduationYear,
-      currentProfession: text("currentProfession", 200, true)!, city: text("city", 150),
+      currentProfession: text("currentProfession", 200) || "", city: text("city", 150),
       currentCompany: text("currentCompany", 200), bio: text("bio", 5000), phone: text("phone", 50),
       linkedin: safeLink("linkedin"), website: safeLink("website"), photoUrl: safeLink("photoUrl"),
       skills: text("skills", 2000), languages: text("languages", 1000), interests: text("interests", 2000),
@@ -69,13 +70,13 @@ export async function registerAccount(request: NextRequest) {
   try {
     const newUser = db.transaction((tx) => {
       const user = tx.insert(users).values({ username: account.username, email: account.email, passwordHash,
-        role: "user", status: "pending", pendingUniversity: account.university }).returning().get();
+        role: "user", status: "pending", pendingUniversity: account.university || null }).returning().get();
       const graduate = tx.insert(graduates).values({ ...profile, userId: user.id }).returning({ id: graduates.id }).get();
       tx.update(users).set({ graduateId: graduate.id }).where(eq(users.id, user.id)).run();
       return user;
     });
     await setSession(newUser);
-    return NextResponse.json({ message: "Registro recibido. Tu institución revisará la solicitud.",
+    return NextResponse.json({ message: "Registro recibido. La administración revisará la solicitud.",
       pending: true, redirect: "/pendiente", user: { id: newUser.id, username: newUser.username, status: "pending" } }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && /UNIQUE constraint failed/.test(error.message)) {

@@ -4,9 +4,6 @@ import { PageHeader } from "@/components/PageHeader";
 
 import { useState } from "react";
 import Link from "next/link";
-import { MemberTypeSelect } from "@/components/MemberTypeSelect";
-import { InstitutionField } from "@/components/InstitutionField";
-import { useRouter } from "next/navigation";
 
 const COUNTRIES = [
   "Argentina", "Bolivia", "Brasil", "Canadá", "Chile", "Colombia",
@@ -18,7 +15,6 @@ const COUNTRIES = [
 ];
 
 export default function RegistroPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -31,27 +27,9 @@ export default function RegistroPage() {
 
     // Combine auth + graduate data in one request
     const data = {
-      memberType: formData.get("memberType"),
       employmentConfirmed: formData.get("employmentConfirmed") === "on",
-      username: formData.get("username"),
-      email: formData.get("email"),
-      password: formData.get("password"),
-      institution: formData.get("institution"),
-      name: formData.get("name"),
-      country: formData.get("country"),
-      career: formData.get("career"),
-      graduationYear: formData.get("graduationYear") ? Number(formData.get("graduationYear")) : null,
-      currentProfession: formData.get("currentProfession"),
-      city: formData.get("city") || null,
-      currentCompany: formData.get("currentCompany") || null,
-      bio: formData.get("bio") || null,
-      phone: formData.get("phone") || null,
-      linkedin: formData.get("linkedin") || null,
-      website: formData.get("website") || null,
-      skills: formData.get("skills") || null,
-      languages: formData.get("languages") || null,
-      interests: formData.get("interests") || null,
-      photoUrl: formData.get("photoUrl") || null,
+      username: formData.get("username"),email:formData.get("email"),password:formData.get("password"),
+      name:formData.get("name"),country:formData.get("country"),city:formData.get("city") || null,
     };
 
     try {
@@ -87,6 +65,7 @@ export default function RegistroPage() {
           </div>
         )}
 
+        <p className="mb-6 text-sm text-slate-600">Solicita acceso con tus datos personales y de acceso. Una vez aprobada tu cuenta podrás completar tu trayectoria, institución e intereses desde Mi perfil.</p>
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Datos de acceso */}
           <Section title="Datos de Acceso">
@@ -106,41 +85,9 @@ export default function RegistroPage() {
             </div>
           </Section>
 
-          {/* Formación */}
-          <Section title="Vinculación institucional y formación">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InstitutionField />
-              <MemberTypeSelect />
-              <InputField label="Área de conocimiento o formación (opcional)" name="career" placeholder="Ingeniería Informática" />
-              <InputField label="Año de graduación (opcional)" name="graduationYear" type="number" min={1900} max={new Date().getFullYear()} placeholder="2020" />
-            </div>
-          </Section>
-
-          {/* Situación Profesional */}
-          <Section title="Actividad en la comunidad">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <InputField label="Cargo o actividad actual" name="currentProfession" required placeholder="Docente, especialista, investigador, técnico..." />
-              <InputField label="Unidad, centro o departamento" name="currentCompany" placeholder="Facultad, dirección, centro o departamento" />
-            </div>
-          </Section>
-
-          {/* Perfil y Enlaces */}
-          <Section title="Perfil y Enlaces">
-            <div className="space-y-4">
-              <TextAreaField label="Biografía" name="bio" placeholder="Cuéntanos sobre tu trayectoria..." rows={4} />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <InputField label="LinkedIn" name="linkedin" placeholder="https://linkedin.com/in/tuperfil" />
-                <InputField label="Sitio Web" name="website" placeholder="https://tusitio.com" />
-              </div>
-              <InputField label="Habilidades" name="skills" placeholder="JavaScript, Gestión (separadas por coma)" />
-              <InputField label="Idiomas" name="languages" placeholder="Español, Inglés (separados por coma)" />
-              <InputField label="Intereses" name="interests" placeholder="Tecnología, Salud (separados por coma)" />
-            </div>
-          </Section>
-
           <label className="flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-gray-700">
             <input type="checkbox" name="employmentConfirmed" required className="mt-1" />
-            <span>Declaro que trabajo en el MES o en una de sus instituciones. La institución verificará mi vínculo antes de aprobar el acceso. El registro de estudiantes no está habilitado en esta etapa.</span>
+            <span>Declaro que trabajo en el MES o en una de sus instituciones. La administración revisará mi solicitud de acceso. El registro de estudiantes no está habilitado en esta etapa.</span>
           </label>
           <button
             type="submit"

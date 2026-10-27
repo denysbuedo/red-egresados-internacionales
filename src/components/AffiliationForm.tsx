@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { MEMBER_TYPES } from "@/lib/site";
 
-export function AffiliationForm({ initial }: { initial: { institution: string; memberType: string; currentProfession: string; currentCompany: string } }) {
+export function AffiliationForm({ initial, firstCompletion=false }: { firstCompletion?: boolean; initial: { institution: string; memberType: string; currentProfession: string; currentCompany: string } }) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   return <form className="mt-6 space-y-5" onSubmit={async (event) => {
@@ -37,6 +37,6 @@ export function AffiliationForm({ initial }: { initial: { institution: string; m
     </label>
     <label className="flex items-start gap-3 text-sm text-gray-600"><input type="checkbox" name="employmentConfirmed" required className="mt-1" /><span>Confirmo que trabajo en el MES o en una de sus instituciones. Mi información será revisada por los responsables de la red.</span></label>
     {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
-    <button disabled={saving} className="rounded-lg bg-blue-800 px-5 py-3 font-semibold text-white disabled:opacity-50">{saving ? "Enviando..." : "Enviar vínculo para validar"}</button>
+    <button disabled={saving} className="rounded-lg bg-blue-800 px-5 py-3 font-semibold text-white disabled:opacity-50">{saving ? "Enviando..." : firstCompletion ? "Guardar vínculo laboral" : "Enviar vínculo para validar"}</button>
   </form>;
 }

@@ -41,7 +41,7 @@ export default async function DirectorioPage({
 
   if (search) {
     conditions.push(
-      sql`(${graduates.name} LIKE ${"%" + search + "%"} OR ${graduates.currentProfession} LIKE ${"%" + search + "%"} OR ${graduates.bio} LIKE ${"%" + search + "%"})`
+      sql`(${graduates.name} LIKE ${"%" + search + "%"} OR ${graduates.currentProfession} LIKE ${"%" + search + "%"} OR ${graduates.bio} LIKE ${"%" + search + "%"} OR ${graduates.career} LIKE ${"%" + search + "%"} OR ${graduates.skills} LIKE ${"%" + search + "%"})`
     );
   }
   if (country) conditions.push(sql`${graduates.country} = ${country}`);
@@ -73,11 +73,6 @@ export default async function DirectorioPage({
     .from(graduates)
     .orderBy(graduates.university);
 
-  const careersResult = await db
-    .selectDistinct({ career: graduates.career })
-    .from(graduates)
-    .orderBy(graduates.career);
-
   return (
     <main className="ui-page min-h-screen bg-gray-50">
       <div className="ui-content ui-primary-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -89,7 +84,7 @@ export default async function DirectorioPage({
               type="text"
               name="search"
               defaultValue={search}
-              placeholder="Buscar por nombre, profesión o biografía..."
+              placeholder="Buscar personas, profesión o conocimientos..."
               className="flex-1 px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-sm transition-all"
             />
             <button
@@ -132,19 +127,6 @@ export default async function DirectorioPage({
               <option value="">Todos los vínculos</option>
               {MEMBER_TYPES.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
             </select>
-            <select
-              name="career"
-              defaultValue={career}
-              className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            >
-              <option value="">Todas las áreas de conocimiento</option>
-              {careersResult.filter((c) => c.career).map((c) => (
-                <option key={c.career} value={c.career}>
-                  {c.career}
-                </option>
-              ))}
-            </select>
-
             <input
               type="number"
               name="yearFrom"
@@ -182,7 +164,7 @@ export default async function DirectorioPage({
         </form>
 
         {allGraduates.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {allGraduates.map((g) => (
               <GraduateCard
                 key={g.id}

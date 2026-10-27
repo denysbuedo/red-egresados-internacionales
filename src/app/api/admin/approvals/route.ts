@@ -52,7 +52,8 @@ export async function PUT(request: NextRequest) {
   if (target.status !== "pending") return NextResponse.json({ error: "La solicitud ya fue resuelta" }, { status: 409 });
   if (action === "approve") {
     const profile = db.select().from(graduates).where(eq(graduates.userId, id)).get();
-    if (!profile?.employmentConfirmed || !profile.university.trim() || !profile.currentProfession.trim() || !MEMBER_TYPES.some((type) => type.value === profile.memberType) || profile.university !== target.pendingUniversity) {
+    const basicRequest = session.role === "admin" && !target.pendingUniversity && profile?.memberType === "unspecified" && !profile.university;
+    if (!profile?.employmentConfirmed || (!basicRequest && ( !profile.university.trim() || !profile.currentProfession.trim() || !MEMBER_TYPES.some((type) => type.value === profile.memberType) || profile.university !== target.pendingUniversity))) {
       return NextResponse.json({ error: "La persona debe completar su vínculo laboral antes de ser aprobada" }, { status: 409 });
     }
   }

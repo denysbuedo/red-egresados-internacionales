@@ -360,3 +360,44 @@ test("connection retries, crossed requests and legacy rows keep one stable relat
   assert.equal((await call('/api/connections',{method:'POST',cookie:sender.cookie,body:{receiverId:'1abc'}})).status,400);
   assert.equal((await call('/api/connections',{method:'POST',cookie:sender.cookie,body:{receiverId:sender.id}})).status,400);
 });
+
+
+test("community membership survives reload and retries; global admin edits another creator without granting member privileges", async () => {
+  let response=await call('/api/groups',{method:'POST',cookie:cookies.member,body:{name:'Comunidad de prueba',description:'Compartimos capacidades y experiencias de investigación',type:'interest',category:'Ciencia abierta'}});
+  assert.equal(response.status,201);const group=await response.json();
+  let listed=await (await call('/api/groups',{cookie:cookies.member})).json();assert.equal(listed.find(g=>g.id===group.id).isMember,true);
+  assert.equal(listed.find(g=>g.id===group.id).canEdit,true);
+  const otherCookie=cookies.editor;
+  const join=()=>call('/api/groups',{method:'PUT',cookie:otherCookie,body:{groupId:group.id,action:'join'}});
+  const joins=await Promise.all([join(),join()]);assert.deepEqual(joins.map(r=>r.status),[200,200]);
+  assert.equal(db.prepare('SELECT count(*) n FROM group_members WHERE group_id=? AND graduate_id=5').get(group.id).n,1);
+  const detail=await (await call('/api/groups?id='+group.id,{cookie:otherCookie})).json();assert.equal(detail.isMember,true);assert.equal(detail.canEdit,false);
+  assert.equal((await call('/api/groups',{method:'PATCH',cookie:otherCookie,body:{id:group.id,name:'No autorizado'}})).status,403);
+  assert.equal((await call('/api/groups',{method:'PATCH',cookie:cookies.editor,body:{id:group.id,name:'No autorizado'}})).status,403);
+  response=await call('/api/groups',{method:'PATCH',cookie:cookies.admin,body:{id:group.id,name:'Comunidad revisada',description:'Información institucional revisada por la administración',type:'university',category:'Institución de prueba'}});assert.equal(response.status,200);
+  const edited=db.prepare('SELECT * FROM groups WHERE id=?').get(group.id);assert.equal(edited.name,'Comunidad revisada');assert.equal(edited.creator_id,2);assert.equal(edited.type,'university');
+  assert.equal(db.prepare('SELECT count(*) n FROM group_members WHERE group_id=? AND graduate_id=1').get(group.id).n,0);
+  const adminDetail=await (await call('/api/groups?id='+group.id,{cookie:cookies.admin})).json();assert.equal(adminDetail.canEdit,true);assert.equal(adminDetail.isMember,false);
+  assert.equal((await call('/api/groups',{method:'PATCH',cookie:cookies.admin,body:{id:group.id,name:' '}})).status,400);
+  assert.equal((await call('/api/groups',{method:'PUT',cookie:cookies.member,body:{groupId:group.id,action:'leave'}})).status,409);
+  assert.equal((await call('/api/groups',{method:'PUT',cookie:otherCookie,body:{groupId:group.id,action:'leave'}})).status,200);
+  const left=await (await call('/api/groups',{cookie:otherCookie})).json();assert.equal(left.find(g=>g.id===group.id).isMember,false);
+  assert.equal((await call('/api/groups',{method:'PUT',cookie:otherCookie,body:{groupId:999999,action:'join'}})).status,404);
+});
+
+test("minimal worker access request waits for global approval and profile completion follows approval", async () => {
+  const basic={username:'basicworker',email:'basicworker@example.test',password,name:'Trabajadora de prueba',country:'Cuba',employmentConfirmed:true,role:'admin',status:'approved'};
+  const response=await call('/api/auth/register-complete',{method:'POST',body:basic});assert.equal(response.status,201);
+  const cookie=response.headers.get('set-cookie').split(';')[0],user=db.prepare("SELECT * FROM users WHERE username='basicworker'").get();assert.equal(user.status,'pending');assert.equal(user.role,'user');assert.equal(user.pending_university,null);
+  const g=db.prepare('SELECT * FROM graduates WHERE user_id=?').get(user.id);assert.equal(g.member_type,'unspecified');assert.equal(g.career,'');assert.equal(g.current_profession,'');
+  assert.equal((await call('/api/members',{cookie})).status,403);
+  const scoped=await (await call('/api/admin/approvals',{cookie:cookies.institution})).json();assert.equal(scoped.some(u=>u.id===user.id),false);
+  assert.equal((await call('/api/admin/approvals',{method:'PUT',cookie:cookies.institution,body:{userId:user.id,action:'approve'}})).status,403);
+  assert.equal((await call('/api/admin/approvals',{method:'PUT',cookie:cookies.admin,body:{userId:user.id,action:'approve'}})).status,200);
+  assert.equal((await call('/api/members',{cookie})).status,200);
+  assert.equal((await call('/api/members/'+g.id,{method:'PUT',cookie,body:{name:basic.name,email:basic.email,country:'Cuba',currentProfession:'Investigadora',career:'Ciencia abierta, Educación superior',bio:'Mi trayectoria profesional'}})).status,200);
+  const complete=db.prepare('SELECT * FROM graduates WHERE id=?').get(g.id);assert.equal(complete.current_profession,'Investigadora');assert.equal(complete.career,'Ciencia abierta, Educación superior');
+  const affiliation=await call('/api/auth/affiliation',{method:'POST',cookie,body:{institution:uniA,memberType:'researcher',employmentConfirmed:true,currentProfession:'Investigadora'}});assert.equal(affiliation.status,200);assert.equal((await affiliation.json()).redirect,'/miembros/'+g.id);assert.equal(db.prepare('SELECT status FROM users WHERE id=?').get(user.id).status,'approved');
+  assert.equal((await call('/api/auth/affiliation',{method:'POST',cookie,body:{institution:uniB,memberType:'researcher',employmentConfirmed:true,currentProfession:'Investigadora'}})).status,200);assert.equal(db.prepare('SELECT status FROM users WHERE id=?').get(user.id).status,'pending');
+  const form=await (await call('/register')).text();assert.ok(!form.includes('name="career"'));assert.ok(!form.includes('name="institution"'));assert.ok(!form.includes('name="currentProfession"'));assert.ok(form.includes('Información Personal') && form.includes('Datos de Acceso'));
+});

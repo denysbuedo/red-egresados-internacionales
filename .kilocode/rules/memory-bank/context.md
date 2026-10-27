@@ -226,3 +226,17 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Desplegado como `8ae3dd7`. Linux: build/typecheck/lint y 18 pruebas HTTP correctas. Suite adicional de 8 pruebas de sesión/datos correcta en Windows; revisión general de páginas y roles con Chrome sin errores.
 - Producción y HTTPS público: cuatro contenedores comunes, perfil/editor, administración y APIs de conexiones comprobados sin crear solicitudes ni usuarios de prueba. Manifiesto de 172 archivos validado contra la compilación Linux y la VM.
 - Todas las filas de las 19 tablas preservadas durante el corte; estado observado: 4 cuentas, 4 perfiles, 1 aporte y 6 conexiones. Imágenes y credenciales intactas, sin migraciones. Servicio activo, NRestarts=0; pre-cutover.db y compilación anterior disponibles en el respaldo.
+
+
+## Comunidades, espacio personal y acceso simplificado — 2026-10-27
+
+- La lista de comunidades recibe isMember/canEdit del servidor: muestra «Ya eres miembro» y evita repetir Unirse tras recargar. Unión/salida transaccional e idempotente; el creador permanece en su comunidad. Filtros y categorías sin emojis ajenos a la marca.
+- Nueva gestión exclusiva de administración en /admin/comunidades: editar nombre, descripción, categoría y tipo de comunidades de cualquier creador. Permiso PATCH comprobado en servidor; no cambia propietario ni añade al administrador como miembro. Editor y miembro sin propiedad no reciben ese permiso.
+- Inicio privado de dos columnas: avatar/foto, cargo e institución junto al saludo; retirada la columna izquierda. Conservada la columna derecha con personas, agenda y noticias, las tarjetas decorativas aprobadas y los accesos de gestión por rol en la cabecera.
+- Directorio más compacto, hasta cuatro tarjetas por fila, sin franja superior ni sombras. Retirado el select de formación libre; búsqueda incluye áreas de conocimiento y habilidades. Noticias adopta el ancho común de 1280 px.
+- Perfil: formación/áreas separadas por comas, punto y coma o saltos de línea se presentan como etiquetas, sin modificar los datos históricos. Edición con textarea y orientación para organizar áreas, habilidades e intereses.
+- Registro reducido a Datos de Acceso e Información Personal, más declaración laboral. Sin institución/cargo/formación/enlaces obligatorios antes del acceso. Perfil inicial con vínculo unspecified; cuenta siempre pending, privilegios ignorados. Administración global revisa solicitudes sin institución; institución no puede aprobar solicitudes ajenas o sin asignación.
+- Tras aprobación, completar por primera vez un vínculo vacío mantiene el acceso ya aprobado. Cambios posteriores de afiliación siguen el proceso de validación existente. Esta decisión sustituye el requisito histórico de completar toda la afiliación antes de aprobar el nuevo registro básico.
+- Respaldo verificado: /var/backups/red-egresados/pre-conecta-refinements-20261027. Conservar todos los datos actuales, sin reinicio ni migraciones.
+
+- Windows: build/typecheck, 20 pruebas HTTP y 8 de sesión/datos correctas; lint sin errores. Chrome: ocho rutas a 320/390/768/1024/1440 px, pertenencia tras recarga, edición admin de comunidad ajena y bloqueo de miembro, etiquetas de formación, sombras ausentes, ancho de Noticias y cabecera personal sin columna izquierda, sin overflow ni errores JS.

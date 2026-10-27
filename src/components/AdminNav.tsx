@@ -5,7 +5,7 @@ import { BrandLogo } from "./BrandLogo";
 export function AdminNav({ role }: { role: string }) {
   const pathname = usePathname();
   const links = [
-    ...(role === "admin" ? [{ href:"/admin",label:"Resumen",icon:"◇" },{ href:"/admin/approvals",label:"Aprobaciones",icon:"◎" },{ href:"/admin/users",label:"Usuarios",icon:"◉" }] : []),
+    ...(role === "admin" ? [{ href:"/admin",label:"Resumen",icon:"◇" },{ href:"/admin/approvals",label:"Aprobaciones",icon:"◎" },{ href:"/admin/users",label:"Usuarios",icon:"◉" },{ href:"/admin/comunidades",label:"Comunidades",icon:"◎" }] : []),
     { href:"/admin/posts",label:"Noticias",icon:"▤" }, { href:"/admin/events/new",label:"Crear evento",icon:"▦" },
     ...(role === "admin" ? [{ href:"/listas-correo",label:"Listas de correo",icon:"↗" }] : []),
   ];

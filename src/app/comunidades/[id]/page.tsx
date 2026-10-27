@@ -78,17 +78,8 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
           category: data.category || "",
         });
 
-        // Check if current user is member
-        const authResponse = await fetch("/api/auth/me");
-        if (authResponse.ok) {
-          const authData = await authResponse.json();
-          if (authData.graduate) {
-            const currentGraduateId = authData.graduate.id;
-            const isMemberCheck = data.members?.some((m: Member) => m.graduateId === currentGraduateId);
-            setIsMember(!!isMemberCheck);
-            setCreator(data.creatorId === currentGraduateId);
-          }
-        }
+        setIsMember(data.isMember);
+        setCreator(data.canEdit);
       }
     } catch (error) {
       console.error("Error fetching group:", error);

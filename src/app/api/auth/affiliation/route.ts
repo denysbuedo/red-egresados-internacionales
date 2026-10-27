@@ -19,11 +19,12 @@ export async function POST(request: NextRequest) {
       (body.currentCompany != null && (typeof body.currentCompany !== "string" || body.currentCompany.length > 200))) {
     return NextResponse.json({ error: "Indica tu institución, perfil profesional y cargo, y confirma tu vínculo laboral" }, { status: 400 });
   }
-  const profile = db.select({ id: graduates.id }).from(graduates).where(eq(graduates.userId, session.id)).get();
+  const profile = db.select({ id: graduates.id, university: graduates.university, memberType: graduates.memberType }).from(graduates).where(eq(graduates.userId, session.id)).get();
   if (!profile) return NextResponse.json({ error: "Primero debes crear tu perfil profesional", redirect: "/miembros/registro" }, { status: 400 });
   // A user's new affiliation needs institutional validation. Operational roles
   // remain assigned by administrators and cannot be changed through this route.
-  const nextStatus = session.role === "user" ? "pending" : session.status;
+  const firstCompletion = session.status === "approved" && !profile.university.trim() && profile.memberType === "unspecified";
+  const nextStatus = session.role === "user" && !firstCompletion ? "pending" : session.status;
   db.transaction((tx) => {
     tx.update(graduates).set({ memberType: body.memberType as MemberType,
       university: body.institution.trim(), currentProfession: body.currentProfession.trim(),
@@ -32,5 +33,5 @@ export async function POST(request: NextRequest) {
     tx.update(users).set({ pendingUniversity: body.institution.trim(), status: nextStatus,
       rejectionReason: null, updatedAt: new Date() }).where(eq(users.id, session.id)).run();
   });
-  return NextResponse.json({ message: "Vínculo laboral enviado para validación", redirect: nextStatus === "pending" ? "/pendiente" : `/miembros/${profile.id}` });
+  return NextResponse.json({ message: nextStatus === "pending" ? "Vínculo laboral enviado para validación" : "Vínculo laboral completado", redirect: nextStatus === "pending" ? "/pendiente" : `/miembros/${profile.id}` });
 }

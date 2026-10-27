@@ -39,10 +39,10 @@ export function GraduateCard({
     .slice(0, 2);
 
   return (
-    <div className="ui-person-card bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all group">
-      <div className="flex items-start gap-4">
+    <div className="ui-person-card bg-white border border-gray-200 rounded-xl p-4 transition-colors group">
+      <div className="flex items-start gap-3">
         <Link href={`/miembros/${id}`}>
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
             {photoUrl ? (
               <img
                 src={photoUrl}
@@ -64,8 +64,8 @@ export function GraduateCard({
             {currentProfession}
             {currentCompany && ` en ${currentCompany}`}
           </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-md">
+          <div className="mt-2 flex flex-wrap gap-1">
+            <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md">
               <svg
                 className="w-3 h-3"
                 fill="none"
@@ -87,7 +87,7 @@ export function GraduateCard({
               </svg>
               {country}
             </span>
-            <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-1 rounded-md">
+            <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-md">
               <svg
                 className="w-3 h-3"
                 fill="none"
@@ -106,7 +106,7 @@ export function GraduateCard({
           </div>
 
           <p className="mt-2 text-xs font-medium text-blue-700">{memberTypeLabel(memberType)}</p>
-          <div className="mt-3"><ConnectionAction graduateId={id} isOwn={isOwn} compact /></div>
+          <div className="mt-2"><ConnectionAction graduateId={id} isOwn={isOwn} compact /></div>
         </div>
       </div>
     </div>

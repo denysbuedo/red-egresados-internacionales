@@ -1,6 +1,6 @@
 import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/db";
+import { db, sqlite } from "@/db";
 import { groups, groupMembers, groupPosts, graduates, users } from "@/db/schema";
 import { getSession } from "@/lib/session";
 import { eq, and, desc, sql } from "drizzle-orm";
@@ -10,6 +10,10 @@ export async function GET(request: NextRequest) {
   const denied = await authorizeApi(request);
   if (denied) return denied;
   try {
+    const session = (await getSession())!;
+    const own = db.select({ id: graduates.id }).from(graduates).where(eq(graduates.userId, session.id)).get();
+    const memberships = own ? db.select().from(groupMembers).where(eq(groupMembers.graduateId, own.id)).all() : [];
+    const membershipFor = (id: number) => memberships.find(item => item.groupId === id);
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type");
     const groupId = searchParams.get("id");
@@ -62,6 +66,8 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json({
         ...groupData[0],
+        isMember: !!membershipFor(groupData[0].id),
+        canEdit: session.role === "admin" || groupData[0].creatorId === own?.id,
         members,
         memberCount: members.length,
         posts,
@@ -114,12 +120,14 @@ export async function GET(request: NextRequest) {
 
         return {
           ...group,
+          isMember: !!membershipFor(group.id),
+          canEdit: session.role === "admin" || group.creatorId === own?.id,
           memberCount: count[0]?.count || 0,
         };
       })
     );
 
-    return NextResponse.json(groupsWithCount);
+    return NextResponse.json(groupsWithCount, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
     console.error("Error fetching groups:", error);
     return NextResponse.json(
@@ -136,7 +144,6 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
 
-    console.log("Session:", session);
 
     if (!session) {
       return NextResponse.json(
@@ -146,7 +153,6 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log("Request body:", body);
     const { name, description, type, category } = body;
 
     if (!name || !description || !type) {
@@ -163,7 +169,6 @@ export async function POST(request: NextRequest) {
       .where(eq(graduates.userId, session.id))
       .limit(1);
 
-    console.log("User graduate:", userGraduate);
 
     if (!userGraduate || userGraduate.length === 0) {
       return NextResponse.json(
@@ -203,93 +208,24 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT - Unirse/Salir de grupo
+// Membership changes are idempotent and atomic, including retries.
 export async function PUT(request: NextRequest) {
-  const denied = await authorizeApi(request);
-  if (denied) return denied;
-  try {
-    const session = await getSession();
-
-    if (!session) {
-      return NextResponse.json(
-        { error: "Debes iniciar sesión" },
-        { status: 401 }
-      );
-    }
-
-    const body = await request.json();
-    const { groupId, action } = body;
-
-    if (!groupId || !["join", "leave"].includes(action)) {
-      return NextResponse.json(
-        { error: "Datos inválidos" },
-        { status: 400 }
-      );
-    }
-
-    // Obtener graduateId del usuario
-    const userGraduate = await db
-      .select({ graduateId: graduates.id })
-      .from(graduates)
-      .where(eq(graduates.userId, session.id))
-      .limit(1);
-
-    if (!userGraduate || userGraduate.length === 0) {
-      return NextResponse.json(
-        { error: "No tienes perfil de miembro" },
-        { status: 400 }
-      );
-    }
-
-    const graduateId = userGraduate[0].graduateId;
-
-    if (action === "join") {
-      // Verificar si ya es miembro
-      const existing = await db
-        .select()
-        .from(groupMembers)
-        .where(
-          and(
-            eq(groupMembers.groupId, parseInt(groupId)),
-            eq(groupMembers.graduateId, graduateId)
-          )
-        )
-        .limit(1);
-
-      if (existing.length > 0) {
-        return NextResponse.json(
-          { error: "Ya eres miembro de este grupo" },
-          { status: 400 }
-        );
-      }
-
-      await db.insert(groupMembers).values({
-        groupId: parseInt(groupId),
-        graduateId,
-        role: "member",
-      });
-
-      return NextResponse.json({ success: true, action: "joined" });
-    } else {
-      // Salir del grupo
-      await db
-        .delete(groupMembers)
-        .where(
-          and(
-            eq(groupMembers.groupId, parseInt(groupId)),
-            eq(groupMembers.graduateId, graduateId)
-          )
-        );
-
-      return NextResponse.json({ success: true, action: "left" });
-    }
-  } catch (error) {
-    console.error("Error joining/leaving group:", error);
-    return NextResponse.json(
-      { error: "Error al procesar solicitud" },
-      { status: 500 }
-    );
-  }
+  const denied=await authorizeApi(request);if(denied)return denied;
+  const session=(await getSession())!;
+  let body;try{body=await request.json();}catch{return NextResponse.json({error:"Datos inválidos"},{status:400});}
+  const id=Number(body?.groupId),action=body?.action;
+  if(!Number.isSafeInteger(id)||id<1||!["join","leave"].includes(action))return NextResponse.json({error:"Datos inválidos"},{status:400});
+  const own=db.select({id:graduates.id}).from(graduates).where(eq(graduates.userId,session.id)).get();
+  if(!own)return NextResponse.json({error:"Completa tu perfil antes de unirte"},{status:400});
+  const result=sqlite.transaction(()=>{
+    const group=sqlite.prepare('SELECT creator_id FROM groups WHERE id=?').get(id) as {creator_id:number}|undefined;
+    if(!group)return {error:"Comunidad no encontrada",status:404};
+    if(action==="leave" && group.creator_id===own.id)return {error:"El creador debe permanecer en la comunidad",status:409};
+    if(action==="join")sqlite.prepare("INSERT INTO group_members (group_id,graduate_id,role,joined_at) SELECT ?,?,'member',? WHERE NOT EXISTS (SELECT 1 FROM group_members WHERE group_id=? AND graduate_id=?)").run(id,own.id,Math.floor(Date.now()/1000),id,own.id);
+    else sqlite.prepare('DELETE FROM group_members WHERE group_id=? AND graduate_id=?').run(id,own.id);
+    return {success:true,action:action==="join"?"joined":"left",isMember:action==="join"};
+  }).immediate();
+  return NextResponse.json(result,{status:'status' in result?result.status:200,headers:{"Cache-Control":"private, no-store"}});
 }
 
 // PATCH - Editar grupo (solo creador)
@@ -323,14 +259,14 @@ export async function PATCH(request: NextRequest) {
       .where(eq(graduates.userId, session.id))
       .limit(1);
 
-    if (!userGraduate || userGraduate.length === 0) {
+    if (session.role !== "admin" && (!userGraduate || userGraduate.length === 0)) {
       return NextResponse.json(
         { error: "No tienes perfil de miembro" },
         { status: 400 }
       );
     }
 
-    const graduateId = userGraduate[0].graduateId;
+    const graduateId = userGraduate[0]?.graduateId;
 
     // Verificar que es el creador
     const group = await db
@@ -346,18 +282,26 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    if (group[0].creatorId !== graduateId) {
+    if (session.role !== "admin" && group[0].creatorId !== graduateId) {
       return NextResponse.json(
-        { error: "Solo el creador puede editar el grupo" },
+        { error: "Solo el creador o la administración pueden editar la comunidad" },
         { status: 403 }
       );
     }
 
     // Actualizar
     const updateData: any = {};
-    if (name) updateData.name = name;
-    if (description) updateData.description = description;
-    if (category !== undefined) updateData.category = category;
+    if (name !== undefined && (typeof name !== "string" || name.trim().length < 3 || name.length > 150)) return NextResponse.json({error:"Nombre inválido (3–150 caracteres)"},{status:400});
+    if (description !== undefined && (typeof description !== "string" || description.trim().length < 10 || description.length > 5000)) return NextResponse.json({error:"Descripción inválida (10–5000 caracteres)"},{status:400});
+    if (category !== undefined && category !== null && (typeof category !== "string" || category.length > 200)) return NextResponse.json({error:"Categoría inválida"},{status:400});
+    if (name) updateData.name = name.trim();
+    if (description) updateData.description = description.trim();
+    if (category !== undefined) updateData.category = category?.trim() || null;
+    if (body.type !== undefined) {
+      if (!["university","career","country","interest"].includes(body.type)) return NextResponse.json({error:"Tipo inválido"},{status:400});
+      updateData.type = body.type;
+    }
+    if (!Object.keys(updateData).length) return NextResponse.json({error:"No hay cambios"},{status:400});
 
     await db
       .update(groups)
