@@ -221,3 +221,8 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Conexiones carga las tres pestañas juntas y actualiza en segundo plano; el header actualiza contadores sin refrescar toda la página cada 30 segundos. Contador pendiente incluye solo invitaciones recibidas.
 - Windows: build y 18 pruebas HTTP correctas; lint sin errores (38 advertencias existentes). Chrome con dos cuentas: envío/aceptación, respuesta atrasada y reintento tras fallo; ancho idéntico en cuatro rutas a 320/390/768/1024/1440 px, sin overflow ni errores JS.
 - Respaldo previo verificado en /var/backups/red-egresados/pre-conecta-navigation-connections-20261027. Conservar cuentas, aportes e imágenes actuales; no ejecutar el reinicio histórico.
+
+
+- Desplegado como `8ae3dd7`. Linux: build/typecheck/lint y 18 pruebas HTTP correctas. Suite adicional de 8 pruebas de sesión/datos correcta en Windows; revisión general de páginas y roles con Chrome sin errores.
+- Producción y HTTPS público: cuatro contenedores comunes, perfil/editor, administración y APIs de conexiones comprobados sin crear solicitudes ni usuarios de prueba. Manifiesto de 172 archivos validado contra la compilación Linux y la VM.
+- Todas las filas de las 19 tablas preservadas durante el corte; estado observado: 4 cuentas, 4 perfiles, 1 aporte y 6 conexiones. Imágenes y credenciales intactas, sin migraciones. Servicio activo, NRestarts=0; pre-cutover.db y compilación anterior disponibles en el respaldo.

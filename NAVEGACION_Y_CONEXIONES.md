@@ -21,3 +21,8 @@ Windows: compilación, 18 pruebas HTTP y lint sin errores. La prueba de regresi�
 Chrome real con dos cuentas aisladas: envío y aceptación desde el directorio; respuesta GET atrasada; error temporal al aceptar y reintento desde Conexiones; contacto final visible. Cuatro páginas con anchos iguales en cinco tamaños de 320 a 1440 px, sin desbordamiento ni errores JavaScript.
 
 Sin migraciones, cambio de credenciales ni reinicio de datos. Respaldo de fuente, base e imágenes: `/var/backups/red-egresados/pre-conecta-navigation-connections-20261027`.
+
+
+- Desplegado como `8ae3dd7`. Linux: build/typecheck/lint y 18 pruebas HTTP correctas. Suite adicional de 8 pruebas de sesión/datos correcta en Windows; revisión general de páginas y roles con Chrome sin errores.
+- Producción y HTTPS público: cuatro contenedores comunes, perfil/editor, administración y APIs de conexiones comprobados sin crear solicitudes ni usuarios de prueba. Manifiesto de 172 archivos validado contra la compilación Linux y la VM.
+- Todas las filas de las 19 tablas preservadas durante el corte; estado observado: 4 cuentas, 4 perfiles, 1 aporte y 6 conexiones. Imágenes y credenciales intactas, sin migraciones. Servicio activo, NRestarts=0; pre-cutover.db y compilación anterior disponibles en el respaldo.
