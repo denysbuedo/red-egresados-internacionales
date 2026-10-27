@@ -182,4 +182,9 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - El operador autoriza expresamente vaciar los datos de la red y conservar solo dinfo, sin publicaciones. Se conserva también su perfil asociado y credencial actual. Esta decisión sustituye la consulta pendiente de revalidación de cuentas históricas.
 - Implementada carga directa de imágenes y alternativa URL en aportes y noticias, con vista previa, errores y WebP optimizado. Nuevas rutas privadas /api/media, directorio persistente UPLOADS_PATH y Sharp como dependencia directa; sin migraciones.
 - Script transaccional reset-network.cjs conserva exactamente cuenta/perfil/sesiones de dinfo y migraciones, elimina los demás datos. Prueba aislada y ensayo sobre copia antes de producción.
-- Respaldo verificado: /var/backups/red-egresados/pre-conecta-uploads-reset-20261027. Implementación y reinicio en preparación; ver IMAGENES_Y_REINICIO.md.
+- Respaldo verificado: /var/backups/red-egresados/pre-conecta-uploads-reset-20261027. Implementación y reinicio completados como 5c4aa66; ver IMAGENES_Y_REINICIO.md.
+
+- Estado actual de producción tras reinicio: solo dinfo y su perfil; cero aportes/noticias/comentarios/reacciones/conexiones/grupos/eventos/notificaciones/listas. Contraseña, rol y sesiones previas de dinfo conservados exactamente. Se mantienen esquema y 18 migraciones técnicas.
+- Validación Windows/Linux: compilación, typecheck y 24 pruebas correctas; lint sin errores. Ensayo sobre copia real y reversión ante fallo comprobados. Chrome: publicar aporte y noticia con imágenes locales. Manifiesto de 165 archivos verificado contra producción.
+- Prueba pública HTTPS de imagen >1 MB correcta; almacenamiento persistente propiedad del servicio, lectura privada y logout verificados. Imágenes temporales eliminadas; no se crearon usuarios ni publicaciones de prueba en producción. Servicio activo y NRestarts=0.
+- Respaldo adicional pre-cutover.db y compilación/dependencias anteriores conservados. DNS/TLS/HAProxy/Nginx sin cambios; el límite existente de Nginx de 10 MB admite estas cargas.

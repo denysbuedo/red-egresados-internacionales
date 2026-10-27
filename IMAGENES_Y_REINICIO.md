@@ -19,3 +19,11 @@ El operador solicita vaciar los datos y conservar únicamente su cuenta `dinfo`,
 Respaldo verificado: `/var/backups/red-egresados/pre-conecta-uploads-reset-20261027`. Se toma una segunda copia `pre-cutover.db` inmediatamente antes del reinicio. El borrado se ejecuta transaccionalmente mediante `scripts/reset-network.cjs`, con nombre de cuenta y confirmación explícitos de CLI. Exige administrador aprobado, tablas conocidas e integridad válida; comprueba que la cuenta y su perfil permanezcan exactamente iguales. No exponer este procedimiento como API pública.
 
 Pruebas: vaciado sobre base aislada y copia real; conservación exacta de cuenta/perfil/sesiones/migraciones; subida válida y rechazo de acceso anónimo, cuenta pendiente, origen externo, SVG, archivo disfrazado y exceso de tamaño; imagen adjunta a noticia y lectura privada. Navegador real para publicar aporte y noticia con imagen local.
+
+## Resultado del despliegue
+
+Implementación `5c4aa66` publicada el 27 de octubre de 2026. Windows: compilación y TypeScript correctos, lint sin errores (40 advertencias), ocho pruebas unitarias y dieciséis HTTP correctas. Chrome real: aporte y noticia con imagen subida, filtros y diseño móvil correctos. Linux: npm ci, compilación y las 24 pruebas correctas; ensayo sobre copia real y prueba de reversión transaccional ante fallo. Manifiesto de 165 archivos verificado en producción.
+
+El vaciado real conserva una cuenta (`dinfo`) y su perfil exacto, contraseña, rol y sesiones previas. Quedan cero publicaciones, noticias, comentarios, reacciones, conexiones, eventos, grupos, notificaciones y listas de correo. Integridad y claves foráneas correctas. Copia adicional previa al corte: `pre-cutover.db`; compilación y dependencias anteriores preservadas en el respaldo.
+
+Verificación de producción: autenticación de dinfo y logout correctos; subida de imagen de más de 1 MB y lectura por HTTPS a través de HAProxy/Nginx; WebP almacenado por el usuario de servicio fuera del código; lectura anónima rechazada y cabecera de caché privada. No se crearon publicaciones ni cuentas de prueba en producción; las dos imágenes temporales de comprobación fueron retiradas. Servicio activo, sin reinicios inesperados.
