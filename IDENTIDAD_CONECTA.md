@@ -17,3 +17,11 @@ Se conserva el acceso para trabajadores del MES y sus instituciones, la revisió
 Comprobación local: TypeScript, lint sin errores, compilación de producción, siete pruebas unitarias y catorce HTTP. Navegador Chrome real con cuenta efímera sobre base aislada: inicio de sesión, panel, menú móvil y portada a 320, 390 y 768 píxeles. Capturas de escritorio y móvil revisadas.
 
 Respaldo de producción: `/var/backups/red-egresados/pre-conecta-brand-20261026`, archivo de fuentes y SQLite verificados por SHA-256. El despliegue utiliza una compilación Linux validada, conserva la base real y permite restaurar la compilación anterior. No requiere migraciones.
+
+## Publicación verificada
+
+Implementación `98c36c5` publicada en GitHub y VM. Compilación y 21 pruebas correctas en Linux; 156 archivos de ejecución y recursos coinciden con el manifiesto validado. Comprobada la navegación institucional con nombre largo a 1280 píxeles.
+
+Servicio activo, sin reinicios inesperados. Portada pública HTTPS 200 en https://conecta.reduniv.edu.cu/. Páginas de acceso, registro, ayuda, privacidad y recursos de marca responden 200. Administrador existente autenticado y sesión revocada al salir; API de miembros rechaza acceso anónimo.
+
+Snapshot adicional `pre-cutover.db`: todos los valores de las 19 tablas conservados. Continúan 8 cuentas, 7 perfiles, 5 aportes, 8 noticias y 8 conexiones. No se sustituyó la base real ni se crearon cuentas de prueba en producción. Compilación anterior preservada en `previous-next` dentro del respaldo. DNS, TLS y HAProxy conservan su configuración.

@@ -142,4 +142,8 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Adoptados nombre, logos originales, favicon, imagen social, colores y tipografías del paquete `diseño/`. Ver IDENTIDAD_CONECTA.md.
 - Portada institucional adaptable, login compartido, navegación y paleta privada actualizados; ayuda y privacidad reales. Código/repositorios claramente futuro.
 - Sin cambios de esquema ni datos: trabajadores solamente, aprobación institucional y cuentas históricas conservadas.
-- Windows: typecheck/build y 21 pruebas correctas; lint sin errores. Capturas y flujos en Chrome real sobre base efímera. Respaldo de VM verificado; publicación Linux en preparación.
+- Windows: typecheck/build y 21 pruebas correctas; lint sin errores. Capturas y flujos en Chrome real sobre base efímera. Respaldo de VM verificado.
+
+- Identidad desplegada como 98c36c5. Linux: compilación, typecheck y 21 pruebas correctas; lint sin errores. Manifiesto de 156 fuentes/recursos validado contra la VM. Navegación institucional con nombre largo comprobada a 1280px.
+- Producción HTTPS 200 con CONECTA; páginas públicas y logos correctos. Credencial admin vigente y logout revocado. Servicio activo, NRestarts=0.
+- Snapshot pre-cutover adicional y compilación anterior respaldados. Conservados todos los valores de las 19 tablas, incluidos usuarios, contraseñas, roles y aprobaciones; cuentas y contenido sin cambios. Sin migraciones ni modificación de DNS/TLS/HAProxy.
