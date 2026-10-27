@@ -173,3 +173,6 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - El operador rechaza expresamente la ilustración figurativa de profesionales. Se retira del banner personal; permanece la cabecera con saludo y paleta, sin cifras.
 - El operador indica reutilizar las mismas tarjetas de la portada pública. Se extrae EcosystemMosaic para compartir Personas, Ciencia, Proyectos y Código entre ambas cabeceras, con tamaño adaptado a la zona personal y móvil. Sin cifras ni nueva imagen.
 - Recurso generado conservado sin referencia en la interfaz como historial; no reutilizarlo como propuesta aprobada.
+
+- Tarjetas originales publicadas como 2cd3cb8. Navegador real: cuatro tarjetas visibles entre 320 y 1440px, sin desbordamiento ni ilustración en la cabecera. Linux: compilación/typecheck/lint y 15 pruebas HTTP correctas.
+- Producción: inicio autenticado 200 con las cuatro tarjetas, sin imagen generada ni cifras. Portada pública HTTPS 200 conservada. Manifiesto de 158 archivos verificado; todas las filas de las 19 tablas conservadas. Respaldo: /var/backups/red-egresados/pre-conecta-clean-banner-20261027.
