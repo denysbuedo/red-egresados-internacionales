@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { POST_TYPES } from "@/lib/site";
 import Link from "next/link";
 import { db } from "@/db";
@@ -27,10 +28,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   if (session?.status === "approved") await checkAndSendEventNotifications();
 
   const approvedProfiles = sql`EXISTS (SELECT 1 FROM users WHERE users.id = ${graduates.userId} AND users.status = 'approved')`;
-  const stats = db.select({ count: sql<number>`count(*)`, institutions: sql<number>`count(distinct ${graduates.university})` })
-    .from(graduates).where(approvedProfiles).get();
-  const totalMembers = stats?.count || 0;
-  const totalInstitutions = stats?.institutions || 0;
 
   // Get posts for logged-in users
   let adminPostsData: any[] = [];
@@ -88,7 +85,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   const profile = db.select({ id: graduates.id, name: graduates.name, profession: graduates.currentProfession, institution: graduates.university, employmentConfirmed: graduates.employmentConfirmed }).from(graduates).where(eq(graduates.userId, session.id)).get();
   const people = db.select({ id: graduates.id, name: graduates.name, profession: graduates.currentProfession, institution: graduates.university }).from(graduates).where(sql`${approvedProfiles} AND ${graduates.userId} != ${session.id}`).orderBy(desc(graduates.createdAt)).limit(3).all();
   const agenda = db.select({ id: events.id, title: events.title, date: events.date, type: events.type }).from(events).where(gte(events.date, new Date(nowSec * 1000))).orderBy(asc(events.date)).limit(3).all();
-  const publicationCount = db.select({ count: sql<number>`count(*)` }).from(userPosts).innerJoin(graduates, eq(userPosts.graduateId, graduates.id)).where(approvedProfiles).get()?.count ?? 0;
 
   // ============================================
   // HOME PARA USUARIOS LOGUEADOS
@@ -115,7 +111,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
             <p>Una conversación puede ser el inicio de tu próxima colaboración. Comparte lo que haces y descubre lo que nos une.</p>
             <div className="workspace-welcome-actions"><a href="#compartir" className="conecta-cta">Compartir un aporte <span aria-hidden="true">↗</span></a><Link href="/directorio" className="workspace-quiet-link">Explorar la comunidad <span aria-hidden="true">→</span></Link></div>
           </div>
-          <div className="workspace-network" aria-label="La comunidad en cifras"><span className="workspace-network-label">UNA RED, MUCHAS POSIBILIDADES</span><div><Link href="/directorio"><strong>{totalMembers}</strong><span>personas</span></Link><Link href="/directorio"><strong>{totalInstitutions}</strong><span>instituciones</span></Link><a href="#actividad"><strong>{publicationCount}</strong><span>aportes</span></a></div><p>Talento y conocimiento de la educación superior cubana.</p></div>
+          <div className="workspace-welcome-art"><Image src="/brand/conecta-colaboracion-personal.png" alt="Profesionales que construyen conocimiento en conjunto: ciencia abierta, colaboración e innovación compartida." width={1536} height={1024} sizes="(max-width: 767px) 290px, (max-width: 1199px) 40vw, 480px" priority /></div>
         </header>
         <nav className="workspace-spaces" aria-label="Explora el ecosistema">{spaces.map((space) => <Link key={space.name} href={space.href} className={selectedType && selectedType === space.type ? "workspace-space workspace-space-active" : "workspace-space"}><span className="workspace-space-symbol" aria-hidden="true">{space.symbol}</span><span><strong>{space.name}</strong><small>{space.description}</small></span><span className="workspace-space-arrow" aria-hidden="true">↗</span></Link>)}</nav>
         <div className="workspace-grid">

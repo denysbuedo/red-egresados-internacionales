@@ -33,3 +33,7 @@ Inicio privado rediseñado con la misma identidad: cabecera personal, cifras de 
 Diseño comprobado entre 320 y 1440 píxeles con estados vacíos y contenido. Navegador real: entrar, desplegar formulario, publicar y filtrar aportes. Se conserva la portada pública y el esquema de datos. Prueba HTTP adicional cubre eventos futuros, acceso aprobado y ausencia de información privada en los resúmenes.
 
 Interior publicado como `aa76efb`: 22 pruebas y compilación Linux correctas, 156 archivos de ejecución verificados. Inicio autenticado 200, acceso administrador y logout verificados en producción; portada pública HTTPS conservada. Todas las filas de las 19 tablas se conservaron al cambiar la compilación. Respaldo específico: `/var/backups/red-egresados/pre-conecta-workspace-20261026`.
+
+## Cabecera personal ilustrada — 27 de octubre
+
+A petición del operador, las cifras salen del banner personal. Su lugar lo ocupa una ilustración original de colaboración, conocimiento compartido y ciencia abierta, integrada en la paleta institucional y adaptada a móvil. Se retiran las consultas de agregación que solo alimentaban esas cifras. Archivo y prompt documentados en [ilustracion-cabecera.md](diseño/07_Desarrollo/ilustracion-cabecera.md). No cambia el contenido ni los permisos del resto del espacio de trabajo.
