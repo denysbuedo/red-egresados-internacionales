@@ -147,3 +147,10 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Identidad desplegada como 98c36c5. Linux: compilación, typecheck y 21 pruebas correctas; lint sin errores. Manifiesto de 156 fuentes/recursos validado contra la VM. Navegación institucional con nombre largo comprobada a 1280px.
 - Producción HTTPS 200 con CONECTA; páginas públicas y logos correctos. Credencial admin vigente y logout revocado. Servicio activo, NRestarts=0.
 - Snapshot pre-cutover adicional y compilación anterior respaldados. Conservados todos los valores de las 19 tablas, incluidos usuarios, contraseñas, roles y aprobaciones; cuentas y contenido sin cambios. Sin migraciones ni modificación de DNS/TLS/HAProxy.
+
+## Interior de CONECTA — 2026-10-26
+
+- Inicio privado convertido en espacio de trabajo profesional: cabecera personal, métricas reales, accesos temáticos, perfil y navegación por rol; actividad central y formulario desplegable.
+- Descubrimiento basado en datos existentes: perfiles aprobados sin contactos privados, próximos eventos y resumen de noticias. Sin recomendaciones algorítmicas ni contenido de demostración en producción.
+- Windows: typecheck/build y 15 pruebas HTTP correctas; lint sin errores (42 advertencias existentes). Chrome: publicar y filtrar, estados vacíos/con contenido, tamaños 320–1440px sin desbordamiento.
+- Respaldo verificado en /var/backups/red-egresados/pre-conecta-workspace-20261026. Despliegue Linux en preparación; sin migración ni cambios de cuentas.

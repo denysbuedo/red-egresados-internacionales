@@ -1,11 +1,9 @@
-import { BrandLogo } from "@/components/BrandLogo";
 import { POST_TYPES } from "@/lib/site";
 import Link from "next/link";
 import { db } from "@/db";
-import { graduates, adminPosts, userPosts } from "@/db/schema";
-import { sql, desc, eq } from "drizzle-orm";
+import { graduates, adminPosts, userPosts, events } from "@/db/schema";
+import { sql, desc, eq, asc, gte } from "drizzle-orm";
 import { getSession } from "@/lib/session";
-import { AdminPostCard } from "@/components/AdminPostCard";
 import { CreatePost } from "@/components/CreatePost";
 import { UserPostCard } from "@/components/UserPostCard";
 import { PublicLanding } from "@/components/PublicLanding";
@@ -87,6 +85,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   // eslint-disable-next-line react-hooks/purity
   const nowSec = Math.floor(Date.now() / 1000);
 
+  const profile = db.select({ id: graduates.id, name: graduates.name, profession: graduates.currentProfession, institution: graduates.university, employmentConfirmed: graduates.employmentConfirmed }).from(graduates).where(eq(graduates.userId, session.id)).get();
+  const people = db.select({ id: graduates.id, name: graduates.name, profession: graduates.currentProfession, institution: graduates.university }).from(graduates).where(sql`${approvedProfiles} AND ${graduates.userId} != ${session.id}`).orderBy(desc(graduates.createdAt)).limit(3).all();
+  const agenda = db.select({ id: events.id, title: events.title, date: events.date, type: events.type }).from(events).where(gte(events.date, new Date(nowSec * 1000))).orderBy(asc(events.date)).limit(3).all();
+  const publicationCount = db.select({ count: sql<number>`count(*)` }).from(userPosts).innerJoin(graduates, eq(userPosts.graduateId, graduates.id)).where(approvedProfiles).get()?.count ?? 0;
+
   // ============================================
   // HOME PARA USUARIOS LOGUEADOS
   // ============================================
@@ -95,167 +98,47 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
       if (!p.pinnedUntil) return false;
       return p.pinnedUntil >= nowSec;
     });
-    const regular = adminPostsData.filter((p) => {
-      if (!p.pinnedUntil) return true;
-      return p.pinnedUntil < nowSec;
-    });
 
-    return (
-      <main className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Sidebar */}
-            <aside className="lg:w-72 shrink-0 space-y-6">
-              {/* Welcome Card */}
-              <div className="bg-[#102B46] rounded-xl p-6 text-white">
-                <BrandLogo inverse className="mb-5 max-w-[150px]" />
-                <h2 className="text-lg font-bold mb-1">¡Hola, {session?.username}!</h2>
-                <p className="text-sm text-blue-200">CONECTA</p>
-              </div>
-
-              {/* Stats */}
-              <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Estadísticas</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Miembros</span>
-                    <span className="text-xl font-bold text-[#102B46]">{totalMembers}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Instituciones</span>
-                    <span className="text-xl font-bold text-[#102B46]">{totalInstitutions}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Links */}
-              <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Accesos Rápidos</h3>
-                <div className="space-y-1">
-                  <Link href="/directorio" className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">📋 Directorio</Link>
-                  <Link href="/conexiones" className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">🤝 Conexiones</Link>
-                  {userGraduateId && (
-                    <Link href={`/miembros/${userGraduateId}`} className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">👤 Mi Perfil</Link>
-                  )}
-                  <Link href="/eventos" className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">📅 Eventos</Link>
-                  <Link href="/comunidades" className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">👥 Comunidades</Link>
-                  {session?.role === 'admin' && (
-                    <Link href="/admin" className="block px-3 py-2 text-sm text-purple-700 hover:bg-purple-50 rounded-lg transition-colors">🛡️ Panel Admin</Link>
-                  )}
-                </div>
-              </div>
-            </aside>
-
-            {/* Main Content */}
-            <div className="flex-1 min-w-0 space-y-6">
-              {/* Create Post */}
-              <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
-                {userGraduateId ? <CreatePost /> : <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900">Completa tu perfil profesional</h2>
-                  <p className="mt-2 text-sm text-gray-600">Indica tu institución y actividad laboral para compartir resultados y participar en conversaciones profesionales.</p>
-                  <Link href="/miembros/registro" className="mt-4 inline-block font-semibold text-blue-800 underline">Crear mi perfil</Link>
-                </div>}
-              </div>
-
-              {/* Pinned News */}
-              {pinned.length > 0 && (
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                    Noticias Destacadas
-                  </h2>
-                  <div className="space-y-4">
-                    {pinned.map((post) => (
-                      <div key={post.id} className="border-2 border-red-200 bg-red-50/30 rounded-xl overflow-hidden">
-                        <AdminPostCard
-                          key={post.id}
-                          id={post.id}
-                          title={post.title}
-                          content={post.content}
-                          imageUrl={post.imageUrl}
-                          authorName={post.authorName}
-                          createdAt={post.createdAt}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Activity Feed */}
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Actividad profesional y académica</h2>
-                <div className="mb-5 flex flex-wrap gap-2" aria-label="Tipos de aportes">
-                  <Link href="/" aria-current={!selectedType ? "page" : undefined} className={`rounded-full border px-3 py-1.5 text-sm ${!selectedType ? "border-blue-800 bg-blue-800 text-white" : "border-gray-200 bg-white text-gray-700"}`}>Todos</Link>
-                  {POST_TYPES.map((type) => <Link key={type.value} href={`/?type=${type.value}`} aria-current={selectedType === type.value ? "page" : undefined}
-                    className={`rounded-full border px-3 py-1.5 text-sm ${selectedType === type.value ? "border-blue-800 bg-blue-800 text-white" : "border-gray-200 bg-white text-gray-700"}`}>{type.label}</Link>)}
-                </div>
-                {userPostsData.length > 0 ? (
-                  <div className="space-y-4">
-                    {userPostsData.map((post) => (
-                      <UserPostCard
-                        key={post.id}
-                        id={post.id}
-                        content={post.content}
-                        imageUrl={post.imageUrl}
-                        postType={post.postType}
-                        referenceUrl={post.referenceUrl}
-                        likes={post.likes}
-                        commentsCount={post.commentsCount}
-                        createdAt={post.createdAt}
-                        graduateId={post.graduateId}
-                        graduateName={post.graduateName}
-                        graduatePhoto={post.graduatePhoto}
-                        graduateProfession={post.graduateProfession}
-                        graduateCountry={post.graduateCountry}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-                    <p className="text-gray-500">Aún no hay aportes en esta sección. Comparte un resultado, un proyecto o una oportunidad de colaboración.</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Regular News */}
-              {regular.length > 0 && (
-                <div className="pt-6 border-t border-gray-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-gray-900">Noticias</h2>
-                    {session?.role === 'admin' && (
-                      <Link href="/admin/posts/new" className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
-                        + Nueva Noticia
-                      </Link>
-                    )}
-                  </div>
-                  <div className="grid gap-6">
-                    {regular.map((post) => (
-                      <AdminPostCard
-                        key={post.id}
-                        id={post.id}
-                        title={post.title}
-                        content={post.content}
-                        imageUrl={post.imageUrl}
-                        authorName={post.authorName}
-                        createdAt={post.createdAt}
-                      />
-                    ))}
-                  </div>
-                  <div className="text-center mt-4">
-                    <Link href="/noticias" className="text-[#102B46] hover:underline text-sm font-medium">
-                      Ver todas las noticias →
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
+    const news = [...pinned, ...adminPostsData.filter((post) => !pinned.includes(post))].slice(0, 3);
+    const spaces = [
+      { symbol: "◎", name: "Personas", description: "Encuentra talento y afinidades", href: "/directorio", type: undefined },
+      { symbol: "◇", name: "Ciencia", description: "Resultados que abren conversaciones", href: "/?type=publication", type: "publication" },
+      { symbol: "▦", name: "Proyectos", description: "Ideas para construir en conjunto", href: "/?type=project", type: "project" },
+      { symbol: "↗", name: "Oportunidades", description: "Convocatorias y colaboración", href: "/?type=call", type: "call" },
+    ];
+    return <main className="conecta-workspace">
+      <div className="workspace-wrap">
+        <header className="workspace-welcome">
+          <div className="workspace-welcome-copy">
+            <p className="conecta-eyebrow">TU ESPACIO EN CONECTA</p>
+            <h1>Hola, {profile?.name.split(" ")[0] || session.username}.<br /><span>El conocimiento nos conecta.</span></h1>
+            <p>Una conversación puede ser el inicio de tu próxima colaboración. Comparte lo que haces y descubre lo que nos une.</p>
+            <div className="workspace-welcome-actions"><a href="#compartir" className="conecta-cta">Compartir un aporte <span aria-hidden="true">↗</span></a><Link href="/directorio" className="workspace-quiet-link">Explorar la comunidad <span aria-hidden="true">→</span></Link></div>
           </div>
+          <div className="workspace-network" aria-label="La comunidad en cifras"><span className="workspace-network-label">UNA RED, MUCHAS POSIBILIDADES</span><div><Link href="/directorio"><strong>{totalMembers}</strong><span>personas</span></Link><Link href="/directorio"><strong>{totalInstitutions}</strong><span>instituciones</span></Link><a href="#actividad"><strong>{publicationCount}</strong><span>aportes</span></a></div><p>Talento y conocimiento de la educación superior cubana.</p></div>
+        </header>
+        <nav className="workspace-spaces" aria-label="Explora el ecosistema">{spaces.map((space) => <Link key={space.name} href={space.href} className={selectedType && selectedType === space.type ? "workspace-space workspace-space-active" : "workspace-space"}><span className="workspace-space-symbol" aria-hidden="true">{space.symbol}</span><span><strong>{space.name}</strong><small>{space.description}</small></span><span className="workspace-space-arrow" aria-hidden="true">↗</span></Link>)}</nav>
+        <div className="workspace-grid">
+          <aside className="workspace-left" aria-label="Tu espacio profesional">
+            <section className="workspace-panel workspace-profile"><div className="workspace-profile-cover" /><div className="workspace-profile-body"><span className="workspace-avatar" aria-hidden="true">{(profile?.name || session.username).split(" ").map((part) => part[0]).slice(0, 2).join("")}</span><p className="workspace-kicker">MI ESPACIO PROFESIONAL</p><h2>{profile?.name || session.username}</h2><p>{profile?.profession || "Tu trayectoria tiene un lugar aquí."}</p>{profile?.institution && <p className="workspace-profile-institution">{profile.institution}</p>}<Link href={userGraduateId ? `/miembros/${userGraduateId}` : "/miembros/registro"} className="workspace-profile-link">{userGraduateId ? "Ver mi perfil" : "Crear mi perfil"} <span aria-hidden="true">↗</span></Link></div></section>
+            {profile && !profile.employmentConfirmed && <section className="workspace-affiliation"><span className="workspace-kicker">TU VÍNCULO INSTITUCIONAL</span><h2>Completa tu información laboral</h2><p>Actualiza tu institución y actividad profesional para solicitar la validación de tu vínculo.</p><Link href="/completar-perfil">Actualizar mi vínculo <span aria-hidden="true">→</span></Link></section>}
+            <nav className="workspace-panel workspace-shortcuts" aria-label="Mis accesos"><h2>Mi comunidad</h2><Link href="/conexiones"><span aria-hidden="true">◎</span> Mis conexiones <span aria-hidden="true">↗</span></Link><Link href="/comunidades"><span aria-hidden="true">◉</span> Comunidades <span aria-hidden="true">↗</span></Link><Link href="/eventos"><span aria-hidden="true">▦</span> Eventos <span aria-hidden="true">↗</span></Link>{session.role === "admin" && <Link href="/admin"><span aria-hidden="true">◇</span> Administración <span aria-hidden="true">↗</span></Link>}{session.role === "institution" && <Link href="/institucion"><span aria-hidden="true">◇</span> Mi institución <span aria-hidden="true">↗</span></Link>}{session.role === "editor" && <Link href="/admin/posts"><span aria-hidden="true">◇</span> Gestionar noticias <span aria-hidden="true">↗</span></Link>}</nav>
+            <div className="workspace-smallprint"><span>CONECTA · MES · RedUniv</span><Link href="/ayuda">Ayuda</Link><Link href="/privacidad">Privacidad</Link></div>
+          </aside>
+          <div className="workspace-center">
+            <section id="compartir" className="workspace-composer" aria-label="Compartir conocimiento">{userGraduateId ? <details><summary><span className="workspace-composer-icon" aria-hidden="true">＋</span><span><strong>¿En qué estás trabajando?</strong><small>Comparte un resultado, una idea o una pregunta.</small></span><span className="workspace-compose-action">Crear aporte <span aria-hidden="true">↗</span></span></summary><CreatePost /></details> : <div className="workspace-create-profile"><h2>Tu experiencia suma a la red</h2><p>Crea tu perfil profesional para compartir resultados y participar en las conversaciones.</p><Link href="/miembros/registro" className="workspace-inline-link">Crear mi perfil →</Link></div>}</section>
+            <section id="actividad" className="workspace-activity"><div className="workspace-section-heading"><div><p className="workspace-kicker">CONOCIMIENTO EN MOVIMIENTO</p><h2>Actividad profesional y académica</h2></div><span className="workspace-live-dot">Reciente</span></div><nav className="workspace-filters" aria-label="Tipos de aportes"><Link href="/#actividad" aria-current={!selectedType ? "page" : undefined}>Todos</Link>{POST_TYPES.map((type) => <Link key={type.value} href={`/?type=${type.value}#actividad`} aria-current={selectedType === type.value ? "page" : undefined}>{type.label}</Link>)}</nav>
+              {userPostsData.length ? <div className="workspace-posts">{userPostsData.map((post) => <UserPostCard key={post.id} {...post} />)}</div> : <div className="workspace-empty"><span aria-hidden="true">◇</span><h3>La próxima conversación puede empezar contigo.</h3><p>{selectedType ? "Todavía no hay aportes de este tipo. Comparte un resultado o explora el resto de la actividad." : "Comparte un resultado, plantea una consulta o presenta una iniciativa. Tu experiencia puede conectar con la de alguien más."}</p><a href="#compartir" className="workspace-inline-link">Compartir conocimiento →</a>{selectedType && <Link href="/#actividad">Ver todos los aportes</Link>}</div>}
+            </section>
+          </div>
+          <aside className="workspace-right" aria-label="Descubre la comunidad">
+            <section className="workspace-panel workspace-discover"><div className="workspace-panel-heading"><span className="workspace-kicker">AMPLÍA TU RED</span><h2>Personas de la comunidad</h2></div>{people.length ? people.map((person) => <Link href={`/miembros/${person.id}`} className="workspace-person" key={person.id}><span className="workspace-person-avatar" aria-hidden="true">{person.name.split(" ").map((part) => part[0]).slice(0, 2).join("")}</span><span><strong>{person.name}</strong><small>{person.profession || person.institution}</small></span><span aria-hidden="true">↗</span></Link>) : <p className="workspace-panel-empty">A medida que se incorporen miembros, podrás descubrir sus perfiles aquí.</p>}<Link href="/directorio" className="workspace-panel-footer">Explorar personas <span aria-hidden="true">→</span></Link></section>
+            <section className="workspace-panel workspace-agenda"><div className="workspace-panel-heading"><span className="workspace-kicker">NOS ENCONTRAMOS</span><h2>En agenda</h2></div>{agenda.length ? agenda.map((event) => <Link href={`/eventos/${event.id}`} className="workspace-event" key={event.id}><time dateTime={event.date.toISOString()}><strong>{event.date.toLocaleDateString("es-CU", { day: "2-digit", timeZone: "America/Havana" })}</strong><span>{event.date.toLocaleDateString("es-CU", { month: "short", timeZone: "America/Havana" })}</span></time><span><strong>{event.title}</strong><small>{event.type === "virtual" ? "Encuentro virtual" : "Encuentro presencial"}</small></span></Link>) : <p className="workspace-panel-empty">No hay próximos eventos publicados. Consulta los encuentros de la comunidad.</p>}<Link href="/eventos" className="workspace-panel-footer">Ver eventos <span aria-hidden="true">→</span></Link></section>
+            <section className="workspace-panel workspace-news"><div className="workspace-panel-heading"><span className="workspace-kicker">ACTUALIDAD INSTITUCIONAL</span><h2>En la red</h2></div>{news.length ? news.map((post) => <Link href="/noticias" className="workspace-news-item" key={post.id}>{pinned.includes(post) && <span className="workspace-news-pinned">Destacado</span>}<h3>{post.title}</h3><p>{post.content.slice(0, 100)}{post.content.length > 100 ? "…" : ""}</p></Link>) : <p className="workspace-panel-empty">Las novedades institucionales aparecerán aquí cuando se publiquen.</p>}<Link href="/noticias" className="workspace-panel-footer">Todas las noticias <span aria-hidden="true">→</span></Link></section>
+          </aside>
         </div>
-      </main>
-    );
+      </div>
+    </main>;
   }
 
   // ============================================

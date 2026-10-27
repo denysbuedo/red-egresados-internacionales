@@ -25,3 +25,9 @@ Implementación `98c36c5` publicada en GitHub y VM. Compilación y 21 pruebas co
 Servicio activo, sin reinicios inesperados. Portada pública HTTPS 200 en https://conecta.reduniv.edu.cu/. Páginas de acceso, registro, ayuda, privacidad y recursos de marca responden 200. Administrador existente autenticado y sesión revocada al salir; API de miembros rechaza acceso anónimo.
 
 Snapshot adicional `pre-cutover.db`: todos los valores de las 19 tablas conservados. Continúan 8 cuentas, 7 perfiles, 5 aportes, 8 noticias y 8 conexiones. No se sustituyó la base real ni se crearon cuentas de prueba en producción. Compilación anterior preservada en `previous-next` dentro del respaldo. DNS, TLS y HAProxy conservan su configuración.
+
+## Espacio de trabajo después de entrar
+
+Inicio privado rediseñado con la misma identidad: cabecera personal, cifras de miembros aprobados y aportes reales; accesos a personas, ciencia, proyectos y convocatorias; perfil propio y accesos según rol. Formulario de aporte desplegable y actividad central con filtros. Columna de descubrimiento con hasta tres perfiles aprobados, tres próximos eventos y tres noticias institucionales, priorizando las destacadas. Sin contactos privados en los resúmenes ni datos ficticios.
+
+Diseño comprobado entre 320 y 1440 píxeles con estados vacíos y contenido. Navegador real: entrar, desplegar formulario, publicar y filtrar aportes. Se conserva la portada pública y el esquema de datos. Prueba HTTP adicional cubre eventos futuros, acceso aprobado y ausencia de información privada en los resúmenes.

@@ -1,4 +1,4 @@
-# Contexto de producto: Red MES
+# Contexto de producto: CONECTA
 
 La red atiende primero a trabajadores del Ministerio de Educación Superior y de
 sus instituciones. El registro de estudiantes queda para una posible fase futura.
@@ -19,3 +19,7 @@ del operador y un flujo para completar y validar el vínculo laboral.
 La siguiente evolución puede ofrecer bibliografía estructurada, ORCID/DOI,
 repositorio de documentos, proyectos con equipos y búsqueda por líneas de
 investigación. Esas funciones no se presentan como completadas en esta fase.
+
+El inicio privado se organiza como espacio de trabajo: descubrir personas y capacidades,
+compartir aportes por tipo, consultar agenda y actualidad institucional. Evitar métricas
+ficticias, rankings de popularidad y funciones simuladas; los bloques usan datos reales.

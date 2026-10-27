@@ -247,3 +247,23 @@ test("CONECTA identity, logos, metadata and public links match the supplied kit"
   assert.deepEqual(Buffer.from(await logo.arrayBuffer()),fs.readFileSync('diseño/01_Logotipos/SVG/conecta-logo-principal.svg'));
   const icon=await call('/brand/favicon.svg'); assert.equal(icon.status,200);
 });
+
+test("workspace shows real upcoming events and approved people without exposing private contact data", async () => {
+  const future=Math.floor(Date.now()/1000)+86400*20, past=future-86400*40;
+  const insert=db.prepare("INSERT INTO events (title,description,date,type,organizer_id) VALUES (?, 'Encuentro de prueba', ?, 'virtual', 2)");
+  const upcoming=insert.run('Workspace future event',future).lastInsertRowid;
+  const expired=insert.run('Workspace past event',past).lastInsertRowid;
+  try {
+    const response=await call('/',{cookie:cookies.institution});assert.equal(response.status,200);
+    const html=await response.text();
+    assert.ok(html.includes('TU ESPACIO EN CONECTA'));
+    assert.ok(html.includes('Workspace future event'));assert.ok(!html.includes('Workspace past event'));
+    assert.ok(html.includes('Personas de la comunidad'));assert.ok(html.includes('other'));
+    assert.ok(!html.includes('othercampus@example.test'));assert.ok(!html.includes('other@example.test'));
+    assert.ok(html.includes('Mi institución'));assert.ok(html.includes('Actualizar mi vínculo'));
+    assert.ok(!html.includes('href="/admin"'));
+    const anonymous=await (await call('/')).text();assert.ok(!anonymous.includes('Workspace future event'));
+    const pending=await call('/',{cookie:cookies.otherPending});assert.equal(pending.status,200);
+    assert.ok(!(await pending.text()).includes('TU ESPACIO EN CONECTA'));
+  } finally { db.prepare('DELETE FROM events WHERE id IN (?,?)').run(upcoming,expired); }
+});
