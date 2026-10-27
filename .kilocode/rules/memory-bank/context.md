@@ -153,4 +153,7 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Inicio privado convertido en espacio de trabajo profesional: cabecera personal, métricas reales, accesos temáticos, perfil y navegación por rol; actividad central y formulario desplegable.
 - Descubrimiento basado en datos existentes: perfiles aprobados sin contactos privados, próximos eventos y resumen de noticias. Sin recomendaciones algorítmicas ni contenido de demostración en producción.
 - Windows: typecheck/build y 15 pruebas HTTP correctas; lint sin errores (42 advertencias existentes). Chrome: publicar y filtrar, estados vacíos/con contenido, tamaños 320–1440px sin desbordamiento.
-- Respaldo verificado en /var/backups/red-egresados/pre-conecta-workspace-20261026. Despliegue Linux en preparación; sin migración ni cambios de cuentas.
+- Respaldo verificado en /var/backups/red-egresados/pre-conecta-workspace-20261026. Desplegado como aa76efb; sin migración ni cambios de cuentas.
+
+- Linux: typecheck, lint sin errores, build y 22 pruebas correctas (7 unitarias, 15 HTTP). Producción: inicio autenticado 200, administrador y cierre de sesión verificados; portada pública HTTPS conservada.
+- Manifiesto de 156 archivos coincide con la versión validada. Todas las filas de las 19 tablas conservadas durante el corte; servicio activo y sin reinicios inesperados. Respaldo de compilación y snapshot pre-cutover disponibles.
