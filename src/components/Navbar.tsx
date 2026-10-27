@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 interface User {
@@ -32,6 +32,8 @@ export function Navbar() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const pendingSequence = useRef(0);
+  const notificationSequence = useRef(0);
   const [pendingCount, setPendingCount] = useState(0);
   const [notifCount, setNotifCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -55,11 +57,12 @@ export function Navbar() {
   }
 
   async function fetchPendingCount() {
+    const version = ++pendingSequence.current;
     try {
       const response = await fetch("/api/connections");
       if (response.ok) {
         const data = await response.json();
-        setPendingCount(data.pendingCount || 0);
+        if (version === pendingSequence.current) setPendingCount(data.pendingCount || 0);
       }
     } catch (error) {
       console.error("Error fetching pending count:", error);
@@ -67,11 +70,13 @@ export function Navbar() {
   }
 
   async function fetchNotifications() {
+    const version = ++notificationSequence.current;
     try {
       // Get all notifications, not just unread
       const response = await fetch("/api/notifications");
       if (response.ok) {
         const data = await response.json();
+        if (version !== notificationSequence.current) return;
         setNotifications(data);
         setNotifCount(data.filter((n: Notification) => n.read === 0).length);
       }
@@ -129,14 +134,11 @@ export function Navbar() {
     fetchPendingCount();
     fetchNotifications();
 
-    // Refrescar datos cada 30 segundos
-    const interval = setInterval(() => {
-      fetchPendingCount();
-      fetchNotifications();
-      router.refresh();
-    }, 30000);
-
-    return () => clearInterval(interval);
+    const refresh = () => { void fetchPendingCount(); void fetchNotifications(); };
+    const interval = setInterval(refresh, 30000);
+    window.addEventListener("conecta:connections-changed", refresh);
+    window.addEventListener("focus", refresh);
+    return () => { clearInterval(interval); window.removeEventListener("conecta:connections-changed", refresh); window.removeEventListener("focus", refresh); };
   }, []);
 
 
@@ -151,30 +153,13 @@ export function Navbar() {
           </Link>
 
           <div className="hidden xl:flex items-center gap-1">
-            <NavLink href="/">Inicio</NavLink>
-            {user && <NavLink href="/directorio">Personas</NavLink>}
-            {user && <NavLink href="/?type=publication">Ciencia</NavLink>}
-            {user && <NavLink href="/?type=project">Proyectos</NavLink>}
-            {user && user.role === "institution" && (
-              <NavLink href="/institucion">
-                <span className="flex items-center gap-1">🏛️ Mi institución</span>
-              </NavLink>
-            )}
-            {user && <NavLink href="/eventos">Eventos</NavLink>}
-            {user && <NavLink href="/noticias">Noticias</NavLink>}
+            {!user && <NavLink href="/">Inicio</NavLink>}
             {user && <NavLink href="/comunidades">Comunidades</NavLink>}
-            {user && (
-              <NavLink href="/conexiones">
-                <div className="flex items-center gap-1.5">
-                  <span>Conexiones</span>
-                  {pendingCount > 0 && (
-                    <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
-                      {pendingCount}
-                    </span>
-                  )}
-                </div>
-              </NavLink>
-            )}
+            {user && <NavLink href="/eventos">Eventos</NavLink>}
+            {user && <NavLink href="/directorio">Directorio</NavLink>}
+            {user && <NavLink href="/conexiones"><span className="flex items-center gap-1.5">Conexiones{pendingCount > 0 && <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">{pendingCount}</span>}</span></NavLink>}
+            {user && <NavLink href="/noticias">Noticias</NavLink>}
+            {user?.role === "institution" && <NavLink href="/institucion">Mi institución</NavLink>}
 
             {user && (
               <div className="relative">
@@ -372,19 +357,9 @@ export function Navbar() {
         {isOpen && (
           <div className="xl:hidden pb-4 border-t border-gray-200 pt-2">
             <div className="flex flex-col gap-1">
-              <MobileNavLink href="/" onClick={() => setIsOpen(false)}>
-                Inicio
-              </MobileNavLink>
-              {user && <MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Personas</MobileNavLink>}
-              {user && <MobileNavLink href="/?type=publication" onClick={() => setIsOpen(false)}>Ciencia</MobileNavLink>}
-              {user && <MobileNavLink href="/?type=project" onClick={() => setIsOpen(false)}>Proyectos</MobileNavLink>}
-              {user && <MobileNavLink href="/conexiones" onClick={() => setIsOpen(false)}>🤝 Conexiones</MobileNavLink>}
-              {user && user.role === "institution" && (
-                <MobileNavLink href="/institucion" onClick={() => setIsOpen(false)}>🏛️ Mi institución</MobileNavLink>
-              )}
-              {user && <MobileNavLink href="/eventos" onClick={() => setIsOpen(false)}>Eventos</MobileNavLink>}
-              {user && <MobileNavLink href="/noticias" onClick={() => setIsOpen(false)}>Noticias</MobileNavLink>}
-              {user && <MobileNavLink href="/comunidades" onClick={() => setIsOpen(false)}>Comunidades</MobileNavLink>}
+              {!user && <MobileNavLink href="/" onClick={() => setIsOpen(false)}>Inicio</MobileNavLink>}
+              {user && <><MobileNavLink href="/comunidades" onClick={() => setIsOpen(false)}>Comunidades</MobileNavLink><MobileNavLink href="/eventos" onClick={() => setIsOpen(false)}>Eventos</MobileNavLink><MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Directorio</MobileNavLink><MobileNavLink href="/conexiones" onClick={() => setIsOpen(false)}>Conexiones{pendingCount > 0 ? ` (${pendingCount})` : ""}</MobileNavLink><MobileNavLink href="/noticias" onClick={() => setIsOpen(false)}>Noticias</MobileNavLink></>}
+              {user?.role === "institution" && <MobileNavLink href="/institucion" onClick={() => setIsOpen(false)}>Mi institución</MobileNavLink>}
 
               {user ? (
                 <>

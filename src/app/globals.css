@@ -480,3 +480,25 @@ nav.sticky a[aria-current=page] { background:#E8FAF6; color:#155D59; }
 .ui-admin-topline>span:last-child { max-width:35%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .ui-event-banner { background:#E8FAF6; color:#155D59; border-bottom:1px solid #CFE7E3; }
 @media(max-width:767px) { .ui-event-banner>div { gap:12px; flex-wrap:wrap; } .ui-event-banner .text-lg { font-size:15px; } }
+
+/* Stable community layout and invitation feedback. */
+html { scrollbar-gutter:stable; }
+.ui-primary-content { width:100%; max-width:1280px; margin-inline:auto; }
+.connection-action { display:flex; flex-direction:column; gap:8px; min-width:0; min-height:42px; }
+.connection-action-compact { width:100%; }
+.connection-primary,.connection-state { display:flex; align-items:center; justify-content:center; gap:12px; min-height:40px; padding:10px 14px; border:1px solid transparent; border-radius:9px; font-size:12px; font-weight:600; text-align:center; line-height:1.5; }
+.connection-primary { background:#102B46; color:white; }
+.connection-primary:hover { background:#0C1D30; }
+.connection-primary:disabled,.connection-secondary:disabled { opacity:.6; cursor:wait; }
+.connection-checking { background:#EDF4F8; color:#637A8D; }
+.connection-state { background:#E8FAF6; border-color:#CFE7E3; color:#155D59; }
+.connection-state a { margin-left:auto; font-size:10px; text-decoration:underline; }
+.connection-secondary { color:#4B6278; font-size:11px; font-weight:550; text-align:center; padding:3px 8px; }
+.connection-secondary:hover { color:#102B46; text-decoration:underline; }
+.connection-error { font-size:11px; line-height:1.8; color:#A52F37; padding:9px 11px; background:#FFF4F4; border:1px solid #F1D2D4; border-radius:8px; }
+.connection-error p { overflow-wrap:anywhere; }
+.connection-error button { margin-top:7px; }
+.connection-page-error { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:15px 19px; margin-bottom:20px; border-radius:10px; background:#FFF4F4; border:1px solid #F1D2D4; color:#A52F37; font-size:12px; }
+.connection-page-error button { text-decoration:underline; font-weight:600; }
+.connection-page-success { padding:15px 19px; margin-bottom:20px; border-radius:10px; background:#E8FAF6; border:1px solid #BFE6DC; color:#155D59; font-size:12px; }
+.connection-tab-count { display:inline-flex; align-items:center; justify-content:center; min-width:20px; padding:1px 5px; margin-left:3px; border-radius:5px; background:#EDF4F8; color:#4B6278; font-size:10px; }

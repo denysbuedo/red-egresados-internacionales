@@ -97,7 +97,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
 
     const news = [...pinned, ...adminPostsData.filter((post) => !pinned.includes(post))].slice(0, 3);
     const spaces = [
-      { symbol: "◎", name: "Personas", description: "Encuentra talento y afinidades", href: "/directorio", type: undefined },
+      { symbol: "◎", name: "Directorio", description: "Encuentra talento y afinidades", href: "/directorio", type: undefined },
       { symbol: "◇", name: "Ciencia", description: "Resultados que abren conversaciones", href: "/?type=publication", type: "publication" },
       { symbol: "▦", name: "Proyectos", description: "Ideas para construir en conjunto", href: "/?type=project", type: "project" },
       { symbol: "↗", name: "Oportunidades", description: "Convocatorias y colaboración", href: "/?type=call", type: "call" },

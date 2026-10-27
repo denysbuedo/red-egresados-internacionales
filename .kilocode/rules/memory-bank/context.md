@@ -210,3 +210,14 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Linux: build/typecheck/lint y 17 pruebas HTTP correctas. 44 vistas y variantes comprobadas con Chrome, incluidos miembros regulares y estados vacíos, sin desbordamiento entre 320–1440px.
 - HTTPS real: diseño compartido en público/comunidad/gestión; perfil y editor propios disponibles; admin y logout verificados. Manifiesto de 171 archivos coincide con la compilación validada.
 - Conservados todos los valores de las 19 tablas durante el corte y las imágenes persistentes. Estado observado: 4 cuentas, 4 perfiles, 1 aporte y 6 conexiones. Snapshot pre-cutover y compilación anterior respaldados. Servicio activo y NRestarts=0; sin pruebas con datos nuevos en producción.
+
+
+## Navegación y solicitudes de conexión — 2026-10-27
+
+- Cabecera privada: Comunidades, Eventos, Directorio y Conexiones, seguidas de Noticias y acceso institucional cuando corresponde. Retirados los enlaces redundantes Ciencia/Proyectos; el logo conserva acceso al inicio. Mismo orden en móvil. «Personas» pasa a «Directorio» en accesos y migas; tarjetas decorativas aprobadas sin cambios.
+- Las cuatro páginas principales comparten un contenedor adaptable de máximo 1280 px y márgenes/padding iguales. Gutter estable de desplazamiento para evitar saltos horizontales al cambiar de sección.
+- Unificados botones del directorio y perfil en ConnectionAction: estado devuelto por servidor, bloqueo inmediato de doble clic, protección frente a respuestas GET atrasadas, errores inline y reintentos. Aceptación desde el perfil actualiza la vista protegida.
+- Servicio SQLite transaccional para enviar/aceptar/rechazar/cancelar: reintentos idempotentes, reutilización de solicitudes rechazadas respetando UNIQUE(sender_id,receiver_id), solicitudes cruzadas coherentes y una sola notificación de aceptación. Lecturas canónicas por pareja sin limpieza masiva de datos históricos.
+- Conexiones carga las tres pestañas juntas y actualiza en segundo plano; el header actualiza contadores sin refrescar toda la página cada 30 segundos. Contador pendiente incluye solo invitaciones recibidas.
+- Windows: build y 18 pruebas HTTP correctas; lint sin errores (38 advertencias existentes). Chrome con dos cuentas: envío/aceptación, respuesta atrasada y reintento tras fallo; ancho idéntico en cuatro rutas a 320/390/768/1024/1440 px, sin overflow ni errores JS.
+- Respaldo previo verificado en /var/backups/red-egresados/pre-conecta-navigation-connections-20261027. Conservar cuentas, aportes e imágenes actuales; no ejecutar el reinicio histórico.

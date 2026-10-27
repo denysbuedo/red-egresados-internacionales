@@ -2,9 +2,10 @@
 
 import { PageHeader } from "@/components/PageHeader";
 
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { announceConnectionChange } from "@/components/ConnectionAction";
 
 interface ConnectionRequest {
   id: number;
@@ -37,99 +38,62 @@ export default function ConnectionsPage() {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
-
-  async function fetchData() {
-    setLoading(true);
+  const [actionName, setActionName] = useState("");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const sequence=useRef(0), mutating=useRef(false), mounted=useRef(true);
+  const fetchData=useCallback(async(silent=true,signal?:AbortSignal)=>{
+    const version=++sequence.current;
+    if(!silent)setLoading(true);
     try {
-      if (activeTab === "pending") {
-        const response = await fetch("/api/connections?type=pending");
-        if (response.ok) {
-          const data = await response.json();
-          setPendingRequests(data);
-        }
-      } else if (activeTab === "sent") {
-        const response = await fetch("/api/connections?type=sent");
-        if (response.ok) {
-          const data = await response.json();
-          setSentRequests(data);
-        }
-      } else if (activeTab === "friends") {
-        const response = await fetch("/api/connections?type=accepted");
-        if (response.ok) {
-          const data = await response.json();
-          setFriends(data);
-        }
+      const responses=await Promise.all(["pending","sent","accepted"].map(type=>fetch(`/api/connections?type=${type}`,{cache:"no-store",signal})));
+      const denied=responses.find(response=>!response.ok);
+      if(denied){
+        if(denied.status===401){router.replace("/login?redirect=/conexiones");return;}
+        if(denied.status===403){router.replace("/pendiente");return;}
+        const body=await denied.json().catch(()=>({error:"No se pudo contactar con CONECTA."}));throw new Error(body.error||"No se pudieron consultar tus conexiones.");
       }
-    } catch (error) {
-      console.error("Error fetching connections:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const handleResponse = async (connectionId: number, action: "accept" | "reject") => {
-    setActionLoading(connectionId);
-    try {
-      const response = await fetch("/api/connections", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ connectionId, action }),
-      });
-
-      if (response.ok) {
-        fetchData();
+      const [pending,sent,contacts]=await Promise.all(responses.map(response=>response.json()));
+      if(mounted.current && !signal?.aborted && version===sequence.current){setPendingRequests(pending);setSentRequests(sent);setFriends(contacts);}
+    }catch(reason){if(mounted.current && !signal?.aborted && version===sequence.current)setError(reason instanceof Error?reason.message:"Revisa tu conexión e inténtalo de nuevo.");}
+    finally{if(mounted.current && version===sequence.current)setLoading(false);}
+  },[router]);
+  const mutate=async(connectionId:number,action:"accept"|"reject"|"cancel")=>{
+    if(mutating.current)return;
+    mutating.current=true;++sequence.current;setActionLoading(connectionId);setActionName(action);setError("");setMessage("");
+    try{
+      const response=await fetch(action==="cancel"?`/api/connections?id=${connectionId}`:"/api/connections",{method:action==="cancel"?"DELETE":"PUT",headers:{"Content-Type":"application/json"},...(action==="cancel"?{}:{body:JSON.stringify({connectionId,action})})});
+      const data=await response.json().catch(()=>({error:"No se pudo contactar con CONECTA. Inténtalo de nuevo."}));
+      if(!response.ok){if(response.status===404||response.status===409)await fetchData();throw new Error(data.error||"No se pudo actualizar esta invitación.");}
+      if(mounted.current){
+        setPendingRequests(previous=>previous.filter(row=>row.id!==connectionId));setSentRequests(previous=>previous.filter(row=>row.id!==connectionId));
+        setMessage(action==="accept"?"Invitación aceptada. La conexión ya aparece en Contactos.":action==="reject"?"Invitación rechazada.":"Solicitud cancelada.");
+        await fetchData();
       }
-    } catch (error) {
-      console.error("Error responding to connection:", error);
-    } finally {
-      setActionLoading(null);
-    }
+      announceConnectionChange(data.profileIds);
+    }catch(reason){if(mounted.current)setError(reason instanceof Error?reason.message:"Revisa tu conexión e inténtalo de nuevo.");}
+    finally{mutating.current=false;if(mounted.current){setActionLoading(null);setActionName("");}}
   };
-
-  const handleCancelRequest = async (connectionId: number) => {
-    setActionLoading(connectionId);
-    try {
-      const response = await fetch(`/api/connections?id=${connectionId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        fetchData();
-      }
-    } catch (error) {
-      console.error("Error canceling connection:", error);
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  useEffect(() => {
-    // Verificar sesión y estado de aprobación
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          router.push("/login?redirect=/conexiones");
-          return;
-        }
-        if (data.user?.status === "pending") {
-          router.push("/pendiente");
-          return;
-        }
-        fetchData();
-      })
-      .catch(() => {
-        router.push("/login?redirect=/conexiones");
-      });
-  }, [activeTab]);
+  useEffect(()=>{if(!message)return;const timer=setTimeout(()=>setMessage(""),6000);return()=>clearTimeout(timer);},[message]);
+  const handleResponse=(id:number,action:"accept"|"reject")=>mutate(id,action);
+  const handleCancelRequest=(id:number)=>mutate(id,"cancel");
+  useEffect(()=>{
+    mounted.current=true;const controller=new AbortController();void fetchData(false,controller.signal);
+    const refresh=()=>{if(!mutating.current)void fetchData(true,controller.signal);};
+    const interval=setInterval(refresh,30000);
+    window.addEventListener("conecta:connections-changed",refresh);window.addEventListener("focus",refresh);
+    return()=>{mounted.current=false;controller.abort();clearInterval(interval);window.removeEventListener("conecta:connections-changed",refresh);window.removeEventListener("focus",refresh);};
+  },[fetchData]);
 
 
   return (
     <main className="ui-page min-h-screen bg-gray-50">
-      <div className="ui-content max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="ui-content ui-primary-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <PageHeader title="Mis Conexiones" description="Una conversación abre nuevas posibilidades. Construye tu red profesional." eyebrow="RELACIONES QUE GENERAN CONOCIMIENTO" />
 
+        {error && <div className="connection-page-error"><p role="alert">{error}</p><button type="button" onClick={()=>{setError("");void fetchData(false);}}>Actualizar conexiones</button></div>}
+        {message && <p role="status" className="connection-page-success">{message}</p>}
         {/* Tabs */}
         <div className="bg-white border border-gray-200 rounded-xl mb-6 overflow-hidden">
           <div className="ui-tabs flex border-b border-gray-200">
@@ -168,7 +132,7 @@ export default function ConnectionsPage() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
-                Enviadas
+                Enviadas <span className="connection-tab-count">{sentRequests.length}</span>
               </div>
               {activeTab === "sent" && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
@@ -186,7 +150,7 @@ export default function ConnectionsPage() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                Contactos
+                Contactos <span className="connection-tab-count">{friends.length}</span>
               </div>
               {activeTab === "friends" && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
@@ -238,17 +202,17 @@ export default function ConnectionsPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleResponse(request.id, "reject")}
-                        disabled={actionLoading === request.id}
+                        disabled={actionLoading !== null}
                         className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                       >
-                        Rechazar
+                        {actionLoading === request.id && actionName === "reject" ? "Rechazando…" : "Rechazar"}
                       </button>
                       <button
                         onClick={() => handleResponse(request.id, "accept")}
-                        disabled={actionLoading === request.id}
+                        disabled={actionLoading !== null}
                         className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                       >
-                        {actionLoading === request.id ? "..." : "Aceptar"}
+                        {actionLoading === request.id && actionName === "accept" ? "Aceptando…" : "Aceptar"}
                       </button>
                     </div>
                   </div>
@@ -304,10 +268,10 @@ export default function ConnectionsPage() {
                     </div>
                     <button
                       onClick={() => handleCancelRequest(request.id)}
-                      disabled={actionLoading === request.id}
+                      disabled={actionLoading !== null}
                       className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                     >
-                      {actionLoading === request.id ? "..." : "Cancelar"}
+                      {actionLoading === request.id ? "Cancelando…" : "Cancelar"}
                     </button>
                   </div>
                 ))}

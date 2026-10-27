@@ -80,7 +80,7 @@ export default async function DirectorioPage({
 
   return (
     <main className="ui-page min-h-screen bg-gray-50">
-      <div className="ui-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="ui-content ui-primary-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <PageHeader title="Directorio" description="Descubre personas, capacidades y afinidades para tu próxima colaboración." eyebrow="PERSONAS · COMUNIDAD CONECTA" />
 
         <form className="ui-filter-panel mb-8 space-y-4">

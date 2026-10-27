@@ -318,3 +318,45 @@ test("professional profile editor saves own data and uploaded portrait without c
   assert.equal((await call('/api/members/5',{method:'PUT',cookie:owner,body:{institution:'Otra institución'}})).status,409);
   const conflict=await call('/api/members/5',{method:'PUT',cookie:owner,body:{email:'member@example.test'}});assert.equal(conflict.status,409);
 });
+
+test("connection retries, crossed requests and legacy rows keep one stable relationship and accurate counts", async () => {
+  const actors=[];
+  for(const name of ['connection_sender','connection_receiver','connection_observer']){
+    const uid=Number(db.prepare("INSERT INTO users (username,email,password_hash,role,status) VALUES (?,?,?,'user','approved')").run(name,name+'@example.test',bcrypt.hashSync(password,10)).lastInsertRowid);
+    const id=Number(db.prepare("INSERT INTO graduates (user_id,name,email,country,university,career,graduation_year,current_profession) VALUES (?,?,?,'Cuba',?,'Investigación',2020,'Profesional')").run(uid,name,name+'@example.test',uniA).lastInsertRowid);
+    db.prepare('UPDATE users SET graduate_id=? WHERE id=?').run(id,uid);actors.push({uid,id,cookie:await login(name)});
+  }
+  const [sender,receiver,observer]=actors;
+  const pairCount=()=>db.prepare('SELECT count(*) AS n FROM connections WHERE (sender_id=? AND receiver_id=?) OR (sender_id=? AND receiver_id=?)').get(sender.id,receiver.id,receiver.id,sender.id).n;
+  const send=()=>call('/api/connections',{method:'POST',cookie:sender.cookie,body:{receiverId:receiver.id}});
+  const repeated=await Promise.all([send(),send()]);assert.ok(repeated.every(r=>r.status===200));assert.equal(pairCount(),1);
+  let state=await (await call('/api/connections?check='+receiver.id,{cookie:sender.cookie})).json();assert.equal(state.status,'pending-sent');const cid=state.connectionId;assert.ok(cid);
+  assert.equal((await (await call('/api/connections?check='+sender.id,{cookie:receiver.cookie})).json()).status,'pending-received');
+  assert.equal((await (await call('/api/connections',{cookie:receiver.cookie})).json()).pendingCount,1);
+  assert.equal((await (await call('/api/connections',{cookie:sender.cookie})).json()).pendingCount,0);
+  assert.equal((await call('/api/connections',{method:'PUT',cookie:observer.cookie,body:{connectionId:cid,action:'accept'}})).status,404);
+  assert.equal((await call('/api/connections',{method:'PUT',cookie:receiver.cookie,body:{connectionId:cid,action:'reject'}})).status,200);
+  state=await (await call('/api/connections?check='+receiver.id,{cookie:sender.cookie})).json();assert.equal(state.status,'none');assert.ok(!('pendingCount' in state));
+  assert.equal((await send()).status,200);assert.equal(pairCount(),1);
+  const crossed=await call('/api/connections',{method:'POST',cookie:receiver.cookie,body:{receiverId:sender.id}});assert.equal(crossed.status,200);assert.equal((await crossed.json()).status,'pending-received');
+  const accept=()=>call('/api/connections',{method:'PUT',cookie:receiver.cookie,body:{connectionId:cid,action:'accept'}});
+  const accepted=await Promise.all([accept(),accept()]);assert.ok(accepted.every(r=>r.status===200));assert.equal(pairCount(),1);
+  assert.equal(db.prepare("SELECT count(*) AS n FROM notifications WHERE user_id=? AND type='connection_accepted'").get(sender.uid).n,1);
+  assert.equal((await (await send()).json()).status,'connected');
+  assert.equal((await (await call('/api/connections',{cookie:receiver.cookie})).json()).pendingCount,0);
+  db.prepare("INSERT INTO connections (sender_id,receiver_id,status,created_at) VALUES (?,?,'rejected',?)").run(receiver.id,sender.id,Math.floor(Date.now()/1000)+5);
+  assert.equal((await (await call('/api/connections?check='+receiver.id,{cookie:sender.cookie})).json()).status,'connected');
+  db.prepare("UPDATE connections SET status='pending',created_at=? WHERE sender_id=? AND receiver_id=?").run(Math.floor(Date.now()/1000)+10,receiver.id,sender.id);
+  state=await (await call('/api/connections?check='+receiver.id,{cookie:sender.cookie})).json();assert.equal(state.status,'connected');
+  assert.equal((await (await call('/api/connections?type=accepted',{cookie:sender.cookie})).json()).filter(row=>row.graduateId===receiver.id).length,1);
+  assert.equal((await (await call('/api/connections',{cookie:sender.cookie})).json()).pendingCount,0);
+  const cancel=await call('/api/connections?id='+cid,{method:'DELETE',cookie:sender.cookie});assert.equal(cancel.status,200);assert.equal(pairCount(),0);
+  const sentAgain=await send();assert.equal(sentAgain.status,200);const fresh=(await sentAgain.json()).connectionId;
+  assert.equal((await call('/api/connections?id='+fresh,{method:'DELETE',cookie:sender.cookie})).status,200);
+  assert.equal((await (await call('/api/connections?check='+receiver.id,{cookie:sender.cookie})).json()).status,'none');
+  db.prepare("INSERT INTO connections (sender_id,receiver_id,status,created_at) VALUES (?,?,'rejected',?)").run(sender.id,receiver.id,1);
+  db.prepare("INSERT INTO connections (sender_id,receiver_id,status,created_at) VALUES (?,?,'rejected',?)").run(receiver.id,sender.id,2);
+  const legacyRetry=await send();assert.equal(legacyRetry.status,200);assert.equal((await legacyRetry.json()).status,'pending-sent');assert.equal(pairCount(),2);
+  assert.equal((await call('/api/connections',{method:'POST',cookie:sender.cookie,body:{receiverId:'1abc'}})).status,400);
+  assert.equal((await call('/api/connections',{method:'POST',cookie:sender.cookie,body:{receiverId:sender.id}})).status,400);
+});

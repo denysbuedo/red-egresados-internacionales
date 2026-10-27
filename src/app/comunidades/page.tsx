@@ -128,7 +128,7 @@ export default function CommunitiesPage() {
 
   return (
     <main className="ui-page min-h-screen bg-gray-50">
-      <div className="ui-content max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="ui-content ui-primary-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <PageHeader title="Comunidades" description="Encuentra tu espacio para intercambiar conocimiento y desarrollar ideas en común." eyebrow="ESPACIOS PARA COLABORAR" actions={<button
             onClick={() => setShowCreateForm(!showCreateForm)}
