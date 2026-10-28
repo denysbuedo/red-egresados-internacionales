@@ -285,3 +285,9 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Cuota global 100 intentos/día, automáticos 5/destinatario/día; avisos manuales conservan 5/minuto/admin. Bloqueos por cuota/configuración se auditan sin bloquear registro ni decisiones. Panel de aprobación informa por separado el resultado guardado y el resultado del correo.
 - Windows: build/typecheck/lint sin errores, 25 HTTP y 15 unitarias correctas. Chrome con proveedor simulado: tres formularios reales, aprobación conservada tras timeout, tipos de historial y 320–1440px sin overflow ni errores JS. No se enviaron nuevos correos reales.
 - Respaldo verificado: /var/backups/red-egresados/pre-conecta-access-email-20261027. Estado observado antes del despliegue: 5 cuentas/perfiles, 1 aporte y 8 conexiones; preservar todos los datos y correos manuales previos.
+
+
+- Publicado como `209589e`. Linux: compilación/typecheck/lint sin errores, 25 pruebas HTTP y 15 unitarias correctas; proveedor de prueba simulado sin nuevos correos reales.
+- HTTPS/producción: panel de aprobaciones, notificaciones habilitadas, historial con tipo y APIs protegidas verificados sin registrar cuentas ni resolver solicitudes reales. Ningún correo generado por el despliegue ni aviso retroactivo.
+- Conservados todos los valores anteriores de las 20 tablas, incluido el historial de correo; solo columna kind y una entrada técnica de migración adicionales (20 migraciones en total). Estado observado: 5 cuentas/perfiles, 1 aporte, 8 conexiones y 2 comunidades. Imágenes, secretos y resolución privada de HAProxy preservados.
+- Manifiesto de 187 archivos verificado contra la compilación Linux y la VM. Servicio activo y NRestarts=0. Snapshot pre-cutover y compilación anterior disponibles en /var/backups/red-egresados/pre-conecta-access-email-20261027.

@@ -63,3 +63,9 @@ Los límites globales siguen siendo 100 intentos diarios de plataforma. Los auto
 No hay cola de reintentos. Si el proceso se interrumpe antes de reclamar la reserva, el historial mostrará No enviado tras dos minutos; si se interrumpe durante el envío, mostrará Resultado incierto. No se almacena el cuerpo, no se recuperan automáticamente mensajes interrumpidos y no se permite reenvío directo desde el historial.
 
 Migración aditiva 0019_email_dispatch_kind.sql: añade kind con valor manual para operaciones previas. Se conservan todos los datos y metadatos existentes. Validación Windows: build/typecheck/lint sin errores, 25 pruebas HTTP y 15 unitarias correctas, con proveedor simulado. Chrome recorre formularios reales de registro/aprobación/rechazo, caída simulada y consulta del historial, sin emitir correos reales.
+
+
+- Publicado como `209589e`. Linux: compilación/typecheck/lint sin errores, 25 pruebas HTTP y 15 unitarias correctas; proveedor de prueba simulado sin nuevos correos reales.
+- HTTPS/producción: panel de aprobaciones, notificaciones habilitadas, historial con tipo y APIs protegidas verificados sin registrar cuentas ni resolver solicitudes reales. Ningún correo generado por el despliegue ni aviso retroactivo.
+- Conservados todos los valores anteriores de las 20 tablas, incluido el historial de correo; solo columna kind y una entrada técnica de migración adicionales (20 migraciones en total). Estado observado: 5 cuentas/perfiles, 1 aporte, 8 conexiones y 2 comunidades. Imágenes, secretos y resolución privada de HAProxy preservados.
+- Manifiesto de 187 archivos verificado contra la compilación Linux y la VM. Servicio activo y NRestarts=0. Snapshot pre-cutover y compilación anterior disponibles en /var/backups/red-egresados/pre-conecta-access-email-20261027.
