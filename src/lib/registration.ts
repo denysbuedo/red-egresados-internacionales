@@ -1,3 +1,4 @@
+import { reserveAccessEmail, deliverAccessEmail } from "./email-notifications";
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
@@ -73,11 +74,13 @@ export async function registerAccount(request: NextRequest) {
         role: "user", status: "pending", pendingUniversity: account.university || null }).returning().get();
       const graduate = tx.insert(graduates).values({ ...profile, userId: user.id }).returning({ id: graduates.id }).get();
       tx.update(users).set({ graduateId: graduate.id }).where(eq(users.id, user.id)).run();
-      return user;
+      const notification=reserveAccessEmail('access_received',{id:user.id,email:user.email,name:profile.name},null);
+      return {user,notification};
     });
-    await setSession(newUser);
+    await setSession(newUser.user);
+    await deliverAccessEmail(newUser.notification);
     return NextResponse.json({ message: "Registro recibido. La administración revisará la solicitud.",
-      pending: true, redirect: "/pendiente", user: { id: newUser.id, username: newUser.username, status: "pending" } }, { status: 201 });
+      pending: true, redirect: "/pendiente", user: { id: newUser.user.id, username: newUser.user.username, status: "pending" } }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && /UNIQUE constraint failed/.test(error.message)) {
       return NextResponse.json({ error: "El username o correo ya está registrado" }, { status: 409 });

@@ -2,8 +2,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PageHeader } from "./PageHeader";
 type Recipient={id:number;name:string;email:string};
-type Item={id:string;recipient:string;subject:string;status:string;code?:string;correlationId?:string;createdAt:number};
-const labels:Record<string,string>={accepted:"Aceptado por el relay",failed:"No aceptado",unknown:"Resultado incierto",sending:"En curso"};
+type Item={id:string;recipient:string;subject:string;status:string;code?:string;correlationId?:string;createdAt:number;kind?:string};
+const labels:Record<string,string>={accepted:"Aceptado por el relay",failed:"No aceptado",unknown:"Resultado incierto",sending:"En curso",prepared:"Preparado",not_sent:"No enviado"};
+const kinds:Record<string,string>={manual:"Aviso manual",access_received:"Solicitud recibida",access_approved:"Cuenta aprobada",access_rejected:"Solicitud rechazada"};
 export function EmailNotifications(){
  const [recipients,setRecipients]=useState<Recipient[]>([]),[items,setItems]=useState<Item[]>([]),[enabled,setEnabled]=useState(false),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[result,setResult]=useState<Item|null>(null),[preview,setPreview]=useState(false),[attempted,setAttempted]=useState(false);
  const [recipientId,setRecipientId]=useState(''),[subject,setSubject]=useState(''),[textBody,setTextBody]=useState('');
@@ -27,6 +28,6 @@ export function EmailNotifications(){
  </form>
  <section className="member-section"><div className="member-section-heading"><div><p className="workspace-kicker">ÚLTIMAS 50 OPERACIONES</p><h2>Historial de envíos</h2></div><button type="button" disabled={busy} className="connection-secondary" onClick={()=>void load()}>Actualizar historial</button></div>
  <p className="email-guidance">Los resultados inciertos no se reenvían desde el historial. Conserva la referencia para consultar a Interoperabilidad. Por privacidad, no se almacena el cuerpo del mensaje.</p>
- {loading?<p>Cargando…</p>:items.length?<div className="ui-table-scroll overflow-x-auto"><table className="email-history"><thead><tr><th>Fecha</th><th>Destinatario / asunto</th><th>Resultado</th><th>Referencia</th></tr></thead><tbody>{items.map(item=><tr key={item.id}><td>{new Date(item.createdAt).toLocaleString('es-CU',{timeZone:'America/Havana'})}</td><td>{item.recipient}<strong>{item.subject}</strong></td><td>{labels[item.status]||item.status}<small>{item.code}</small></td><td><code>{item.correlationId}</code></td></tr>)}</tbody></table></div>:<p>Todavía no hay envíos registrados.</p>}
+ {loading?<p>Cargando…</p>:items.length?<div className="ui-table-scroll overflow-x-auto"><table className="email-history"><thead><tr><th>Fecha</th><th>Destinatario / asunto</th><th>Resultado</th><th>Referencia</th></tr></thead><tbody>{items.map(item=><tr key={item.id}><td>{new Date(item.createdAt).toLocaleString('es-CU',{timeZone:'America/Havana'})}</td><td>{item.recipient}<strong>{item.subject}</strong><small>{kinds[item.kind||"manual"]||item.kind}</small></td><td>{labels[item.status]||item.status}<small>{item.code}</small></td><td><code>{item.correlationId}</code></td></tr>)}</tbody></table></div>:<p>Todavía no hay envíos registrados.</p>}
  </section></div>;
 }

@@ -107,3 +107,8 @@ PageHeader unifica cabeceras; AdminNav aplica navegación activa y enlaces por r
 ## Correo de Interoperabilidad
 
 OAuth2 Client Credentials desde servidor, sin SMTP. Cliente `conecta`; URLs fijas de identidad.reduniv.edu.cu y api.reduniv.edu.cu. NOTIFICATION_CLIENT_ID/NOTIFICATION_CLIENT_SECRET privados y NOTIFICATION_EMAIL_ENABLED controlan acceso. Token solo en memoria, TLS obligatorio. Tabla email_dispatches mediante migración 0018 para reserva única y auditoría sin cuerpo; reintentos externos automáticos deshabilitados. Solo administradores aprobados acceden a /admin/notificaciones y /api/admin/notifications. Resolución de los dos dominios hacia HAProxy interno aislada en el namespace de la unidad systemd.
+
+
+### Avisos del ciclo de acceso
+
+Migración 0019 añade kind a email_dispatches. reserveAccessEmail exige transacción SQLite activa para reservar junto a registro o decisión; deliverAccessEmail reclama prepared→sending una sola vez después del commit. Plantillas en access-email-template.cjs con URLs fijas y HTML escapado. Fallos de correo no se propagan a la operación de cuenta; intentos no ejecutados se conservan como not_sent y no hay worker/reintentos. Límite automático de 5/destinatario/24h dentro del global 100/24h; límite manual 5/min/admin se filtra por kind=manual.

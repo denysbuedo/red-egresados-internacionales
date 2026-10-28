@@ -1,3 +1,4 @@
+import { reserveAccessEmail, deliverAccessEmail } from "@/lib/email-notifications";
 import { MEMBER_TYPES } from "@/lib/site";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
@@ -62,8 +63,12 @@ export async function PUT(request: NextRequest) {
       rejectionReason: action === "reject" ? reason.trim() : null, updatedAt: new Date() })
       .where(and(eq(users.id, id), eq(users.status, "pending"))).returning({ id: users.id }).get();
     if (result && action === "reject") sessionStore.revokeUser(id);
-    return result;
+    if(!result)return null;
+    const profile=tx.select({name:graduates.name}).from(graduates).where(eq(graduates.userId,id)).get();
+    const notification=reserveAccessEmail(action==='approve'?'access_approved':'access_rejected',{id:target.id,email:target.email,name:profile?.name||target.username},session.id,action==='reject'?reason.trim():undefined);
+    return {notification};
   });
   if (!updated) return NextResponse.json({ error: "La solicitud ya fue resuelta" }, { status: 409 });
-  return NextResponse.json({ success: true, message: action === "approve" ? "Usuario aprobado" : "Usuario rechazado" });
+  const notification=await deliverAccessEmail(updated.notification);
+  return NextResponse.json({ success: true, notification, message: action === "approve" ? "Usuario aprobado" : "Usuario rechazado" });
 }

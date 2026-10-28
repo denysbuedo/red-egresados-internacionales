@@ -3,7 +3,7 @@
 import { PageHeader } from "@/components/PageHeader";
 
 import { memberTypeLabel } from "@/lib/site";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface PendingUser {
   id: number;
@@ -26,6 +26,9 @@ export default function ApprovalsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const actionLock=useRef(false);
+  const [feedback,setFeedback]=useState("");
+  const [error,setError]=useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
   async function fetchPendingUsers() {
@@ -43,12 +46,13 @@ export default function ApprovalsPage() {
   }
 
   const handleAction = async (userId: number, action: "approve" | "reject") => {
+    if(actionLock.current)return;
     if (action === "reject" && !rejectReason.trim()) {
-      alert("Debe especificar un motivo de rechazo");
+      setError("Debe especificar un motivo de rechazo");
       return;
     }
 
-    setActionLoading(true);
+    actionLock.current=true;setActionLoading(true);setError("");setFeedback("");
     try {
       const response = await fetch("/api/admin/approvals", {
         method: "PUT",
@@ -60,15 +64,15 @@ export default function ApprovalsPage() {
         }),
       });
 
-      if (response.ok) {
-        setRejectReason("");
-        setSelectedUser(null);
-        fetchPendingUsers();
-      }
-    } catch (error) {
-      console.error("Error updating user:", error);
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||"No se pudo confirmar la decisión.");
+      const decision=action==="approve"?"Cuenta aprobada.":"Solicitud rechazada.";
+      setFeedback(decision+(data.notification?.status==="accepted"?" El servicio de notificaciones aceptó el correo; no confirma su entrega al buzón.":" El correo no se pudo confirmar o no se envió. La decisión está guardada; la incidencia queda registrada en el historial de notificaciones. No se reintentará automáticamente."));
+      setRejectReason("");setSelectedUser(null);await fetchPendingUsers();
+    } catch (reason) {
+      setError((reason instanceof Error?reason.message:"No se pudo confirmar la operación.")+" Actualiza las solicitudes antes de intentar otra acción.");await fetchPendingUsers();
     } finally {
-      setActionLoading(false);
+      actionLock.current=false;setActionLoading(false);
     }
   };
 
@@ -81,6 +85,8 @@ export default function ApprovalsPage() {
     <div className="ui-surface space-y-6">
       <PageHeader title="Aprobación de Registros" description="Revisa el vínculo laboral antes de habilitar el acceso a la comunidad." eyebrow="GESTIÓN · ACCESO INSTITUCIONAL" compact />
 
+      {feedback && <p role="status" className="connection-page-success">{feedback}</p>}
+      {error && <p role="alert" className="connection-page-error">{error}</p>}
       {loading ? (
         <div className="text-center py-12">
           <div className="w-8 h-8 border-4 border-[#102B46] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>

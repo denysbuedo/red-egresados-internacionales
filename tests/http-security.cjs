@@ -409,11 +409,13 @@ test("admin email notifications enforce permissions, limits and persistent dedup
  for(const cookie of [cookies.member,cookies.editor,cookies.institution]){assert.equal((await call('/api/admin/notifications',{cookie})).status,403);assert.equal((await call('/api/admin/notifications',{cookie,method:'POST',body:{}})).status,403);}
  assert.equal((await call('/api/admin/notifications',{cookie:cookies.admin,method:'POST',origin:false,body:{}})).status,403);
  const info=await (await call('/api/admin/notifications',{cookie:cookies.admin})).json();assert.equal(info.enabled,true);assert.ok(Array.isArray(info.recipients));
+ const beforeCount=db.prepare("SELECT count(*) n FROM email_dispatches WHERE kind='manual'").get().n;
+ const startAttempts=()=>{try{return readFileSync(join(dir,'email-requests.jsonl'),'utf8').trim().split('\n').filter(Boolean).length;}catch{return 0;}};const beforeAttempts=startAttempts();
  const body={operationId:randomUUID(),recipientId:2,subject:'Aviso de prueba',textBody:'Texto de prueba con <contenido> y & símbolos.'};
  const post=body=>call('/api/admin/notifications',{cookie:cookies.admin,method:'POST',body});
  const responses=await Promise.all([post(body),post(body)]);assert.ok(responses.every(r=>r.status===200));
- assert.equal(db.prepare('SELECT count(*) n FROM email_dispatches').get().n,1);
- const attempts=()=>readFileSync(join(dir,'email-requests.jsonl'),'utf8').trim().split('\n').filter(Boolean).map(line=>JSON.parse(line));assert.equal(attempts().length,1);
+ assert.equal(db.prepare("SELECT count(*) n FROM email_dispatches WHERE kind='manual'").get().n,beforeCount+1);
+ const attempts=()=>readFileSync(join(dir,'email-requests.jsonl'),'utf8').trim().split('\n').filter(Boolean).map(line=>JSON.parse(line)).slice(beforeAttempts);assert.equal(attempts().length,1);
  const stored=db.prepare('SELECT * FROM email_dispatches WHERE id=?').get(body.operationId);assert.equal(stored.status,'accepted');assert.equal(stored.recipient,'member@example.test');assert.equal(stored.actor_id,1);assert.ok(!JSON.stringify(stored).includes(body.textBody));
  assert.equal((await post(body)).status,200);assert.equal(attempts().length,1);
  assert.equal((await post({...body,textBody:'Otro contenido'})).status,409);
@@ -424,5 +426,53 @@ test("admin email notifications enforce permissions, limits and persistent dedup
  writeFileSync(join(dir,'email-state.json'),JSON.stringify({mode:502}));response=await post({...body,operationId:randomUUID()});assert.equal((await response.json()).status,'failed');assert.equal(attempts().length,3);
  writeFileSync(join(dir,'email-state.json'),JSON.stringify({mode:'accepted'}));await post({...body,operationId:randomUUID()});await post({...body,operationId:randomUUID()});assert.equal(attempts().length,5);
  assert.equal((await post({...body,operationId:randomUUID()})).status,429);assert.equal(attempts().length,5);
- const history=await (await call('/api/admin/notifications',{cookie:cookies.admin})).json();assert.equal(history.history.length,5);assert.ok(!JSON.stringify(history).includes('fixture-secret'));assert.ok(!JSON.stringify(history).includes(body.textBody));
+ const history=await (await call('/api/admin/notifications',{cookie:cookies.admin})).json();assert.equal(history.history.filter(row=>row.kind==='manual').length,beforeCount+5);assert.ok(!JSON.stringify(history).includes('fixture-secret'));assert.ok(!JSON.stringify(history).includes(body.textBody));
+});
+
+
+function lifecycleRequests(){try{return readFileSync(join(dir,'email-requests.jsonl'),'utf8').trim().split('\n').filter(Boolean).map(line=>JSON.parse(line));}catch{return [];}}
+async function lifecycleRegistration(username,mode='accepted'){
+ writeFileSync(join(dir,'email-state.json'),JSON.stringify({mode}));
+ const payload={username,email:username+'@example.test',password,name:'Persona <colaboradora>',country:'Cuba',employmentConfirmed:true};
+ const response=await fetch(base+'/api/auth/register-complete',{method:'POST',headers:{Origin:base,'Content-Type':'application/json','X-Real-IP':'198.18.0.10'},body:JSON.stringify(payload)});
+ assert.equal(response.status,201);return {response,user:db.prepare('SELECT * FROM users WHERE username=?').get(username),payload};
+}
+test('registration received and concurrent approval send exactly once after commit with correct templates',async()=>{
+ const {user,payload}=await lifecycleRegistration('accessaccepted');
+ let rows=db.prepare('SELECT * FROM email_dispatches WHERE recipient_id=? ORDER BY rowid').all(user.id);assert.equal(rows.length,1);assert.equal(rows[0].kind,'access_received');assert.equal(rows[0].status,'accepted');assert.equal(rows[0].actor_id,null);
+ let mails=lifecycleRequests().filter(row=>row.recipient===payload.email);assert.equal(mails.length,1);assert.equal(mails[0].accountStatus,'pending');assert.ok(mails[0].textBody.includes('/pendiente'));assert.ok(!mails[0].textBody.includes(password));assert.ok(mails[0].htmlBody.includes('&lt;colaboradora&gt;'));
+ const request=()=>call('/api/admin/approvals',{method:'PUT',cookie:cookies.admin,body:{userId:user.id,action:'approve'}});
+ const results=await Promise.all([request(),request()]);assert.deepEqual(results.map(r=>r.status).sort(),[200,409]);
+ rows=db.prepare('SELECT * FROM email_dispatches WHERE recipient_id=? ORDER BY rowid').all(user.id);assert.equal(rows.length,2);assert.equal(rows[1].kind,'access_approved');assert.equal(rows[1].actor_id,1);assert.equal(rows[1].status,'accepted');assert.equal(db.prepare('SELECT status FROM users WHERE id=?').get(user.id).status,'approved');
+ mails=lifecycleRequests().filter(row=>row.recipient===payload.email);assert.equal(mails.length,2);assert.equal(mails[1].accountStatus,'approved');assert.ok(mails[1].textBody.includes('/login'));assert.ok(mails[1].textBody.includes('completa tu perfil'));
+ assert.equal((await request()).status,409);assert.equal(lifecycleRequests().filter(row=>row.recipient===payload.email).length,2);
+ assert.equal((await call('/api/auth/register-complete',{method:'POST',body:payload})).status,409);assert.equal(lifecycleRequests().filter(row=>row.recipient===payload.email).length,2);
+});
+test('rejection includes its reason and help, denies outsiders and revokes access without duplicate mail',async()=>{
+ const {user,payload,response}=await lifecycleRegistration('accessrejected');const cookie=response.headers.get('set-cookie').split(';')[0];
+ const body={userId:user.id,action:'reject',reason:'Debes corregir la información <institucional> & confirmar el vínculo.'};
+ assert.equal((await call('/api/admin/approvals',{method:'PUT',cookie:cookies.member,body})).status,403);
+ assert.equal((await call('/api/admin/approvals',{method:'PUT',cookie:cookies.institution,body})).status,403);
+ assert.equal(lifecycleRequests().filter(row=>row.recipient===payload.email).length,1);
+ const result=await call('/api/admin/approvals',{method:'PUT',cookie:cookies.admin,body});assert.equal(result.status,200);assert.equal((await result.json()).notification.status,'accepted');
+ const mail=lifecycleRequests().filter(row=>row.recipient===payload.email)[1];assert.equal(mail.accountStatus,'rejected');assert.ok(mail.textBody.includes(body.reason));assert.ok(mail.htmlBody.includes('&lt;institucional&gt; &amp;'));assert.ok(mail.textBody.includes('/ayuda'));
+ assert.equal(db.prepare('SELECT status FROM users WHERE id=?').get(user.id).status,'rejected');assert.equal((await call('/api/auth/me',{cookie})).status,401);
+ assert.equal((await call('/api/admin/approvals',{method:'PUT',cookie:cookies.admin,body})).status,409);assert.equal(lifecycleRequests().filter(row=>row.recipient===payload.email).length,2);
+});
+test('email outage never rolls back registration, approval or rejection and timeout is not retried',async()=>{
+ const {user,payload}=await lifecycleRegistration('accessfailure',502);assert.equal(db.prepare('SELECT status FROM users WHERE id=?').get(user.id).status,'pending');
+ assert.equal(db.prepare("SELECT status FROM email_dispatches WHERE recipient_id=? AND kind='access_received'").get(user.id).status,'failed');
+ writeFileSync(join(dir,'email-state.json'),JSON.stringify({mode:'timeout'}));
+ const approve=()=>call('/api/admin/approvals',{method:'PUT',cookie:cookies.admin,body:{userId:user.id,action:'approve'}});
+ let response=await approve();assert.equal(response.status,200);assert.equal((await response.json()).notification.status,'unknown');assert.equal(db.prepare('SELECT status FROM users WHERE id=?').get(user.id).status,'approved');assert.equal((await approve()).status,409);assert.equal(lifecycleRequests().filter(row=>row.recipient===payload.email).length,2);
+ const rejected=await lifecycleRegistration('accessfailure_reject');writeFileSync(join(dir,'email-state.json'),JSON.stringify({mode:500}));response=await call('/api/admin/approvals',{method:'PUT',cookie:cookies.admin,body:{userId:rejected.user.id,action:'reject',reason:'Vínculo pendiente de justificar'}});assert.equal(response.status,200);assert.equal((await response.json()).notification.status,'unknown');assert.equal(db.prepare('SELECT status FROM users WHERE id=?').get(rejected.user.id).status,'rejected');
+ writeFileSync(join(dir,'email-state.json'),JSON.stringify({mode:'accepted'}));
+});
+test('automatic email quota records unsent notices while preserving account operations',async()=>{
+ const insert=db.prepare("INSERT INTO email_dispatches (id,recipient,subject,payload_hash,status,correlation_id,created_at,updated_at) VALUES (?,'quota@example.test','Fixture','hash','accepted','fixture',?,?)");const now=Date.now();for(let n=0;n<100;n++)insert.run('quota-fixture-'+n,now,now);
+ const attempts=lifecycleRequests().length;
+ try{
+  const {user}=await lifecycleRegistration('accessquota');let row=db.prepare("SELECT * FROM email_dispatches WHERE recipient_id=? AND kind='access_received'").get(user.id);assert.equal(row.status,'not_sent');assert.equal(row.code,'DAILY_LIMIT');
+  const response=await call('/api/admin/approvals',{method:'PUT',cookie:cookies.admin,body:{userId:user.id,action:'approve'}});assert.equal(response.status,200);assert.equal((await response.json()).notification.status,'not_sent');assert.equal(db.prepare('SELECT status FROM users WHERE id=?').get(user.id).status,'approved');assert.equal(lifecycleRequests().length,attempts);
+ }finally{db.prepare("DELETE FROM email_dispatches WHERE id LIKE 'quota-fixture-%'").run();}
 });

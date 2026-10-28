@@ -42,3 +42,24 @@ Migración aditiva 0018_add_email_dispatches.sql. Conservar todas las cuentas, c
 - Correo manual habilitado después de la prueba autorizada y OAuth200 con Node de producción. Verificados por HTTPS /admin/notificaciones y /api/admin/notifications: enabled=true, destinatarios aprobados, sin secreto/token expuestos. Historial inicial vacío porque el único correo controlado salió desde desarrollo, no desde esta API.
 - Todos los valores anteriores conservados en las 19 tablas existentes; solo se añade email_dispatches y una entrada al registro de migraciones (19 migraciones en total). Cuentas, perfiles, aporte, conexiones, comunidad, imágenes y credenciales anteriores intactos. No se ejecutó el reinicio de datos.
 - Manifiesto de 183 archivos coincide con la compilación Linux y la VM. Servicio activo y NRestarts=0. Secreto de Interoperabilidad escaneado contra fuentes rastreadas sin coincidencias. Namespace del servicio utiliza HAProxy interno; no se modifica la resolución global.
+
+
+## Avisos automáticos del ciclo de acceso
+
+Se incorporan tres avisos, únicamente para operaciones nuevas:
+
+1. **Solicitud recibida:** al crear la cuenta pendiente, con enlace a consultar su estado.
+2. **Cuenta aprobada:** al guardar una aprobación válida, con enlace de entrada e invitación a completar el perfil.
+3. **Solicitud rechazada:** al guardar un rechazo válido, con el motivo y enlace de Ayuda.
+
+Los textos usan la identidad CONECTA/MES; el proveedor se denomina simplemente **servicio de notificaciones**. El operador confirmó la recepción del correo controlado con referencia eca895ae-40cd-4ca8-9823-bfc588ad6004. No se repite ese ensayo ni se avisa retroactivamente a las cuentas existentes.
+
+La cuenta o decisión y la reserva del aviso se guardan en la misma transacción SQLite. Solo después de confirmar la transacción se intenta el envío. Se reclama la reserva una sola vez con un cambio condicional de estado. La creación repetida de cuenta devuelve conflicto; la decisión repetida/concurrente se rechaza sin generar otro aviso. Una revisión futura legítima de la misma cuenta puede producir su propio aviso.
+
+Si falla el proveedor, el registro/aprobación/rechazo se conserva. El historial distingue solicitud recibida, cuenta aprobada, solicitud rechazada y aviso manual. El panel de aprobaciones informa el resultado del correo sin confundirlo con el resultado de la decisión, tanto para administración como responsables institucionales.
+
+Los límites globales siguen siendo 100 intentos diarios de plataforma. Los automáticos tienen además máximo de 5 intentos por destinatario cada 24 horas; el límite por minuto de administración se aplica a los avisos manuales. Un aviso bloqueado por configuración o cuota se registra como **No enviado**, sin contactar al proveedor y sin impedir la operación de cuenta.
+
+No hay cola de reintentos. Si el proceso se interrumpe antes de reclamar la reserva, el historial mostrará No enviado tras dos minutos; si se interrumpe durante el envío, mostrará Resultado incierto. No se almacena el cuerpo, no se recuperan automáticamente mensajes interrumpidos y no se permite reenvío directo desde el historial.
+
+Migración aditiva 0019_email_dispatch_kind.sql: añade kind con valor manual para operaciones previas. Se conservan todos los datos y metadatos existentes. Validación Windows: build/typecheck/lint sin errores, 25 pruebas HTTP y 15 unitarias correctas, con proveedor simulado. Chrome recorre formularios reales de registro/aprobación/rechazo, caída simulada y consulta del historial, sin emitir correos reales.
