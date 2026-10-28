@@ -41,3 +41,11 @@ Chrome real: preferencias, invitación, aviso importante, inscripción/edición/
 Respaldo previo: /var/backups/red-egresados/pre-conecta-notification-suite-20261027. Se conservan datos, imágenes, credenciales y correos anteriores. El script de reinicio se adapta solo para sus fixtures; no se ejecuta en producción.
 
 Referencias técnicas: [Next after](https://nextjs.org/docs/app/api-reference/functions/after), [autoalojamiento](https://nextjs.org/docs/app/guides/self-hosting) y [recuperación de acceso OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html).
+
+
+### Verificación final — 2026-10-28
+
+- Publicado como `8aa5798`. Linux: build/typecheck/lint sin errores, 31 pruebas HTTP y 25 unitarias correctas; 35 vistas de navegador verificadas con proveedor simulado, sin correos reales durante las pruebas.
+- Producción/HTTPS: recuperación pública, preferencias privadas, invitaciones, panel de correo y APIs protegidas comprobados. Timer conecta-notification-mail activo y habilitado; primer proceso Result=success/ExecMainStatus=0 como red-egresados, con heartbeat visible. Cero preferencias activadas y cero avisos opcionales en cola al desplegar.
+- Todas las filas y columnas previas conservadas en las 20 tablas originales; seis tablas nuevas y metadatos de evento adicionales, 26 tablas de aplicación y 21 migraciones en total. Estado observado: 5 cuentas/perfiles, 1 aporte, 8 conexiones y 2 comunidades. Sin altas de prueba, cambios de contraseña/decisiones reales ni correos retroactivos.
+- Manifiesto de 213 archivos coincide con compilación Linux y VM. Servicio principal activo y NRestarts=0. Imágenes, historial de correo, secretos y resolución privada de HAProxy intactos. Snapshot pre-cutover y compilación anterior conservados en /var/backups/red-egresados/pre-conecta-notification-suite-20261027.

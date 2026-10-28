@@ -303,3 +303,11 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Worker independiente de navegación: scripts/process-notification-mail.cjs y unidades en deploy/systemd, timer cada minuto. Mismos EnvironmentFile y resolución privada HAProxy que la aplicación, sin copiar secretos al repo. Máximo cinco envíos/ciclo y límite global 100/día; estado visible en panel de correo.
 - Windows: build/typecheck/lint sin errores; 31 HTTP y 25 unitarias correctas. Chrome: bloque completo con proveedor simulado y 35 vistas responsivas, sin overflow ni errores JS. Ningún correo de prueba real, cambio de contraseña real ni alta de prueba en producción.
 - Respaldo verificado: /var/backups/red-egresados/pre-conecta-notification-suite-20261027. Documento operativo: NOTIFICACIONES_COMPLETAS.md. Preservar cuentas, contenido, imágenes, historial y configuración privada actuales.
+
+
+### Verificación final — 2026-10-28
+
+- Publicado como `8aa5798`. Linux: build/typecheck/lint sin errores, 31 pruebas HTTP y 25 unitarias correctas; 35 vistas de navegador verificadas con proveedor simulado, sin correos reales durante las pruebas.
+- Producción/HTTPS: recuperación pública, preferencias privadas, invitaciones, panel de correo y APIs protegidas comprobados. Timer conecta-notification-mail activo y habilitado; primer proceso Result=success/ExecMainStatus=0 como red-egresados, con heartbeat visible. Cero preferencias activadas y cero avisos opcionales en cola al desplegar.
+- Todas las filas y columnas previas conservadas en las 20 tablas originales; seis tablas nuevas y metadatos de evento adicionales, 26 tablas de aplicación y 21 migraciones en total. Estado observado: 5 cuentas/perfiles, 1 aporte, 8 conexiones y 2 comunidades. Sin altas de prueba, cambios de contraseña/decisiones reales ni correos retroactivos.
+- Manifiesto de 213 archivos coincide con compilación Linux y VM. Servicio principal activo y NRestarts=0. Imágenes, historial de correo, secretos y resolución privada de HAProxy intactos. Snapshot pre-cutover y compilación anterior conservados en /var/backups/red-egresados/pre-conecta-notification-suite-20261027.
