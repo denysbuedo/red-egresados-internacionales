@@ -52,3 +52,6 @@ next-env.d.ts
 
 # Uploaded user images are persistent runtime data, never source.
 /uploads/
+
+# Interoperability credentials are local secrets.
+/interoperabilidad/acceso*.txt

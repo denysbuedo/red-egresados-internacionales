@@ -21,7 +21,7 @@ test("fresh database has the columns needed by authentication and approvals", (t
     for (const column of ["status", "rejection_reason", "institution_name", "pending_university"]) {
       assert.ok(columns.includes(column), column);
     }
-    assert.equal(db.prepare("SELECT count(*) AS n FROM app_migrations").get().n, 18);
+    assert.equal(db.prepare("SELECT count(*) AS n FROM app_migrations").get().n, 19);
     assert.equal(db.pragma("integrity_check", { simple: true }), "ok");
   } finally { db.close(); }
 });

@@ -256,3 +256,15 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Respaldo verificado en /var/backups/red-egresados/pre-conecta-centered-feed-20261027. Esta distribución sustituye el diseño anterior de dos columnas.
 
 - Publicado como `84172c8`. Linux build/typecheck/lint y 20 pruebas HTTP correctas. Producción: inicio con columna de comunidades y perfil en saludo verificado, todas las filas de las 19 tablas e imágenes conservadas. Manifiesto de 174 archivos coincide con la compilación validada. Servicio activo y NRestarts=0.
+
+
+## Notificaciones por servicio de Interoperabilidad — 2026-10-27
+
+- Integración OAuth2 Client Credentials con cliente confirmado `conecta`, audiencia mes-api y rol notification-sender. Secretos excluidos de Git; configuración root-only en /etc/red-egresados/notifications.env mediante EnvironmentFile. Sin SMTP en CONECTA.
+- Nueva Administración → Notificaciones, exclusiva de admin, con un destinatario aprobado por operación, texto/asunto, vista previa escapada e historial de 50 operaciones. HTML automático opcional, sin adjuntos ni envío masivo. Límites locales: 5/min por admin y 100/día globales.
+- Migración aditiva 0018_add_email_dispatches.sql: auditoría de destinatario/asunto/actor/estado/referencia y hash de contenido; no conserva cuerpo, secreto ni token. Identificador único local evita repetir una petición ya registrada. Un envío interrumpido se presenta como incierto, sin reintentos automáticos.
+- Tokens en memoria, caché con vencimiento y comprobación de audiencia/rol. Endpoints HTTPS fijos, TLS validado, sin redirects. 202 accepted_by_relay se distingue expresamente de entrega al buzón. Timeout/500/respuesta inesperada permanecen inciertos.
+- El operador autoriza un correo de prueba a dinfo@mes.gob.cu. Un único envío desde desarrollo fue aceptado HTTP202, referencia eca895ae-40cd-4ca8-9823-bfc588ad6004. No repetirlo; recepción en buzón no confirmada.
+- La VM resuelve ambos dominios a 190.6.81.66 y recibe conexión rechazada en esa salida. HTTPS hacia HAProxy interno 10.46.4.22 funciona con SNI/certificado válidos. Resolución limitada a la unidad systemd mediante BindReadOnlyPaths de /etc/red-egresados/notification-hosts a /etc/hosts; DNS global intacto, sin acceso al 8004.
+- Verificado OAuth HTTP200 desde entorno de servicio en VM: cliente/audiencia/rol correctos, sin emitir otro correo. Mantener secreto y tokens fuera de logs y archivos fuente.
+- Windows: compilación, 21 pruebas HTTP simuladas y 14 unitarias correctas. Navegador: vista previa, aceptación simulada, timeout sin reintento, historial persistente, bloqueo de envío, 320–1440px sin overflow ni errores JS. Respaldo previo: /var/backups/red-egresados/pre-conecta-email-20261027.

@@ -272,3 +272,12 @@ export const authRateLimits = sqliteTable("auth_rate_limits", {
   attempts: integer("attempts").notNull(),
   expiresAt: integer("expires_at").notNull(),
 });
+
+
+export const emailDispatches = sqliteTable("email_dispatches", {
+  id: text("id").primaryKey(), actorId: integer("actor_id").references(()=>users.id,{onDelete:"set null"}),
+  recipientId: integer("recipient_id").references(()=>users.id,{onDelete:"set null"}),
+  recipient: text("recipient").notNull(), subject: text("subject").notNull(), payloadHash:text("payload_hash").notNull(),
+  status:text("status").notNull(), code:text("code"), correlationId:text("correlation_id").notNull(),
+  createdAt:integer("created_at").notNull(),updatedAt:integer("updated_at").notNull(),
+});

@@ -1,5 +1,5 @@
 const Database = require("better-sqlite3");
-const ALLOWED_TABLES = new Set(["connections","email_lists","graduates","posts","users","admin_posts","post_reactions","user_posts","post_comments","notifications","events","event_attendees","groups","group_members","group_posts","event_notification_log","app_migrations","sessions","auth_rate_limits"]);
+const ALLOWED_TABLES = new Set(["connections","email_lists","graduates","posts","users","admin_posts","post_reactions","user_posts","post_comments","notifications","events","event_attendees","groups","group_members","group_posts","event_notification_log","app_migrations","sessions","auth_rate_limits","email_dispatches"]);
 
 function resetNetwork(db, username) {
   const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all().map(row => row.name);

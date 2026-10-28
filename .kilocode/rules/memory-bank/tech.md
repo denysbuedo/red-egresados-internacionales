@@ -102,3 +102,8 @@ Sharp 0.35.5: validar y convertir JPG/PNG/WebP a WebP sin EXIF, máximo 8 MB / 2
 ## Sistema visual compartido
 
 PageHeader unifica cabeceras; AdminNav aplica navegación activa y enlaces por rol sin sustituir las autorizaciones del servidor; PageFooter comparte enlaces institucionales. Las clases ui-* organizan páginas, tarjetas, formularios, tablas y estados. Mantener mensajes de error y acciones destructivas distinguibles; reutilizar estos elementos en nuevas páginas.
+
+
+## Correo de Interoperabilidad
+
+OAuth2 Client Credentials desde servidor, sin SMTP. Cliente `conecta`; URLs fijas de identidad.reduniv.edu.cu y api.reduniv.edu.cu. NOTIFICATION_CLIENT_ID/NOTIFICATION_CLIENT_SECRET privados y NOTIFICATION_EMAIL_ENABLED controlan acceso. Token solo en memoria, TLS obligatorio. Tabla email_dispatches mediante migración 0018 para reserva única y auditoría sin cuerpo; reintentos externos automáticos deshabilitados. Solo administradores aprobados acceden a /admin/notificaciones y /api/admin/notifications. Resolución de los dos dominios hacia HAProxy interno aislada en el namespace de la unidad systemd.

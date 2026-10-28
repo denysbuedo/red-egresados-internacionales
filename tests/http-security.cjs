@@ -1,7 +1,7 @@
 const { test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
 const { spawn } = require("node:child_process");
-const { mkdtempSync, rmSync } = require("node:fs");
+const { mkdtempSync, rmSync, writeFileSync, readFileSync } = require("node:fs");
 const { join } = require("node:path");
 const { tmpdir } = require("node:os");
 const net = require("node:net");
@@ -47,8 +47,9 @@ before(async () => {
   db.prepare("INSERT INTO connections (id,sender_id,receiver_id,status) VALUES (1,3,5,'pending')").run();
   const listener = net.createServer(); listener.listen(0,"127.0.0.1"); await once(listener,"listening");
   const port = listener.address().port; await new Promise(r=>listener.close(r)); base = `http://127.0.0.1:${port}`;
-  server = spawn(process.execPath,["node_modules/next/dist/bin/next","start","-H","127.0.0.1","-p",String(port)],
-    { cwd: process.cwd(), env: {...process.env, DATABASE_PATH:file,UPLOADS_PATH:join(dir,"uploads"),NODE_ENV:"production",NEXT_TELEMETRY_DISABLED:"1"}, stdio:["ignore","pipe","pipe"] });
+  writeFileSync(join(dir,"email-state.json"),JSON.stringify({mode:"accepted"}));
+  server = spawn(process.execPath,["--require",join(process.cwd(),"tests/fixtures/email-provider.cjs"),"node_modules/next/dist/bin/next","start","-H","127.0.0.1","-p",String(port)],
+    { cwd: process.cwd(), env: {...process.env, DATABASE_PATH:file,UPLOADS_PATH:join(dir,"uploads"),NOTIFICATION_EMAIL_ENABLED:"true",NOTIFICATION_CLIENT_ID:"fixture",NOTIFICATION_CLIENT_SECRET:"fixture-secret",NOTIFICATION_TEST_STATE:join(dir,"email-state.json"),NOTIFICATION_TEST_LOG:join(dir,"email-requests.jsonl"),NODE_ENV:"production",NEXT_TELEMETRY_DISABLED:"1"}, stdio:["ignore","pipe","pipe"] });
   // Drain output without printing request bodies, cookies or fixture passwords.
   server.stdout.resume(); server.stderr.resume();
   for (let i=0;i<80;i++) {
@@ -65,7 +66,7 @@ after(async () => {
 });
 
 test("all business APIs require authentication; legacy cookies cannot impersonate admin", async () => {
-  for (const path of ["/api/stats","/api/members","/api/members/2","/api/graduates","/api/graduates/2","/api/email-lists","/api/posts","/api/posts/1/comments","/api/posts/reactions?postId=1","/api/events","/api/groups","/api/groups/1/posts","/api/connections","/api/notifications","/api/admin/users","/api/admin/posts","/api/admin/approvals"]) {
+  for (const path of ["/api/stats","/api/members","/api/members/2","/api/graduates","/api/graduates/2","/api/email-lists","/api/posts","/api/posts/1/comments","/api/posts/reactions?postId=1","/api/events","/api/groups","/api/groups/1/posts","/api/connections","/api/notifications","/api/admin/users","/api/admin/posts","/api/admin/approvals","/api/admin/notifications"]) {
     assert.equal((await call(path)).status,401,path);
   }
   const legacy = 'session='+Buffer.from(JSON.stringify({userId:1,createdAt:Date.now()})).toString('base64');
@@ -400,4 +401,28 @@ test("minimal worker access request waits for global approval and profile comple
   const affiliation=await call('/api/auth/affiliation',{method:'POST',cookie,body:{institution:uniA,memberType:'researcher',employmentConfirmed:true,currentProfession:'Investigadora'}});assert.equal(affiliation.status,200);assert.equal((await affiliation.json()).redirect,'/miembros/'+g.id);assert.equal(db.prepare('SELECT status FROM users WHERE id=?').get(user.id).status,'approved');
   assert.equal((await call('/api/auth/affiliation',{method:'POST',cookie,body:{institution:uniB,memberType:'researcher',employmentConfirmed:true,currentProfession:'Investigadora'}})).status,200);assert.equal(db.prepare('SELECT status FROM users WHERE id=?').get(user.id).status,'pending');
   const form=await (await call('/register')).text();assert.ok(!form.includes('name="career"'));assert.ok(!form.includes('name="institution"'));assert.ok(!form.includes('name="currentProfession"'));assert.ok(form.includes('Información Personal') && form.includes('Datos de Acceso'));
+});
+
+
+test("admin email notifications enforce permissions, limits and persistent deduplication without real upstream requests",async()=>{
+ const {randomUUID}=require('node:crypto');
+ for(const cookie of [cookies.member,cookies.editor,cookies.institution]){assert.equal((await call('/api/admin/notifications',{cookie})).status,403);assert.equal((await call('/api/admin/notifications',{cookie,method:'POST',body:{}})).status,403);}
+ assert.equal((await call('/api/admin/notifications',{cookie:cookies.admin,method:'POST',origin:false,body:{}})).status,403);
+ const info=await (await call('/api/admin/notifications',{cookie:cookies.admin})).json();assert.equal(info.enabled,true);assert.ok(Array.isArray(info.recipients));
+ const body={operationId:randomUUID(),recipientId:2,subject:'Aviso de prueba',textBody:'Texto de prueba con <contenido> y & símbolos.'};
+ const post=body=>call('/api/admin/notifications',{cookie:cookies.admin,method:'POST',body});
+ const responses=await Promise.all([post(body),post(body)]);assert.ok(responses.every(r=>r.status===200));
+ assert.equal(db.prepare('SELECT count(*) n FROM email_dispatches').get().n,1);
+ const attempts=()=>readFileSync(join(dir,'email-requests.jsonl'),'utf8').trim().split('\n').filter(Boolean).map(line=>JSON.parse(line));assert.equal(attempts().length,1);
+ const stored=db.prepare('SELECT * FROM email_dispatches WHERE id=?').get(body.operationId);assert.equal(stored.status,'accepted');assert.equal(stored.recipient,'member@example.test');assert.equal(stored.actor_id,1);assert.ok(!JSON.stringify(stored).includes(body.textBody));
+ assert.equal((await post(body)).status,200);assert.equal(attempts().length,1);
+ assert.equal((await post({...body,textBody:'Otro contenido'})).status,409);
+ assert.equal((await post({...body,operationId:randomUUID(),subject:'x'.repeat(201)})).status,400);
+ assert.equal((await post({...body,operationId:randomUUID(),textBody:'x'.repeat(20001)})).status,400);
+ assert.equal((await post({...body,operationId:randomUUID(),htmlBody:'<script>bad</script>'})).status,400);
+ writeFileSync(join(dir,'email-state.json'),JSON.stringify({mode:'timeout'}));const uncertain={...body,operationId:randomUUID()};let response=await post(uncertain);assert.equal((await response.json()).status,'unknown');assert.equal(attempts().length,2);await post(uncertain);assert.equal(attempts().length,2);
+ writeFileSync(join(dir,'email-state.json'),JSON.stringify({mode:502}));response=await post({...body,operationId:randomUUID()});assert.equal((await response.json()).status,'failed');assert.equal(attempts().length,3);
+ writeFileSync(join(dir,'email-state.json'),JSON.stringify({mode:'accepted'}));await post({...body,operationId:randomUUID()});await post({...body,operationId:randomUUID()});assert.equal(attempts().length,5);
+ assert.equal((await post({...body,operationId:randomUUID()})).status,429);assert.equal(attempts().length,5);
+ const history=await (await call('/api/admin/notifications',{cookie:cookies.admin})).json();assert.equal(history.history.length,5);assert.ok(!JSON.stringify(history).includes('fixture-secret'));assert.ok(!JSON.stringify(history).includes(body.textBody));
 });

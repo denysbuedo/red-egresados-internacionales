@@ -7,7 +7,7 @@ export function AdminNav({ role }: { role: string }) {
   const links = [
     ...(role === "admin" ? [{ href:"/admin",label:"Resumen",icon:"◇" },{ href:"/admin/approvals",label:"Aprobaciones",icon:"◎" },{ href:"/admin/users",label:"Usuarios",icon:"◉" },{ href:"/admin/comunidades",label:"Comunidades",icon:"◎" }] : []),
     { href:"/admin/posts",label:"Noticias",icon:"▤" }, { href:"/admin/events/new",label:"Crear evento",icon:"▦" },
-    ...(role === "admin" ? [{ href:"/listas-correo",label:"Listas de correo",icon:"↗" }] : []),
+    ...(role === "admin" ? [{ href:"/admin/notificaciones",label:"Notificaciones",icon:"✉" },{ href:"/listas-correo",label:"Listas de correo",icon:"↗" }] : []),
   ];
   return <aside className="ui-admin-rail"><div className="ui-admin-brand"><BrandLogo inverse /><p>GESTIÓN INSTITUCIONAL</p></div><nav aria-label="Administración de CONECTA">{links.map(link => {
     const active = link.href === "/admin" ? pathname === link.href : pathname.startsWith(link.href);
