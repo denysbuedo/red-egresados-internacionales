@@ -1,5 +1,6 @@
 "use client";
 
+import { CommunityMailTools } from "@/components/CommunityMailTools";
 import { PageHeader } from "@/components/PageHeader";
 
 import { useState, useEffect } from "react";
@@ -229,6 +230,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
           </div>
         )}
 
+        <CommunityMailTools groupId={Number(groupId)} />
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar - Info del grupo */}
           <aside className="lg:w-80 shrink-0">

@@ -1,0 +1,10 @@
+[Unit]
+Description=CONECTA - Revisar avisos pendientes cada minuto
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+Persistent=true
+Unit=conecta-notification-mail.service
+
+[Install]
+WantedBy=timers.target

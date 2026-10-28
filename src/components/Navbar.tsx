@@ -296,7 +296,7 @@ export function Navbar() {
                         Mi Perfil
                       </Link>
                     )}
-                    <Link href="/completar-perfil" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Vínculo laboral</Link>
+                    <Link href="/preferencias" className="block px-4 py-2 text-sm text-gray-700" onClick={()=>setUserMenuOpen(false)}>Preferencias y seguridad</Link><Link href="/completar-perfil" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Vínculo laboral</Link>
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-red-600 hover:text-red-700 hover:bg-gray-50 text-sm transition-colors"
@@ -359,6 +359,7 @@ export function Navbar() {
             <div className="flex flex-col gap-1">
               {!user && <MobileNavLink href="/" onClick={() => setIsOpen(false)}>Inicio</MobileNavLink>}
               {user && <><MobileNavLink href="/comunidades" onClick={() => setIsOpen(false)}>Comunidades</MobileNavLink><MobileNavLink href="/eventos" onClick={() => setIsOpen(false)}>Eventos</MobileNavLink><MobileNavLink href="/directorio" onClick={() => setIsOpen(false)}>Directorio</MobileNavLink><MobileNavLink href="/conexiones" onClick={() => setIsOpen(false)}>Conexiones{pendingCount > 0 ? ` (${pendingCount})` : ""}</MobileNavLink><MobileNavLink href="/noticias" onClick={() => setIsOpen(false)}>Noticias</MobileNavLink></>}
+              {user && <MobileNavLink href="/preferencias" onClick={()=>setIsOpen(false)}>Preferencias y seguridad</MobileNavLink>}
               {user?.role === "institution" && <MobileNavLink href="/institucion" onClick={() => setIsOpen(false)}>Mi institución</MobileNavLink>}
 
               {user ? (

@@ -574,3 +574,12 @@ html { scrollbar-gutter:stable; }
 .email-compose .email-form-actions { flex-wrap:wrap; }
 .connection-page-error>div,.connection-page-success>div { min-width:0; max-width:100%; overflow-wrap:anywhere; }
 .email-history td { overflow-wrap:anywhere; }
+
+.security-form :is(input,select),.ui-content-reading select { width:100%; padding:12px; border:1px solid #C3D5E1; border-radius:9px; }
+.ui-content-reading>.member-section { margin-top:24px; }
+.ui-content-reading .member-section>h2 { margin-bottom:20px; }
+.community-tools { margin-top:24px; }
+.community-tools :is(input,select,textarea) { width:100%; padding:10px; border:1px solid #C3D5E1; border-radius:9px; }
+.community-invitations { display:grid; gap:14px; margin-bottom:24px; }
+.community-invitations article { padding:20px; border:1px solid #BFE6DC; border-radius:12px; background:#F0FCF9; }
+.community-invitations button { margin:12px 14px 0 0; }

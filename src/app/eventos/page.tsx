@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface Event {
+  cancelledAt?:number|null;
   id: number;
   title: string;
   description: string;
@@ -121,7 +122,7 @@ export default function EventsPage() {
                     <span className={`text-sm font-medium ${
                       event.type === "virtual" ? "text-blue-700" : "text-green-700"
                     }`}>
-                      {event.type === "virtual" ? "🖥️ Evento Virtual" : "📍 Evento Presencial"}
+                      {event.cancelledAt ? "Cancelado" : event.type === "virtual" ? "🖥️ Evento Virtual" : "📍 Evento Presencial"}
                     </span>
                     <span className="text-sm text-gray-500">
                       {event.attendeeCount} {event.attendeeCount === 1 ? "asistente" : "asistentes"}

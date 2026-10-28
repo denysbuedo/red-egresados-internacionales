@@ -1,5 +1,6 @@
 import { validImageUrl } from "@/lib/media";
 import { POST_TYPES, type PostType } from "@/lib/site";
+import { notifyMentions } from "@/lib/notification-suite";
 import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
@@ -179,7 +180,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear el post
-    const newPost = await db
+    const newPost = db.transaction(tx=>{
+     const created=tx
       .insert(userPosts)
       .values({
         graduateId,
@@ -190,7 +192,9 @@ export async function POST(request: NextRequest) {
         likes: 0,
         commentsCount: 0,
       })
-      .returning();
+      .returning().get();
+      notifyMentions(content.trim(),session.id,"/?post="+created.id,"post:"+created.id);return [created];
+    });
 
     return NextResponse.json({
       ...newPost[0],

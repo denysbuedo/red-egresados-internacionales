@@ -112,3 +112,8 @@ OAuth2 Client Credentials desde servidor, sin SMTP. Cliente `conecta`; URLs fija
 ### Avisos del ciclo de acceso
 
 Migración 0019 añade kind a email_dispatches. reserveAccessEmail exige transacción SQLite activa para reservar junto a registro o decisión; deliverAccessEmail reclama prepared→sending una sola vez después del commit. Plantillas en access-email-template.cjs con URLs fijas y HTML escapado. Fallos de correo no se propagan a la operación de cuenta; intentos no ejecutados se conservan como not_sent y no hay worker/reintentos. Límite automático de 5/destinatario/24h dentro del global 100/24h; límite manual 5/min/admin se filtra por kind=manual.
+
+
+### Preferencias, recuperación y ejecutor de correo
+
+Migración 0020 añade seis tablas: notification_preferences, notification_queue, notification_worker_state, password_reset_tokens, community_invitations, community_announcements; events incluye cancelled_at/revision. Núcleo CJS notification-engine para uso compartido entre servidor y worker Node, con tipos .d.cts. Proceso systemd oneshot/timer cada minuto, lease SQLite y hasta cinco entregas por ciclo, sin reintentos de estados reclamados. Digest diario local America/Havana y caducidad de pendientes. Password-recovery CJS comparte el motor para correo obligatorio, hash SHA256 de tokens, bcrypt de contraseñas y consumo transaccional con revocación de sesiones. Rutas públicas de recuperación usan Next after para no revelar existencia por espera del relay. TLS/OAuth y configuración privada existentes conservados.

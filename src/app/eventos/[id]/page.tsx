@@ -1,5 +1,6 @@
 "use client";
 
+import { EventManagement } from "@/components/EventManagement";
 import { PageHeader } from "@/components/PageHeader";
 
 import { useState, useEffect } from "react";
@@ -16,6 +17,7 @@ interface Attendee {
 }
 
 interface EventDetail {
+  cancelledAt?:number|null;canManage?:boolean;
   id: number;
   title: string;
   description: string;
@@ -136,6 +138,8 @@ export default function EventDetailPage() {
           </Link>
         </div>
 
+        <EventManagement event={event} onSaved={()=>void fetchEvent()} />
+        {event.cancelledAt && <p role="status" className="connection-page-error">Este evento está cancelado.</p>}
         <PageHeader title={event.title} eyebrow="AGENDA · ENCUENTRO DE LA COMUNIDAD" compact />
 
         {/* Event Info */}
@@ -216,7 +220,7 @@ export default function EventDetailPage() {
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => handleRSVP("attending")}
-                  disabled={rsvpLoading}
+                  disabled={rsvpLoading||!!event.cancelledAt}
                   className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     userStatus === "attending"
                       ? "bg-green-600 text-white"
@@ -227,7 +231,7 @@ export default function EventDetailPage() {
                 </button>
                 <button
                   onClick={() => handleRSVP("maybe")}
-                  disabled={rsvpLoading}
+                  disabled={rsvpLoading||!!event.cancelledAt}
                   className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     userStatus === "maybe"
                       ? "bg-yellow-100 text-yellow-800"

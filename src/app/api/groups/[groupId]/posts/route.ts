@@ -1,3 +1,4 @@
+import { notifyMentions } from "@/lib/notification-suite";
 import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
@@ -104,14 +105,16 @@ export async function POST(
       );
     }
 
-    const newPost = await db
+    const newPost = db.transaction(tx=>{const created=tx
       .insert(groupPosts)
       .values({
         groupId: parseInt(groupId),
         graduateId,
         content: content.trim(),
       })
-      .returning();
+      .returning().get();
+      notifyMentions(content.trim(),session.id,"/comunidades/"+groupId,"group-post:"+created.id,Number(groupId));return [created];
+    });
 
     return NextResponse.json(newPost[0], { status: 201 });
   } catch (error) {

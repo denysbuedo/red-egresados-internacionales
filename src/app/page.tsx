@@ -4,7 +4,7 @@ import { POST_TYPES } from "@/lib/site";
 import Link from "next/link";
 import { db } from "@/db";
 import { graduates, adminPosts, userPosts, events, groups, groupMembers } from "@/db/schema";
-import { sql, desc, eq, asc, gte } from "drizzle-orm";
+import { sql, desc, eq, asc, gte, and, isNull } from "drizzle-orm";
 import { getSession } from "@/lib/session";
 import { CreatePost } from "@/components/CreatePost";
 import { UserPostCard } from "@/components/UserPostCard";
@@ -16,6 +16,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
+  const selectedPostId=params.post && /^\d+$/.test(params.post) && Number.isSafeInteger(Number(params.post)) && Number(params.post)>0 ? Number(params.post) : null;
   const selectedType = POST_TYPES.find((type) => type.value === params.type)?.value;
   const session = await getSession({ allowPending: true });
   
@@ -75,7 +76,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
       })
       .from(userPosts)
       .leftJoin(graduates, eq(userPosts.graduateId, graduates.id))
-      .where(sql`EXISTS (SELECT 1 FROM users WHERE users.id = ${graduates.userId} AND users.status = 'approved') ${selectedType ? sql`AND ${userPosts.postType} = ${selectedType}` : sql``}`)
+      .where(sql`EXISTS (SELECT 1 FROM users WHERE users.id = ${graduates.userId} AND users.status = 'approved') ${selectedType ? sql`AND ${userPosts.postType} = ${selectedType}` : sql``} ${selectedPostId ? sql`AND ${userPosts.id} = ${selectedPostId}` : sql``}`)
       .orderBy(desc(userPosts.createdAt))
       .limit(20);
   }
@@ -85,7 +86,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
 
   const profile = db.select({ id: graduates.id, name: graduates.name, photo: graduates.photoUrl, profession: graduates.currentProfession, institution: graduates.university, employmentConfirmed: graduates.employmentConfirmed }).from(graduates).where(eq(graduates.userId, session.id)).get();
   const people = db.select({ id: graduates.id, name: graduates.name, profession: graduates.currentProfession, institution: graduates.university }).from(graduates).where(sql`${approvedProfiles} AND ${graduates.userId} != ${session.id}`).orderBy(desc(graduates.createdAt)).limit(3).all();
-  const agenda = db.select({ id: events.id, title: events.title, date: events.date, type: events.type }).from(events).where(gte(events.date, new Date(nowSec * 1000))).orderBy(asc(events.date)).limit(3).all();
+  const agenda = db.select({ id: events.id, title: events.title, date: events.date, type: events.type }).from(events).where(and(gte(events.date, new Date(nowSec * 1000)),isNull(events.cancelledAt))).orderBy(asc(events.date)).limit(3).all();
 
   // ============================================
   // HOME PARA USUARIOS LOGUEADOS
@@ -112,7 +113,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
             <div className="workspace-personal-identity"><Link href={userGraduateId ? `/miembros/${userGraduateId}` : "/miembros/registro"} aria-label="Mi perfil"><ProfileAvatar name={profile?.name || session.username} src={profile?.photo || null} /></Link><div><h1>Hola, {profile?.name.split(" ")[0] || session.username}.</h1><p className="workspace-identity-role">{profile?.profession || "Tu espacio profesional"}</p>{profile?.institution && <p className="workspace-identity-institution">{profile.institution}</p>}<Link href={userGraduateId ? `/miembros/${userGraduateId}` : "/miembros/registro"} className="workspace-identity-link">Mi perfil ↗</Link></div></div>
             <h2 className="workspace-welcome-tagline">El conocimiento nos conecta.</h2>
             <p>Una conversación puede ser el inicio de tu próxima colaboración. Comparte lo que haces y descubre lo que nos une.</p>
-            <div className="workspace-welcome-actions"><a href="#compartir" className="conecta-cta">Compartir un aporte <span aria-hidden="true">↗</span></a><Link href="/directorio" className="workspace-quiet-link">Explorar la comunidad <span aria-hidden="true">→</span></Link>{session.role==="admin" && <Link href="/admin" className="workspace-quiet-link">Administración ↗</Link>}{session.role==="institution" && <Link href="/institucion" className="workspace-quiet-link">Mi institución ↗</Link>}{session.role==="editor" && <Link href="/admin/posts" className="workspace-quiet-link">Gestionar noticias ↗</Link>}</div>
+            <div className="workspace-welcome-actions"><a href="#compartir" className="conecta-cta">Compartir un aporte <span aria-hidden="true">↗</span></a><Link href="/directorio" className="workspace-quiet-link">Explorar la comunidad <span aria-hidden="true">→</span></Link><Link href="/preferencias" className="workspace-quiet-link">Mis preferencias de correo ↗</Link>{session.role==="admin" && <Link href="/admin" className="workspace-quiet-link">Administración ↗</Link>}{session.role==="institution" && <Link href="/institucion" className="workspace-quiet-link">Mi institución ↗</Link>}{session.role==="editor" && <Link href="/admin/posts" className="workspace-quiet-link">Gestionar noticias ↗</Link>}</div>
           </div>
           <EcosystemMosaic />
         </header>
@@ -126,8 +127,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
             {profile && !profile.employmentConfirmed && <section className="workspace-affiliation"><p>Completa tu vínculo institucional para que tu perfil refleje tu actividad en la red.</p><Link href="/completar-perfil">Actualizar mi vínculo →</Link></section>}
             {profile && (!profile.profession || !profile.institution) && <section className="workspace-affiliation"><p>Tu acceso está aprobado. Añade tu cargo, formación y presentación para que puedan encontrarte.</p><Link href={`/miembros/${profile.id}/editar`}>Completar mi perfil →</Link></section>}
             <section id="compartir" className="workspace-composer" aria-label="Compartir conocimiento">{userGraduateId ? <details><summary><span className="workspace-composer-icon" aria-hidden="true">＋</span><span><strong>¿En qué estás trabajando?</strong><small>Comparte un resultado, una idea o una pregunta.</small></span><span className="workspace-compose-action">Crear aporte <span aria-hidden="true">↗</span></span></summary><CreatePost /></details> : <div className="workspace-create-profile"><h2>Tu experiencia suma a la red</h2><p>Crea tu perfil profesional para compartir resultados y participar en las conversaciones.</p><Link href="/miembros/registro" className="workspace-inline-link">Crear mi perfil →</Link></div>}</section>
-            <section id="actividad" className="workspace-activity"><div className="workspace-section-heading"><div><p className="workspace-kicker">CONOCIMIENTO EN MOVIMIENTO</p><h2>Actividad profesional y académica</h2></div><span className="workspace-live-dot">Reciente</span></div><nav className="workspace-filters" aria-label="Tipos de aportes"><Link href="/#actividad" aria-current={!selectedType ? "page" : undefined}>Todos</Link>{POST_TYPES.map((type) => <Link key={type.value} href={`/?type=${type.value}#actividad`} aria-current={selectedType === type.value ? "page" : undefined}>{type.label}</Link>)}</nav>
-              {userPostsData.length ? <div className="workspace-posts">{userPostsData.map((post) => <UserPostCard key={post.id} {...post} />)}</div> : <div className="workspace-empty"><span aria-hidden="true">◇</span><h3>La próxima conversación puede empezar contigo.</h3><p>{selectedType ? "Todavía no hay aportes de este tipo. Comparte un resultado o explora el resto de la actividad." : "Comparte un resultado, plantea una consulta o presenta una iniciativa. Tu experiencia puede conectar con la de alguien más."}</p><a href="#compartir" className="workspace-inline-link">Compartir conocimiento →</a>{selectedType && <Link href="/#actividad">Ver todos los aportes</Link>}</div>}
+            <section id="actividad" className="workspace-activity"><div className="workspace-section-heading"><div><p className="workspace-kicker">CONOCIMIENTO EN MOVIMIENTO</p><h2>{selectedPostId?"Conversación en CONECTA":"Actividad profesional y académica"}</h2></div><span className="workspace-live-dot">Reciente</span></div><nav className="workspace-filters" aria-label="Tipos de aportes"><Link href="/#actividad" aria-current={!selectedType ? "page" : undefined}>Todos</Link>{POST_TYPES.map((type) => <Link key={type.value} href={`/?type=${type.value}#actividad`} aria-current={selectedType === type.value ? "page" : undefined}>{type.label}</Link>)}</nav>
+              {userPostsData.length ? <div className="workspace-posts">{userPostsData.map((post) => <UserPostCard key={post.id} {...post} showCommentsInitially={!!selectedPostId} />)}</div> : <div className="workspace-empty"><span aria-hidden="true">◇</span><h3>La próxima conversación puede empezar contigo.</h3><p>{selectedType ? "Todavía no hay aportes de este tipo. Comparte un resultado o explora el resto de la actividad." : "Comparte un resultado, plantea una consulta o presenta una iniciativa. Tu experiencia puede conectar con la de alguien más."}</p><a href="#compartir" className="workspace-inline-link">Compartir conocimiento →</a>{selectedType && <Link href="/#actividad">Ver todos los aportes</Link>}</div>}
             </section>
           </div>
           <aside className="workspace-right" aria-label="Descubre la comunidad">

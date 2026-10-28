@@ -1,5 +1,6 @@
 "use client";
 
+import { CommunityInvitations } from "@/components/CommunityMailTools";
 import { PageHeader } from "@/components/PageHeader";
 
 import { useState, useEffect, useRef } from "react";
@@ -142,6 +143,7 @@ export default function CommunitiesPage() {
           </button>} />
 
         {error && !showCreateForm && <p role="alert" className="connection-page-error">{error}</p>}
+        <CommunityInvitations />
         {/* Formulario crear grupo */}
         {showCreateForm && (
           <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">

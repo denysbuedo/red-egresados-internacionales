@@ -1,0 +1,21 @@
+[Unit]
+Description=CONECTA - Avisos por correo y resumen diario
+After=network-online.target red-egresados.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=red-egresados
+Group=red-egresados
+WorkingDirectory=/var/www/red-egresados-internacionales
+Environment=NODE_ENV=production
+EnvironmentFile=-/etc/red-egresados/environment
+EnvironmentFile=/etc/red-egresados/notifications.env
+ExecStart=/opt/red-egresados/node/bin/node /var/www/red-egresados-internacionales/scripts/process-notification-mail.cjs
+TimeoutStartSec=240
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/red-egresados
+BindReadOnlyPaths=/etc/red-egresados/notification-hosts:/etc/hosts

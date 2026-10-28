@@ -10,6 +10,6 @@ export default function LoginPage() {
       <p className="mt-6 border-t border-gray-200 pt-5 text-sm text-gray-600">¿Todavía no tienes cuenta? <Link href="/register" className="conecta-auth-link">Solicita tu acceso.</Link></p>
       <p className="mt-3 text-xs leading-relaxed text-gray-500">Las solicitudes están sujetas a revisión institucional.</p>
     </section>
-    <div className="conecta-auth-footer"><p>¿Necesitas recuperar tu acceso? <Link href="/ayuda" className="conecta-auth-link">Consulta la ayuda institucional.</Link></p><p className="mt-3">Ministerio de Educación Superior de Cuba · RedUniv</p></div>
+    <div className="conecta-auth-footer"><p>¿Necesitas recuperar tu acceso? <Link href="/recuperar-acceso" className="conecta-auth-link">Recuperar mi contraseña.</Link></p><p className="mt-3">Ministerio de Educación Superior de Cuba · RedUniv</p></div>
   </main>;
 }

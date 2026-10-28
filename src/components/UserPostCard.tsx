@@ -7,6 +7,7 @@ import { PostImage } from "./PostImage";
 import { PostComments } from "./PostComments";
 
 interface UserPostCardProps {
+  showCommentsInitially?:boolean;
   id: number;
   content: string;
   imageUrl: string | null;
@@ -23,6 +24,7 @@ interface UserPostCardProps {
 }
 
 export function UserPostCard({
+  showCommentsInitially=false,
   id,
   content,
   imageUrl,
@@ -36,8 +38,8 @@ export function UserPostCard({
   graduateProfession,
   graduateCountry,
 }: UserPostCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showComments, setShowComments] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(showCommentsInitially);
+  const [showComments, setShowComments] = useState(showCommentsInitially);
   const [localCommentsCount, setLocalCommentsCount] = useState(commentsCount);
 
 

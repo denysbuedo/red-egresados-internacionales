@@ -4,15 +4,17 @@ import { PageHeader } from "./PageHeader";
 type Recipient={id:number;name:string;email:string};
 type Item={id:string;recipient:string;subject:string;status:string;code?:string;correlationId?:string;createdAt:number;kind?:string};
 const labels:Record<string,string>={accepted:"Aceptado por el relay",failed:"No aceptado",unknown:"Resultado incierto",sending:"En curso",prepared:"Preparado",not_sent:"No enviado"};
-const kinds:Record<string,string>={manual:"Aviso manual",access_received:"Solicitud recibida",access_approved:"Cuenta aprobada",access_rejected:"Solicitud rechazada"};
+const kinds:Record<string,string>={manual:"Aviso manual",access_received:"Solicitud recibida",access_approved:"Cuenta aprobada",access_rejected:"Solicitud rechazada",password_reset:"Recuperación de acceso",password_changed:"Cambio de contraseña",connection_requested:"Invitación de conexión",connection_accepted:"Conexión aceptada",community_invited:"Invitación a comunidad",community_announcement:"Aviso importante",event_registered:"Inscripción a evento",event_updated:"Cambio de evento",event_cancelled:"Evento cancelado",event_reminder:"Recordatorio",post_replied:"Respuesta a un aporte",mention:"Mención",daily_digest:"Resumen diario"};
 export function EmailNotifications(){
+ const [automation,setAutomation]=useState<{lastRun:number|null;pending:number}|null>(null);
  const [recipients,setRecipients]=useState<Recipient[]>([]),[items,setItems]=useState<Item[]>([]),[enabled,setEnabled]=useState(false),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[result,setResult]=useState<Item|null>(null),[preview,setPreview]=useState(false),[attempted,setAttempted]=useState(false);
  const [recipientId,setRecipientId]=useState(''),[subject,setSubject]=useState(''),[textBody,setTextBody]=useState('');
  const operation=useRef<string|null>(null),lock=useRef(false);
- const load=useCallback(async()=>{try{const response=await fetch('/api/admin/notifications',{cache:'no-store'});const data=await response.json();if(!response.ok)throw new Error(data.error||'No se pudo cargar el historial.');setEnabled(data.enabled);setRecipients(data.recipients);setItems(data.history);}catch(reason){setError(reason instanceof Error?reason.message:'Revisa tu conexión.');}finally{setLoading(false);}},[]);
+ const load=useCallback(async()=>{try{const response=await fetch('/api/admin/notifications',{cache:'no-store'});const data=await response.json();if(!response.ok)throw new Error(data.error||'No se pudo cargar el historial.');setAutomation(data.automation||null);setEnabled(data.enabled);setRecipients(data.recipients);setItems(data.history);}catch(reason){setError(reason instanceof Error?reason.message:'Revisa tu conexión.');}finally{setLoading(false);}},[]);
  useEffect(()=>{void load();},[load]);
  const selected=recipients.find(person=>person.id===Number(recipientId));
  return <div className="ui-page"><PageHeader title="Notificaciones por correo" description="Envía avisos a una persona de la comunidad y consulta el resultado de cada operación." eyebrow="ADMINISTRACIÓN · COMUNICACIÓN" />
+ {automation&&<p className="email-guidance">Avisos opcionales pendientes: {automation.pending}. Última revisión del proceso: {automation.lastRun?new Date(automation.lastRun).toLocaleString('es-CU',{timeZone:'America/Havana'}):'Sin ejecución registrada'}.</p>}
  <p className="email-guidance">Un destinatario por envío. El relay acepta el mensaje, pero su aceptación no confirma la entrega al buzón. No se realizan reintentos automáticos. Límite: 5 envíos por minuto por administrador y 100 al día en la plataforma.</p>
  {!loading && !enabled && <p role="status" className="connection-page-error">Envíos deshabilitados. Pendiente de prueba controlada y habilitación con Interoperabilidad.</p>}
  {error && <p role="alert" className="connection-page-error">{error}</p>}

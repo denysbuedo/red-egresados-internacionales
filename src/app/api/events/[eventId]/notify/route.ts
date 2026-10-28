@@ -1,7 +1,8 @@
 import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/db";
+import { db, sqlite } from "@/db";
 import { events, eventAttendees, graduates, notifications } from "@/db/schema";
+import { notificationEngine } from "@/lib/notification-suite";
 import { getSession } from "@/lib/session";
 import { eq, and } from "drizzle-orm";
 
@@ -60,6 +61,7 @@ export async function POST(
         .limit(1);
 
       if (graduate.length > 0 && graduate[0].userId) {
+        if(!event.cancelledAt)notificationEngine.enqueue({key:'event-manual-reminder:'+event.id+':'+event.revision+':'+graduate[0].userId,userId:graduate[0].userId,category:'events',kind:'event_reminder',subject:'CONECTA · Recordatorio de evento',text:'Recuerda tu participación en «'+event.title+'». Consulta los detalles en CONECTA.',link:'/eventos/'+event.id,contextType:'event',contextId:event.id});
         await db.insert(notifications).values({
           userId: graduate[0].userId,
           type: "post_commented", // Reutilizando tipo existente

@@ -196,6 +196,7 @@ export const notifications = sqliteTable("notifications", {
 });
 
 export const events = sqliteTable("events", {
+  cancelledAt:integer("cancelled_at"), revision:integer("revision").notNull().default(0),
   id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   description: text("description").notNull(),
@@ -282,3 +283,16 @@ export const emailDispatches = sqliteTable("email_dispatches", {
   status:text("status").notNull(), code:text("code"), correlationId:text("correlation_id").notNull(),
   createdAt:integer("created_at").notNull(),updatedAt:integer("updated_at").notNull(),
 });
+
+
+export const notificationPreferences=sqliteTable("notification_preferences",{
+ userId:integer("user_id").primaryKey().references(()=>users.id,{onDelete:"cascade"}),
+ connections:text("connections").notNull().default("off"),communities:text("communities").notNull().default("off"),events:text("events").notNull().default("off"),activity:text("activity").notNull().default("off"),updatedAt:integer("updated_at").notNull(),
+});
+export const notificationQueue=sqliteTable("notification_queue",{
+ id:integer("id").primaryKey({autoIncrement:true}),eventKey:text("event_key").notNull().unique(),userId:integer("user_id").notNull().references(()=>users.id,{onDelete:"cascade"}),category:text("category").notNull(),kind:text("kind").notNull(),subject:text("subject").notNull(),textBody:text("text_body").notNull(),link:text("link").notNull(),dueAt:integer("due_at").notNull(),createdAt:integer("created_at").notNull(),state:text("state").notNull().default("pending"),dispatchId:text("dispatch_id").references(()=>emailDispatches.id,{onDelete:"set null"}),contextType:text("context_type"),contextId:integer("context_id"),
+});
+export const notificationWorkerState=sqliteTable("notification_worker_state",{key:text("key").primaryKey(),value:integer("value").notNull()});
+export const passwordResetTokens=sqliteTable("password_reset_tokens",{tokenHash:text("token_hash").primaryKey(),userId:integer("user_id").notNull().references(()=>users.id,{onDelete:"cascade"}),expiresAt:integer("expires_at").notNull(),createdAt:integer("created_at").notNull()});
+export const communityInvitations=sqliteTable("community_invitations",{id:integer("id").primaryKey({autoIncrement:true}),groupId:integer("group_id").notNull().references(()=>groups.id,{onDelete:"cascade"}),userId:integer("user_id").notNull().references(()=>users.id,{onDelete:"cascade"}),invitedBy:integer("invited_by").references(()=>users.id,{onDelete:"set null"}),status:text("status").notNull().default("pending"),createdAt:integer("created_at").notNull()});
+export const communityAnnouncements=sqliteTable("community_announcements",{id:integer("id").primaryKey({autoIncrement:true}),groupId:integer("group_id").notNull().references(()=>groups.id,{onDelete:"cascade"}),authorId:integer("author_id").references(()=>users.id,{onDelete:"set null"}),title:text("title").notNull(),content:text("content").notNull(),createdAt:integer("created_at").notNull()});

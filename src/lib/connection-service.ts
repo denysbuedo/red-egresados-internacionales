@@ -1,4 +1,5 @@
 import "server-only";
+import { notifyProfile } from "./notification-suite";
 import { sqlite } from "@/db";
 
 type Row = { id:number; sender_id:number; receiver_id:number; status:string; created_at:number|null };
@@ -50,6 +51,7 @@ export function sendConnection(own:Profile,receiver:number) {
     const reusable=(sqlite.prepare('SELECT * FROM connections WHERE sender_id=? AND receiver_id=?').get(own.id,receiver) as Row|undefined)||current;
     if(reusable)sqlite.prepare("UPDATE connections SET sender_id=?,receiver_id=?,status='pending',created_at=? WHERE id=?").run(own.id,receiver,now,reusable.id);
     else sqlite.prepare("INSERT INTO connections (sender_id,receiver_id,status,created_at) VALUES (?,?,'pending',?)").run(own.id,receiver,now);
+    notifyProfile(receiver,'connections','connection_requested',`${own.name} quiere conectar contigo.`,'/conexiones',undefined,pair(own.id,receiver)?.id);
     return state(pair(own.id,receiver),own.id,receiver);
   }).immediate();
 }
@@ -71,6 +73,7 @@ export function respondConnection(own:Profile,id:number,action:unknown) {
     else {
       sqlite.prepare("UPDATE connections SET status='accepted' WHERE id=? AND status='pending'").run(id);
       const sender=sqlite.prepare('SELECT u.id FROM users u JOIN graduates g ON g.user_id=u.id WHERE g.id=?').get(row.sender_id) as {id:number}|undefined;
+      notifyProfile(row.sender_id,'connections','connection_accepted',`${own.name} aceptó tu solicitud de conexión.`,'/miembros/'+own.id,undefined,id);
       if(sender)sqlite.prepare("INSERT INTO notifications (user_id,type,message,link,read,created_at) VALUES (?,'connection_accepted',?,?,0,?)").run(sender.id,`${own.name} aceptó tu solicitud de conexión`,`/miembros/${own.id}`,Math.floor(Date.now()/1000));
     }
     return state(pair(own.id,row.sender_id),own.id,row.sender_id);

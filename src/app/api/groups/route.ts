@@ -223,6 +223,7 @@ export async function PUT(request: NextRequest) {
     if(action==="leave" && group.creator_id===own.id)return {error:"El creador debe permanecer en la comunidad",status:409};
     if(action==="join")sqlite.prepare("INSERT INTO group_members (group_id,graduate_id,role,joined_at) SELECT ?,?,'member',? WHERE NOT EXISTS (SELECT 1 FROM group_members WHERE group_id=? AND graduate_id=?)").run(id,own.id,Math.floor(Date.now()/1000),id,own.id);
     else sqlite.prepare('DELETE FROM group_members WHERE group_id=? AND graduate_id=?').run(id,own.id);
+    if(action==='join')sqlite.prepare("UPDATE community_invitations SET status='accepted' WHERE group_id=? AND user_id=? AND status='pending'").run(id,session.id);
     return {success:true,action:action==="join"?"joined":"left",isMember:action==="join"};
   }).immediate();
   return NextResponse.json(result,{status:'status' in result?result.status:200,headers:{"Cache-Control":"private, no-store"}});

@@ -1,10 +1,10 @@
 import { authorizeApi } from "@/lib/api-access";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/db";
+import { db, sqlite } from "@/db";
 import { postComments, userPosts, graduates, users } from "@/db/schema";
 import { getSession } from "@/lib/session";
 import { eq, and, gte, desc, sql } from "drizzle-orm";
-import { createNotification } from "@/lib/notifications";
+import { notifyProfile,notifyMentions } from "@/lib/notification-suite";
 
 const DAILY_COMMENT_LIMIT = 10;
 
@@ -133,51 +133,19 @@ export async function POST(
       );
     }
 
-    // Crear el comentario
-    const newComment = await db
-      .insert(postComments)
-      .values({
-        postId: parseInt(postId),
-        graduateId,
-        content: content.trim(),
-      })
-      .returning();
-
-    // Actualizar contador de comentarios
-    await db
-      .update(userPosts)
-      .set({ commentsCount: sql`comments_count + 1` })
-      .where(eq(userPosts.id, parseInt(postId)));
-
-    // Crear notificación para el autor del post
-    const post = await db
-      .select({
-        graduateId: userPosts.graduateId,
-        content: userPosts.content,
-      })
-      .from(userPosts)
-      .where(eq(userPosts.id, parseInt(postId)))
-      .limit(1);
-
-    if (post.length > 0 && post[0].graduateId !== graduateId) {
-      const postAuthor = await db
-        .select({ userId: graduates.userId })
-        .from(graduates)
-        .where(eq(graduates.id, post[0].graduateId))
-        .limit(1);
-
-      if (postAuthor.length > 0 && postAuthor[0].userId) {
-        await createNotification(
-          postAuthor[0].userId,
-          "post_commented",
-          `${session.username} comentó tu publicación`,
-          `/miembros/${graduateId}`
-        );
+    const comment=sqlite.transaction(()=>{
+      const createdAt=Math.floor(Date.now()/1000);const inserted=sqlite.prepare('INSERT INTO post_comments (post_id,graduate_id,content,created_at) VALUES (?,?,?,?)').run(Number(postId),graduateId,content.trim(),createdAt);
+      sqlite.prepare('UPDATE user_posts SET comments_count=comments_count+1 WHERE id=?').run(Number(postId));
+      const author=sqlite.prepare('SELECT graduate_id FROM user_posts WHERE id=?').get(Number(postId)) as {graduate_id:number};
+      const id=Number(inserted.lastInsertRowid);
+      if(author.graduate_id!==graduateId){const recipient=sqlite.prepare('SELECT user_id FROM graduates WHERE id=?').get(author.graduate_id) as {user_id:number|null};notifyProfile(author.graduate_id,'activity','post_replied',session.username+' respondió a tu publicación.','/?post='+postId+'#actividad','comment:'+id+':'+recipient.user_id);
+       const target=sqlite.prepare('SELECT user_id FROM graduates WHERE id=?').get(author.graduate_id) as {user_id:number|null};if(target?.user_id)sqlite.prepare("INSERT INTO notifications (user_id,type,message,link,read,created_at) VALUES (?,'post_commented',?,?,0,?)").run(target.user_id,session.username+' comentó tu publicación','/?post='+postId,createdAt);
       }
-    }
-
+      notifyMentions(content.trim(),session.id,'/?post='+postId,'comment:'+id);
+      return {id,postId:Number(postId),graduateId,content:content.trim(),createdAt:new Date(createdAt*1000)};
+    }).immediate();
     return NextResponse.json({
-      ...newComment[0],
+      ...comment,
       graduateName: session.username,
       graduatePhoto: null,
       graduateProfession: "",
