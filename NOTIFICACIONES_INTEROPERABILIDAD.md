@@ -36,3 +36,9 @@ Posteriormente se valida OAuth HTTP200 en la VM con el entorno y resolución de 
 21 pruebas HTTP con proveedor simulado y 14 unitarias; los tests no contactan al relay real. Cubren CSRF/roles, reserva concurrente, deduplicación, límites, errores OAuth, rechazo, timeout, resultado incierto y secreto ausente en respuestas. Chrome verifica vista previa escapada, historial, bloqueo, cinco tamaños de pantalla y ausencia de errores JS.
 
 Migración aditiva 0018_add_email_dispatches.sql. Conservar todas las cuentas, contenido e imágenes actuales. El script histórico de reinicio solo se adapta al nuevo esquema para mantener sus pruebas: **no se ejecuta en producción**. Respaldo: `/var/backups/red-egresados/pre-conecta-email-20261027`.
+
+
+- Publicado como `ea51024`. Linux: build/typecheck/lint sin errores, 21 pruebas HTTP y 14 unitarias correctas. Chrome: creación/vista previa/aceptación y fallo simulado, historial, bloqueo, 320–1440px sin overflow ni errores JS.
+- Correo manual habilitado después de la prueba autorizada y OAuth200 con Node de producción. Verificados por HTTPS /admin/notificaciones y /api/admin/notifications: enabled=true, destinatarios aprobados, sin secreto/token expuestos. Historial inicial vacío porque el único correo controlado salió desde desarrollo, no desde esta API.
+- Todos los valores anteriores conservados en las 19 tablas existentes; solo se añade email_dispatches y una entrada al registro de migraciones (19 migraciones en total). Cuentas, perfiles, aporte, conexiones, comunidad, imágenes y credenciales anteriores intactos. No se ejecutó el reinicio de datos.
+- Manifiesto de 183 archivos coincide con la compilación Linux y la VM. Servicio activo y NRestarts=0. Secreto de Interoperabilidad escaneado contra fuentes rastreadas sin coincidencias. Namespace del servicio utiliza HAProxy interno; no se modifica la resolución global.
