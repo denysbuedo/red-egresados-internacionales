@@ -13,12 +13,14 @@ const modules = [
 
 export function PublicLanding() {
   return <div className="conecta-public">
-    <header className="conecta-public-header">
-      <Link href="/" aria-label="CONECTA, inicio"><BrandLogo priority /></Link>
+    <header className="reduniv-header">
+    <div className="reduniv-header-container conecta-public-header reduniv-header-row">
+      <Link href="/" aria-label="CONECTA, inicio"><BrandLogo header priority /></Link>
       <nav aria-label="Navegación principal">
         <a href="#ecosistema">Ecosistema</a><a href="#comunidad">Comunidad</a><a href="#proyectos">Proyectos</a>
         <Link href="/login" className="conecta-header-login">Iniciar sesión <span aria-hidden="true">↗</span></Link>
       </nav>
+    </div>
     </header>
     <main>
       <section className="conecta-hero" aria-labelledby="hero-title">

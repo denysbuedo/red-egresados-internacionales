@@ -311,3 +311,10 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 - Producción/HTTPS: recuperación pública, preferencias privadas, invitaciones, panel de correo y APIs protegidas comprobados. Timer conecta-notification-mail activo y habilitado; primer proceso Result=success/ExecMainStatus=0 como red-egresados, con heartbeat visible. Cero preferencias activadas y cero avisos opcionales en cola al desplegar.
 - Todas las filas y columnas previas conservadas en las 20 tablas originales; seis tablas nuevas y metadatos de evento adicionales, 26 tablas de aplicación y 21 migraciones en total. Estado observado: 5 cuentas/perfiles, 1 aporte, 8 conexiones y 2 comunidades. Sin altas de prueba, cambios de contraseña/decisiones reales ni correos retroactivos.
 - Manifiesto de 213 archivos coincide con compilación Linux y VM. Servicio principal activo y NRestarts=0. Imágenes, historial de correo, secretos y resolución privada de HAProxy intactos. Snapshot pre-cutover y compilación anterior conservados en /var/backups/red-egresados/pre-conecta-notification-suite-20261027.
+
+
+## Normalización de cabeceras RedUniv — 2026-10-30
+
+- Alcance autorizado: solo CONECTA; otros proyectos/demos independientes. Cabecera pública y privada comparten contenedor útil 1280px, márgenes mínimos 24/16px, alturas 72/64px y logo óptico 36/32px; fondo blanco y navegación azul institucional a la derecha. Opciones y funciones conservadas.
+- Nuevo SVG público de cabecera con viewBox sin margen transparente; originales conservados para pie/administración y demás usos. Compensación del gutter reservado para mantener X=80–1360 en viewport1440 y X=16–374 en390.
+- Chrome zoom100%: 16 vistas públicas/privadas a1440/390, apertura y navegación móvil, sin overflow ni erroresJS. Build/TypeScript/ESLint sin errores (dos advertencias previas). Comparación entre tres marcas pendiente de URL válidas: convoca.reduniv.edu.cu y aprende.reduniv.edu.cu no resuelven. Documento NORMALIZACION_CABECERA.md.
