@@ -14,4 +14,11 @@ Compilación/TypeScript y ESLint sin errores (dos advertencias anteriores en Nav
 
 Medidas: a 1440 px, contenedor X=80–1360, fila 72 px y logo 36 px; a 390 px, X=16–374, fila 64 px y logo 32 px. Símbolo visible alineado con el borde, tolerancia del viewBox inferior a 0,2 px.
 
-Comparación entre marcas pendiente: los nombres probados convoca.reduniv.edu.cu y aprende.reduniv.edu.cu no resuelven en DNS desde el equipo. Se han solicitado sus URL; no se modifican esos proyectos ni demos. Evidencia local en el directorio temporal conecta-header-20261030 (report.json y capturas).
+El operador indica expresamente no comparar con CONVOCA/APRENDE. Validación limitada a CONECTA; no se modifican esos proyectos ni demos. Evidencia local en el directorio temporal conecta-header-20261030 (report.json y capturas).
+
+
+## Despliegue
+
+Implementación 3eae9fd. Build Linux correcto y cinco archivos de ejecución coincidentes por SHA256 con la versión validada. Respaldo previo de código/base de datos en /var/backups/red-egresados/pre-header-20261030; compilación anterior conservada. Sin migraciones ni modificaciones de contenido/configuración privada. Servicio principal activo sin reinicios automáticos y timer de notificaciones reactivado.
+
+Comprobación HTTPS en producción: medidas correctas en las mismas 16 vistas a1440/390px y navegación móvil funcional. Se observaron avisos React418 de hidratación de texto en contenido existente; la validación local con datos aislados no los reproduce. No afectan las medidas verificadas de la cabecera; se documentan separadamente del cambio visual.
