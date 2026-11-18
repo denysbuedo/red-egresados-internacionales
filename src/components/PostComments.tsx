@@ -81,6 +81,7 @@ export function PostComments({ postId, currentGraduateId, onCountChange }: PostC
       if (response.ok) {
         setNewComment("");
         fetchComments();
+        window.dispatchEvent(new Event("conecta:notifications-changed"));
       } else {
         alert(data.error || "Error al comentar");
       }

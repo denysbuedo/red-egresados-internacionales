@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       .orderBy(desc(notifications.createdAt))
       .limit(50);
 
-    return NextResponse.json(notifs);
+    return NextResponse.json(notifs, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
   } catch (error) {
     console.error("Error fetching notifications:", error);
     return NextResponse.json(

@@ -3,7 +3,7 @@ import { notifications } from "@/db/schema";
 
 export async function createNotification(
   userId: number,
-  type: "connection_accepted" | "post_commented" | "comment_replied",
+  type: "connection_accepted" | "post_commented" | "comment_replied" | "problem_report",
   message: string,
   link?: string
 ) {

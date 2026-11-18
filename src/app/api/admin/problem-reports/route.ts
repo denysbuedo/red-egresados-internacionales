@@ -1,0 +1,6 @@
+import { NextRequest,NextResponse } from "next/server";
+import { authorizeApi } from "@/lib/api-access";
+import { sqlite } from "@/db";
+
+export async function GET(request:NextRequest){const denied=await authorizeApi(request,["admin"]);if(denied)return denied;const rows=sqlite.prepare("SELECT r.id,r.user_id AS userId,u.username,r.category,r.subject,r.description,r.contact_email AS contactEmail,r.page_url AS pageUrl,r.status,r.created_at AS createdAt FROM problem_reports r LEFT JOIN users u ON u.id=r.user_id ORDER BY CASE r.status WHEN 'new' THEN 0 WHEN 'in_progress' THEN 1 ELSE 2 END,r.created_at DESC LIMIT 300").all();return NextResponse.json(rows,{headers:{"Cache-Control":"private, no-store"}});}
+export async function PATCH(request:NextRequest){const denied=await authorizeApi(request,["admin"]);if(denied)return denied;let body;try{body=await request.json();}catch{return NextResponse.json({error:"Solicitud inválida"},{status:400});}if(!Number.isSafeInteger(body?.id)||!['new','in_progress','resolved'].includes(body?.status))return NextResponse.json({error:"Estado inválido"},{status:400});const changed=sqlite.prepare("UPDATE problem_reports SET status=? WHERE id=?").run(body.status,body.id);if(!changed.changes)return NextResponse.json({error:"Reporte no encontrado"},{status:404});return NextResponse.json({success:true});}

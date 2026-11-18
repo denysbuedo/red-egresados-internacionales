@@ -73,7 +73,7 @@ export function Navbar() {
     const version = ++notificationSequence.current;
     try {
       // Get all notifications, not just unread
-      const response = await fetch("/api/notifications");
+      const response = await fetch("/api/notifications", { cache: "no-store" });
       if (response.ok) {
         const data = await response.json();
         if (version !== notificationSequence.current) return;
@@ -130,15 +130,35 @@ export function Navbar() {
   };
 
   useEffect(() => {
-    fetchUser();
-    fetchPendingCount();
-    fetchNotifications();
+    let active = true;
+    let interval: ReturnType<typeof setInterval> | undefined;
+    void fetchUser().then(() => {
+      if (!active) return;
+      void fetchPendingCount();
+      void fetchNotifications();
+      interval = setInterval(() => {
+        if (document.visibilityState === "visible") void fetchNotifications();
+      }, 10000);
+    });
 
-    const refresh = () => { void fetchPendingCount(); void fetchNotifications(); };
-    const interval = setInterval(refresh, 30000);
+    const refresh = () => {
+      if (document.visibilityState !== "hidden") {
+        void fetchPendingCount();
+        void fetchNotifications();
+      }
+    };
     window.addEventListener("conecta:connections-changed", refresh);
+    window.addEventListener("conecta:notifications-changed", refresh);
     window.addEventListener("focus", refresh);
-    return () => { clearInterval(interval); window.removeEventListener("conecta:connections-changed", refresh); window.removeEventListener("focus", refresh); };
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      active = false;
+      if (interval) clearInterval(interval);
+      window.removeEventListener("conecta:connections-changed", refresh);
+      window.removeEventListener("conecta:notifications-changed", refresh);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
   }, []);
 
 
@@ -165,7 +185,7 @@ export function Navbar() {
               <div className="relative">
                 <button
                   aria-label="Notificaciones"
-                  onClick={() => setNotifOpen(!notifOpen)}
+                  onClick={() => { const opening = !notifOpen; setNotifOpen(opening); if (opening) void fetchNotifications(); }}
                   className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

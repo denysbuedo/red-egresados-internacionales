@@ -602,3 +602,44 @@ html { scrollbar-gutter:stable; }
  .reduniv-header-row { height:64px; gap:16px; }
  .reduniv-header-row .brand-logo { height:32px; width:auto; }
 }
+
+
+/* Community notices are presented as readable editorial cards. */
+.community-tools { padding:0; overflow:hidden; }
+.community-announcements-heading { padding:24px 26px 18px; border-bottom:1px solid #E5EDF2; }
+.community-announcements-heading h2 { margin:6px 0; color:#102B46; font-size:21px; font-weight:700; }
+.community-announcements-heading>p { color:#637A8D; font-size:13px; margin:0; }
+.community-announcements-list { display:grid; gap:12px; padding:18px; }
+.community-announcement-card { display:flex; align-items:flex-start; gap:15px; padding:20px; border:1px solid #DCE7EE; border-radius:14px; background:#fff; }
+.community-announcement-mark { flex:0 0 34px; width:34px; height:34px; display:grid; place-items:center; border-radius:10px; background:#E8FAF6; color:#117666; font-weight:800; }
+.community-announcement-copy { min-width:0; }
+.community-announcement-copy time { color:#637A8D; font-size:11px; }
+.community-announcement-copy h3 { margin:5px 0 8px; color:#102B46; font-size:16px; font-weight:700; overflow-wrap:anywhere; }
+.community-announcement-copy p { margin:0; color:#334F67; font-size:14px; line-height:1.75; white-space:pre-wrap; overflow-wrap:anywhere; }
+.community-announcements-empty { display:flex; align-items:center; gap:15px; margin:18px; padding:22px; border:1px dashed #C3D5E1; border-radius:14px; background:#F8FBFD; color:#637A8D; }
+.community-announcements-empty>span { color:#128B86; font-size:24px; }
+.community-announcements-empty p { margin:0; font-size:13px; line-height:1.65; }
+.community-tools-actions { display:flex; flex-wrap:wrap; gap:10px; padding:0 18px 20px; }
+.community-tools-actions details { flex:1 1 230px; border:1px solid #DCE7EE; border-radius:12px; background:#F8FBFD; }
+.community-tools-actions summary { cursor:pointer; padding:14px 16px; color:#102B46; font-size:13px; font-weight:650; }
+.community-tools-actions form { padding:4px 16px 16px; }
+
+.problem-report-panel { margin-top:28px; padding:26px; border:1px solid #D8E5ED; border-radius:18px; background:white; box-shadow:0 12px 36px #102B460A; }
+.problem-report-panel>p { margin:0 0 22px; color:#4B6278; font-size:14px; line-height:1.75; }
+.problem-report-form { display:grid; gap:18px; }
+.problem-report-form label,.admin-problem-report label { display:grid; gap:7px; color:#102B46; font-size:13px; font-weight:600; }
+.problem-report-form :is(input,select,textarea),.admin-problem-report select { width:100%; min-height:44px; padding:10px 12px; border:1px solid #C3D5E1; border-radius:10px; background:#fff; color:#102B46; font:inherit; font-weight:400; }
+.problem-report-form textarea { resize:vertical; }
+.problem-report-success { margin:0; padding:14px 16px; border:1px solid #BFE6DC; border-radius:11px; background:#E8FAF6; color:#155D59; }
+.admin-problem-reports { display:grid; gap:18px; }
+.admin-problem-report { padding:20px; border:1px solid #D8E5ED; border-radius:14px; background:white; }
+.admin-problem-report>header { display:flex; justify-content:space-between; gap:12px; align-items:center; color:#637A8D; font-size:11px; }
+.admin-problem-report h2 { margin:12px 0 6px; color:#102B46; font-size:17px; font-weight:700; }
+.problem-report-meta { color:#637A8D; font-size:12px; overflow-wrap:anywhere; }
+.admin-problem-description { margin:14px 0; color:#334F67; font-size:14px; line-height:1.7; white-space:pre-wrap; overflow-wrap:anywhere; }
+.problem-status { padding:5px 9px; border-radius:99px; font-weight:650; }
+.problem-status-new { color:#8B4B00; background:#FFF4D6; }
+.problem-status-in_progress { color:#1E5078; background:#E7F2FA; }
+.problem-status-resolved { color:#155D59; background:#E8FAF6; }
+.problem-report-empty { padding:24px; text-align:center; color:#637A8D; }
+@media(max-width:600px) { .problem-report-panel { padding:19px; } .community-announcements-heading { padding:20px; } .community-announcements-list { padding:12px; } .community-announcement-card { padding:15px; } }

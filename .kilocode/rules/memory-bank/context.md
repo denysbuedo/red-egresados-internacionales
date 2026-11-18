@@ -321,3 +321,12 @@ Red social para egresados internacionales de la educación superior cubana. Perm
 
 - Desplegado 3eae9fd con build Linux y verificación SHA256 de los cinco archivos runtime; servicio activo NRestarts=0 y timer de correo activo. Respaldo /var/backups/red-egresados/pre-header-20261030. Sin migraciones ni cambios de datos/configuración privada.
 - HTTPS real: geometría comprobada en las 16 vistas a1440/390 y navegación móvil funcional. Se detectan avisos React418 de hidratación de texto en contenido existente (no reproducidos con la base aislada), separados de la validación de cabecera; no afirmar ausencia de erroresJS en producción.
+
+
+## Reportes, avisos comunitarios y actualización de notificaciones — 2026-11-18
+
+- Se deja fuera de alcance el registro/verificación por correo y acceso, a petición del operador; estado actual sin cambios.
+- Avisos en el detalle de comunidad rediseñados como tarjetas editoriales con fecha, mejor jerarquía, estado vacío claro y acciones de moderación separadas. Invitaciones/avisos conservan permisos y entrega existente.
+- Campana obtiene datos sin caché al completar carga de sesión y al abrir, refresca al volver a pestaña/foco, responde al evento `conecta:notifications-changed` y sondea cada 10 segundos solo con documento visible. API GET envía `Cache-Control: private, no-store`.
+- Nueva página pública `/reportar-problema` y ayuda/contacto. API valida origen, campos y límite de 8 reportes/hora/IP; acepta visitantes o usuarios identificados, guarda referencia a página y datos de contacto. Notifica internamente a administradores. `/admin/reportes` permite solo admin listar y marcar nuevo/en revisión/resuelto. Migración aditiva `0021_problem_reports`; tabla incluida en allowlist del reset de prueba.
+- Verificación local final: Next.js y eslint-config-next 16.4.6 por corrección de seguridad, con `experimental.agentUpgrade="security"`; instalación limpia, typecheck, `npm test` (25), lint (cero errores; 41 advertencias), build y 32 pruebas HTTP pasan. La prueba de migraciones también verifica la tabla nueva. Despliegue en producción en curso; registro/acceso siguen fuera de alcance.

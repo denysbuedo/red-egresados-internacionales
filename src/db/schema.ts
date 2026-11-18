@@ -186,7 +186,7 @@ export const postComments = sqliteTable("post_comments", {
 export const notifications = sqliteTable("notifications", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  type: text("type", { enum: ["connection_accepted", "post_commented", "comment_replied"] }).notNull(),
+  type: text("type", { enum: ["connection_accepted", "post_commented", "comment_replied", "problem_report"] }).notNull(),
   message: text("message").notNull(),
   link: text("link"),
   read: integer("read").default(0),
@@ -296,3 +296,9 @@ export const notificationWorkerState=sqliteTable("notification_worker_state",{ke
 export const passwordResetTokens=sqliteTable("password_reset_tokens",{tokenHash:text("token_hash").primaryKey(),userId:integer("user_id").notNull().references(()=>users.id,{onDelete:"cascade"}),expiresAt:integer("expires_at").notNull(),createdAt:integer("created_at").notNull()});
 export const communityInvitations=sqliteTable("community_invitations",{id:integer("id").primaryKey({autoIncrement:true}),groupId:integer("group_id").notNull().references(()=>groups.id,{onDelete:"cascade"}),userId:integer("user_id").notNull().references(()=>users.id,{onDelete:"cascade"}),invitedBy:integer("invited_by").references(()=>users.id,{onDelete:"set null"}),status:text("status").notNull().default("pending"),createdAt:integer("created_at").notNull()});
 export const communityAnnouncements=sqliteTable("community_announcements",{id:integer("id").primaryKey({autoIncrement:true}),groupId:integer("group_id").notNull().references(()=>groups.id,{onDelete:"cascade"}),authorId:integer("author_id").references(()=>users.id,{onDelete:"set null"}),title:text("title").notNull(),content:text("content").notNull(),createdAt:integer("created_at").notNull()});
+
+export const problemReports=sqliteTable("problem_reports",{
+ id:integer("id").primaryKey({autoIncrement:true}),userId:integer("user_id").references(()=>users.id,{onDelete:"set null"}),
+ category:text("category").notNull(),subject:text("subject").notNull(),description:text("description").notNull(),
+ contactEmail:text("contact_email"),pageUrl:text("page_url"),status:text("status").notNull().default("new"),createdAt:integer("created_at").notNull(),
+});
